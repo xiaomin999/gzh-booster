@@ -96,6 +96,39 @@
   .result{background:#fbfafd;border:1px dashed var(--line);border-radius:11px;padding:14px;margin-top:12px;white-space:pre-wrap;font-size:13px}
   .result h4{margin:0 0 8px;font-size:13px;color:var(--muted)}
   .meter{height:8px;background:#eee;border-radius:6px;overflow:hidden;margin:6px 0}
+  /* review report */
+  .review-report{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.04);margin-top:14px;overflow:hidden}
+  .review-scorehead{background:linear-gradient(135deg,#f3e8ff 0%,#fff 100%);padding:18px 16px;display:flex;align-items:center;gap:18px;border-bottom:1px solid var(--line)}
+  .review-bigscore{text-align:center;min-width:72px}
+  .review-bigscore .num{font-size:38px;font-weight:800;color:var(--accent);line-height:1}
+  .review-bigscore .lab{font-size:11px;color:var(--muted);margin-top:4px}
+  .review-scoremeta{flex:1}
+  .review-meter{height:10px;background:#e9e4f0;border-radius:7px;overflow:hidden;margin-bottom:10px}
+  .review-meter>i{display:block;height:100%;background:linear-gradient(90deg,#a855f7,#7c3aed);border-radius:7px}
+  .review-dims{display:flex;flex-wrap:wrap;gap:8px}
+  .review-dim{background:#fff;border:1px solid #e9e4f0;border-radius:8px;padding:5px 10px;font-size:12px;color:#4b5563}
+  .review-dim b{color:var(--accent);margin-left:4px}
+  .review-body{padding:16px;font-size:13.5px;line-height:1.75;color:#374151}
+  .review-body h3,.review-body h4{font-size:15px;font-weight:700;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+  .review-body h3:first-child,.review-body h4:first-child{margin-top:0}
+  .review-body p{margin:0 0 10px}
+  .review-body ul,.review-body ol{margin:0 0 12px;padding-left:20px}
+  .review-body li{margin:6px 0}
+  .review-body strong{color:#111827}
+  .review-body hr{border:none;border-top:1px solid var(--line);margin:16px 0}
+  .review-body blockquote{border-left:3px solid var(--line);margin:10px 0;padding:8px 12px;background:#f9fafb;color:#4b5563;border-radius:0 8px 8px 0}
+  .review-section{position:relative;padding-left:12px;margin-bottom:16px}
+  .review-section::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:4px;border-radius:3px;background:var(--line)}
+  .review-section.good::before{background:#22c55e}
+  .review-section.problem::before{background:#f59e0b}
+  .review-section.todo::before{background:#a855f7}
+  .review-section.next::before{background:#3b82f6}
+  .review-section h3,.review-section h4{margin-top:0}
+  @media (max-width:760px){
+    .review-scorehead{flex-direction:column;align-items:flex-start;gap:12px}
+    .review-dims{gap:6px}
+    .review-dim{font-size:11px;padding:4px 8px}
+  }
   .meter > i{display:block;height:100%;background:var(--green)}
   .task{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
   .task.done{opacity:.55}
@@ -556,6 +589,11 @@
 
   /* ===== 模块5 复盘 ===== */
   $$("#review-scores input").forEach(r=>r.addEventListener("input",()=>{ r.parentNode.querySelector(".val").textContent=r.value; }));
+  function reviewScoreHead(avg,scores){
+    const pct=Math.round(avg/5*100);
+    const dim=scores.map(s=>'<span class="review-dim">'+esc(s.k)+'<b>'+s.v+'/5</b></span>').join('');
+    return '<div class="review-scorehead"><div class="review-bigscore"><div class="num">'+avg+'</div><div class="lab">/5 平均分</div></div><div class="review-scoremeta"><div class="review-meter"><i style="width:'+pct+'%"></i></div><div class="review-dims">'+dim+'</div></div></div>';
+  }
   $("#review-gen").onclick=async()=>{
     const text=$("#review-text").value.trim();
     if(!text){ toast("先贴全文"); return; }
@@ -565,16 +603,14 @@
     if(AI.ok()){
       box.innerHTML='<div class="result">AI 复盘生成中…</div>';
       try{
-        const sys="你是温和的稿件复盘助手。请基于用户文章做复盘：1)优点 2)现存具体问题 3)逐条可落地修改建议(哪里删/补) 4)2个迭代方向。语气鼓励、不考核数据，只看是否表达出作者自己。";
+        const sys="你是温和的稿件复盘助手。请基于用户文章做复盘，按下面 markdown 结构输出（标题前带 emoji 更佳）：\n\n## 一、这篇文章最打动人的优点\n1. **小标题**\n具体说明…\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **小标题**\n具体说明…\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …\n\n语气鼓励、不考核数据，只看是否表达出作者自己。";
         const out=await AI.chat(sys, text);
-        box.innerHTML='<div class="result"><h4>平均分 '+avg+'/5 ｜ AI 复盘</h4>'+esc(out)+'</div>';
+        box.innerHTML='<div class="review-report">'+reviewScoreHead(avg,scores)+'<div class="review-body">'+renderReviewBody(md2html(out))+'</div></div>';
         return;
       }catch(e){ box.innerHTML='<div class="result">AI 失败（'+e.message+'），改用模板：</div>'; }
     }
-    let r="【平均分 "+avg+"/5】\n";
-    scores.forEach(s=>{ r+="· "+s.k+"："+s.v+"/5\n"; });
-    r+="\n优点：\n（写下这篇里你最满意、最像自己的部分）\n\n现存问题：\n（哪段啰嗦？哪段没讲清？哪里像在说教？）\n\n可落地建议：\n- 删：…\n- 补：…\n\n迭代方向：\n1. …\n2. …";
-    box.innerHTML='<div class="result"><h4>复盘模板（按上面填空）</h4>'+esc(r)+'</div>';
+    let r="## 一、这篇文章最打动人的优点\n1. **真实感**\n（写下这篇里你最满意、最像自己的部分）\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **节奏/结构**\n（哪段啰嗦？哪段没讲清？哪里像在说教？）\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …";
+    box.innerHTML='<div class="review-report">'+reviewScoreHead(avg,scores)+'<div class="review-body">'+renderReviewBody(md2html(r))+'</div></div>';
   };
 
   /* ===== 模块6 督促 ===== */
@@ -730,6 +766,72 @@
   }
 
   function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+  function md2html(s){
+    // 轻量 markdown 解析：标题、粗体、列表、分隔线、引用
+    let html=esc(s).replace(/\r/g,"");
+    // 引用
+    html=html.replace(/^>(.+)$/gm,'<blockquote>$1</blockquote>');
+    // 分隔线
+    html=html.replace(/^\s*-{3,}\s*$/gm,'<hr>');
+    // 标题
+    html=html.replace(/^###\s+(.+)$/gm,'<h4>$1</h4>');
+    html=html.replace(/^##\s+(.+)$/gm,'<h3>$1</h3>');
+    html=html.replace(/^#\s+(.+)$/gm,'<h2>$1</h2>');
+    // 粗体
+    html=html.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+    // 无序列表
+    html=html.replace(/^(\s*)[-*]\s+(.+)$/gm,(_,sp,t)=>'<li data-indent="'+sp.length+'">'+t+'</li>');
+    // 有序列表
+    html=html.replace(/^(\s*)\d+\.\s+(.+)$/gm,(_,sp,t)=>'<li data-indent="'+sp.length+'" data-ol="1">'+t+'</li>');
+    // 合并 li 为 ul/ol
+    const lines=html.split("\n"); let out=[]; let list=null; let listType=null;
+    const flushList=()=>{ if(list){ out.push(listType==='ol'?'<ol>'+list+'</ol>':'<ul>'+list+'</ul>'); list=null; listType=null; } };
+    for(const line of lines){
+      if(line.startsWith('<li')){
+        const isOl=line.includes('data-ol="1"');
+        const lt=isOl?'ol':'ul';
+        if(listType && listType!==lt){ flushList(); }
+        listType=lt; list=(list||'')+line.replace(/ data-(indent|ol)="\d+"/g,'')+'\n';
+      }else{
+        flushList();
+        if(line.trim()) out.push(line);
+      }
+    }
+    flushList();
+    html=out.join("\n");
+    // 段落：非块级元素包 p
+    html=html.split(/\n{2,}/).map(b=>{
+      b=b.trim(); if(!b) return '';
+      if(/^<(h\d|ul|ol|blockquote|hr)/.test(b)) return b;
+      return '<p>'+b.replace(/\n/g,'<br>')+'</p>';
+    }).join('\n');
+    return html;
+  }
+  function renderReviewBody(html){
+    // 根据标题关键词给每个区块上色
+    const temp=document.createElement('div'); temp.innerHTML=html;
+    const children=Array.from(temp.children);
+    const sections=[]; let buf=[];
+    const flush=()=>{ if(buf.length) sections.push(buf); buf=[]; };
+    for(const c of children){
+      if(/^H[123456]$/i.test(c.tagName)) flush();
+      buf.push(c);
+    }
+    flush();
+    const out=document.createElement('div');
+    sections.forEach(sec=>{
+      const head=sec[0]; const text=(head?head.textContent:'').toLowerCase();
+      let cls='review-section';
+      if(/优点|亮点|最打动|值得保留/.test(text)) cls+=' good';
+      else if(/问题|不足|可优化|缺陷|bug|槽点/.test(text)) cls+=' problem';
+      else if(/建议|修改|落地|怎么改|删|补/.test(text)) cls+=' todo';
+      else if(/方向|迭代|下一步|升级|延伸/.test(text)) cls+=' next';
+      const wrap=document.createElement('div'); wrap.className=cls;
+      sec.forEach(n=>wrap.appendChild(n));
+      out.appendChild(wrap);
+    });
+    return out.innerHTML;
+  }
 })();
 </script>
 </body>
