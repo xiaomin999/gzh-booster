@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公众号全栈助推助手</title>
+<meta name="theme-color" content="#9b6fd6">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --bg:#f5f6f8;
+    --panel:#ffffff;
+    --ink:#1f2329;
+    --muted:#6b7280;
+    --line:#e8eaf0;
+    --accent:#9b6fd6;
+    --accent-soft:#f3ecfb;
+    --green:#3aa675;
+    --amber:#e0a73c;
+    --red:#d9697a;
+    --radius:14px;
+    --shadow:0 1px 3px rgba(20,20,40,.06),0 6px 18px rgba(20,20,40,.05);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;
+  }
+  .wrap{display:flex;min-height:100vh}
+  /* sidebar */
+  .sidebar{
+    width:190px;background:var(--panel);border-right:1px solid var(--line);
+    padding:18px 12px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;
+  }
+  .brand{font-weight:700;font-size:15px;padding:6px 10px 14px;letter-spacing:.5px}
+  .brand small{display:block;color:var(--muted);font-weight:400;font-size:11px;margin-top:3px}
+  .nav-btn{
+    text-align:left;border:none;background:transparent;color:var(--ink);
+    padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13.5px;
+    display:flex;align-items:center;gap:9px;width:100%;
+  }
+  .nav-btn:hover{background:var(--accent-soft)}
+  .nav-btn.active{background:var(--accent);color:#fff}
+  .nav-btn .em{font-size:16px}
+  .spacer{flex:1}
+  .nav-btn.set{color:var(--muted);font-size:12px}
+  /* main */
+  .main{flex:1;overflow:auto;padding:22px 28px 60px}
+  .topbar{
+    background:var(--accent-soft);border:1px solid #ecdff7;border-radius:var(--radius);
+    padding:12px 16px;margin-bottom:20px;font-size:12.5px;color:#5a5470;
+  }
+  .topbar b{color:var(--accent)}
+  .topbar .tags{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px}
+  .topbar .tags span{background:#fff;border:1px solid #e6d8f5;color:#7a5aa8;padding:2px 9px;border-radius:20px;font-size:11px}
+  h2{font-size:19px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 18px;font-size:12.5px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+  .card h3{margin:0 0 12px;font-size:15px}
+  label{display:block;font-size:12px;color:var(--muted);margin:12px 0 5px}
+  input,textarea,select{
+    width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;
+    font-size:13.5px;font-family:inherit;background:#fff;color:var(--ink);
+  }
+  textarea{resize:vertical;min-height:90px;line-height:1.6}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>*{flex:1;min-width:160px}
+  button{
+    background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:9px;
+    cursor:pointer;font-size:13px;font-family:inherit;
+  }
+  button.ghost{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+  button.soft{background:var(--accent-soft);color:#7a5aa8}
+  button.sm{padding:5px 10px;font-size:12px}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;border:1px solid var(--line)}
+  .pill.b{background:#fdeef0;color:#c0566a;border-color:#f3d6db}
+  .pill.g{background:#eafaf2;color:#2f9c6d;border-color:#cfeede}
+  .pill.w{background:#eef2fb;color:#5b73b5;border-color:#d6e0f5}
+  .topic{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:10px}
+  .topic .t-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .topic .t-title{font-weight:600}
+  .topic .t-angle{color:var(--muted);font-size:12.5px;margin-top:6px}
+  .topic .t-meta{color:#9aa0ab;font-size:11px;margin-top:6px}
+  .topic .t-ops{display:flex;gap:6px}
+  .topic .t-ops button{padding:4px 9px;font-size:11px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+  th{background:#fafbfc;color:var(--muted);font-weight:600;font-size:12px}
+  .legend{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .score{display:flex;align-items:center;gap:10px;margin:10px 0}
+  .score input[type=range]{flex:1}
+  .score .val{width:26px;text-align:center;font-weight:700;color:var(--accent)}
+  .result{background:#fbfafd;border:1px dashed var(--line);border-radius:11px;padding:14px;margin-top:12px;white-space:pre-wrap;font-size:13px}
+  .result h4{margin:0 0 8px;font-size:13px;color:var(--muted)}
+  .meter{height:8px;background:#eee;border-radius:6px;overflow:hidden;margin:6px 0}
+  .meter > i{display:block;height:100%;background:var(--green)}
+  .task{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+  .task.done{opacity:.55}
+  .task.done .t-text{text-decoration:line-through}
+  .task .t-text{flex:1}
+  .small{font-size:12px;color:var(--muted)}
+  .hint{background:#fff8ec;border:1px solid #f3e2bf;color:#8a6a2b;padding:11px 13px;border-radius:10px;font-size:12.5px;margin-top:10px}
+  .ok{color:var(--green);font-weight:600}
+  .empty{color:var(--muted);font-size:13px;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:10px}
+  .kv{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .kv label{margin:0;min-width:90px}
+  .copy{margin-left:auto}
+  .chip{background:var(--accent-soft);color:#7a5aa8;border-radius:8px;padding:8px 10px;font-size:12.5px;margin:6px 0;cursor:pointer;border:1px solid #ece0f6}
+  .chip:hover{background:#ece0f6}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f2329;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1}
+
+  /* 手机端适配：侧边栏变顶部横向导航，表格可横向滚动 */
+  @media (max-width:760px){
+    .wrap{flex-direction:column}
+    .sidebar{
+      width:100%;flex-direction:row;align-items:center;gap:6px;
+      overflow-x:auto;padding:8px 10px;border-right:none;border-bottom:1px solid var(--line);
+      position:sticky;top:0;z-index:20;background:var(--panel);
+    }
+    .sidebar .brand{display:none}
+    .spacer{display:none}
+    .nav-btn{width:auto;flex:0 0 auto;white-space:nowrap;padding:8px 12px}
+    .main{padding:16px 14px 54px}
+    .row>*{min-width:100%}
+    .topbar{font-size:11.5px}
+    .table-scroll{overflow-x:auto}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="sidebar">
+    <div class="brand">📚 公众号助推助手<small>随笔号 · 不催更 · 松弛写</small></div>
+    <button class="nav-btn active" data-tab="plan"><span class="em">📌</span>定位&amp;排期</button>
+    <button class="nav-btn" data-tab="topics"><span class="em">💡</span>选题库</button>
+    <button class="nav-btn" data-tab="write"><span class="em">✍️</span>写稿</button>
+    <button class="nav-btn" data-tab="title"><span class="em">🏷️</span>标题摘要</button>
+    <button class="nav-btn" data-tab="review"><span class="em">🔍</span>稿件复盘</button>
+    <button class="nav-btn" data-tab="push"><span class="em">🚀</span>行动督促</button>
+    <button class="nav-btn" data-tab="dissect"><span class="em">📖</span>范文拆解</button>
+    <div class="spacer"></div>
+    <button class="nav-btn set" data-tab="settings"><span class="em">⚙️</span>AI 设置</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div><b>固定设定</b>｜纯粹自我记录随笔号 · 写给自己 · 随缘遇见同频读者 · 不为涨粉变现</div>
+      <div class="tags">
+        <span>📝 生活成长碎记</span><span>🔧 折腾手记</span><span>✨ 片刻随感</span>
+        <span>灵感驱动 · 允许断更 · 不设 KPI</span>
+      </div>
+    </div>
+
+    <!-- 模块1 定位&排期 -->
+    <section id="plan" class="tab">
+      <h2>📌 账号定位 &amp; 栏目排期</h2>
+      <p class="sub">账号定位已固定（随笔号），这里只做排期表。任务别排太满，防完不成摆烂。</p>
+      <div class="card">
+        <h3>我的栏目</h3>
+        <div class="row">
+          <div><label>📝 生活成长碎记</label><div class="small">个人生活、成长中的真实片段与感悟</div></div>
+          <div><label>🔧 折腾手记</label><div class="small">折腾的事：Python、理财、工具、副业实验</div></div>
+          <div><label>✨ 片刻随感</label><div class="small">情绪、碎片念头、几百字也能发</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>月度排期表</h3>
+        <div class="legend">填写你「想发」的内容，留空代表这周休息，完全可以。</div>
+        <div class="row">
+          <div><label>日期 / 周次</label><input id="sch-date" placeholder="如 8月第3周 / 0815"></div>
+          <div><label>栏目</label>
+            <select id="sch-col">
+              <option value="📝 生活成长碎记">📝 生活成长碎记</option>
+              <option value="🔧 折腾手记">🔧 折腾手记</option>
+              <option value="✨ 片刻随感">✨ 片刻随感</option>
+              <option value="（休息）">（休息 / 不更）</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div><label>主题 / 梗概</label><input id="sch-topic" placeholder="这篇大概写什么"></div>
+          <div><label>形式</label>
+            <select id="sch-form">
+              <option>深度长文</option><option>轻量随笔</option><option>超短碎记</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row"><button id="sch-add">添加到排期</button><button class="ghost" id="sch-clear">清空排期</button></div>
+        <div class="table-scroll" style="margin-top:16px">
+          <table id="sch-table">
+            <thead><tr><th style="width:130px">日期/周次</th><th style="width:160px">栏目</th><th>主题</th><th style="width:90px">形式</th><th style="width:60px"></th></tr></thead>
+            <tbody id="sch-body"></tbody>
+          </table>
+          <div id="sch-empty" class="empty" style="display:none">还没有排期，先加一条（哪怕是「休息」也可以）。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 模块2 选题库 -->
+    <section id="topics" class="tab" style="display:none">
+      <h2>💡 选题库</h2>
+      <p class="sub">每组 4 个的节奏：爆款(少) / 干货 / 随笔(多)。随手把碎片念头丢进来，别让它溜走。</p>
+      <div class="card">
+        <h3>添加 / 从碎片转选题</h3>
+        <label>碎片想法 / 日常感悟 / 网页笔记（可多行，每段一个）</label>
+        <textarea id="frag-input" placeholder="例如：今天又被自己拖延气到了 / 减脂第7天突然不想动 / 看了篇讲多巴胺的文章很有触动"></textarea>
+        <div class="btn-row">
+          <button id="frag-to-topic">转成备选选题并入库</button>
+          <span class="small" id="frag-tip">未配置 AI 时，直接把碎片存为「待打磨」选题；配置 AI 后可一键提炼标题+角度。</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>选题清单</h3>
+        <div class="legend">
+          <span class="pill b">流量爆款</span>
+          <span class="pill g">专业干货</span>
+          <span class="pill w">低压力随笔</span>
+        </div>
+        <div class="btn-row">
+          <button class="ghost sm" id="topic-export">导出 CSV（可粘 Excel）</button>
+          <button class="ghost sm" id="topic-copy">复制为表格</button>
+        </div>
+        <div id="topic-list" style="margin-top:14px"></div>
+        <div id="topic-empty" class="empty" style="display:none">选题库空空，先把上面的碎片丢进来，或手动加一条。</div>
+      </div>
+    </section>
+
+    <!-- 模块3 写稿 -->
+    <section id="write" class="tab" style="display:none">
+      <h2>✍️ 推文初稿</h2>
+      <p class="sub">松弛口语、像写日记。写完可导出 Prompt（拿去给我或任意 AI 续写 / 润色）。</p>
+      <div class="card">
+        <div class="row">
+          <div><label>标题（可空）</label><input id="draft-title" placeholder="先不取也行"></div>
+          <div><label>栏目</label>
+            <select id="draft-col">
+              <option>📝 .生活成长碎记</option>
+              <option>🔧 折腾手记</option>
+              <option>✨ 片刻随感</option>
+            </select>
+          </div>
+          <div><label>文风</label>
+            <select id="draft-style">
+              <option>松弛口语（默认）</option>
+              <option>走心</option>
+              <option>干货犀利</option>
+            </select>
+          </div>
+        </div>
+        <label>正文 / 提纲 / 碎片大纲</label>
+        <textarea id="draft-body" style="min-height:200px" placeholder="直接写，或先写几句要点，再用「生成写作 Prompt」让 AI 扩成初稿。"></textarea>
+        <div class="btn-row">
+          <button id="draft-save">保存草稿</button>
+          <button class="ghost" id="draft-prompt">生成写作 Prompt</button>
+          <button class="soft" id="draft-list-btn">我的草稿</button>
+        </div>
+        <div id="draft-list" style="margin-top:12px;display:none"></div>
+      </div>
+    </section>
+
+    <!-- 模块4 标题摘要 -->
+    <section id="title" class="tab" style="display:none">
+      <h2>🏷️ 标题 / 摘要 / 封面短句</h2>
+      <p class="sub">给主题即可出 10 条标题（悬念/干货/共情）× 2 摘要 × 4 slogan。配了 AI 会更贴合。</p>
+      <div class="card">
+        <label>主题 / 核心词</label>
+        <input id="title-theme" placeholder="如：拖延、减脂、Python入门、职场内耗">
+        <label>正文片段（可选，配了 AI 才有用）</label>
+        <textarea id="title-text" placeholder="贴一点你的草稿或想法，AI 能据此写得更准"></textarea>
+        <div class="btn-row">
+          <button id="title-gen">生成</button>
+          <span class="small">离线模板默认可用；配置 AI 后点「生成」会优先调用 AI。</span>
+        </div>
+        <div id="title-result" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- 模块5 复盘 -->
+    <section id="review" class="tab" style="display:none">
+      <h2>🔍 稿件复盘</h2>
+      <p class="sub">只从「是否表达出你自己」复盘，不考核阅读数据。打分 + 可落地修改建议。</p>
+      <div class="card">
+        <label>粘贴推文全文</label>
+        <textarea id="review-text" style="min-height:160px" placeholder="把写好的推文贴进来"></textarea>
+        <div id="review-scores">
+          <div class="score"><span class="small" style="min-width:110px">开篇吸引力</span><input type="range" min="1" max="5" value="3" data-k="开篇吸引力"><span class="val">3</span></div>
+          <div class="score"><span class="small" style="min-width:110px">逻辑流畅度</span><input type="range" min="1" max="5" value="3" data-k="逻辑流畅度"><span class="val">3</span></div>
+          <div class="score"><span class="small" style="min-width:110px">可读性</span><input type="range" min="1" max="5" value="3" data-k="可读性"><span class="val">3</span></div>
+          <div class="score"><span class="small" style="min-width:110px">结尾互动性</span><input type="range" min="1" max="5" value="3" data-k="结尾互动性"><span class="val">3</span></div>
+        </div>
+        <div class="btn-row"><button id="review-gen">生成复盘</button></div>
+        <div id="review-result" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- 模块6 督促 -->
+    <section id="push" class="tab" style="display:none">
+      <h2>🚀 行动督促</h2>
+      <p class="sub">对抗拖延：只拆微小任务，不催不焦虑。没灵感就接纳，先把念头存选题。</p>
+      <div class="card">
+        <h3>本周微小行动计划</h3>
+        <div class="row">
+          <div><label>一个极小任务</label><input id="task-input" placeholder="如：整理5个选题 / 写300字开头 / 列3个标题"></div>
+        </div>
+        <div class="btn-row"><button id="task-add">加入计划</button></div>
+        <div id="task-list" style="margin-top:14px"></div>
+        <div id="task-meter" class="meter" style="display:none"><i id="task-bar"></i></div>
+        <div id="task-summary" class="small" style="margin-top:6px"></div>
+      </div>
+      <div class="card">
+        <h3>卡点记录</h3>
+        <label>本周卡在哪？（没选题 / 不敢写 / 没时间 / 没灵感）</label>
+        <textarea id="stuck-note" placeholder="随便写，不用过滤"></textarea>
+      </div>
+      <div class="hint">
+        🌿 想摆烂也很正常。两个不放弃的方案：<br>
+        ① <b>轻量化更新</b>——就写几百字随笔，发「片刻随感」也行；<br>
+        ② <b>延期调整排期</b>——把这条挪到下周，账号不灭，只是歇会儿。
+      </div>
+    </section>
+
+    <!-- 模块7 拆解 -->
+    <section id="dissect" class="tab" style="display:none">
+      <h2>📖 范文拆解</h2>
+      <p class="sub">贴一篇别人的文章，结构化拆给你看；只借鉴不抄袭。</p>
+      <div class="card">
+        <label>粘贴范文</label>
+        <textarea id="dissect-text" style="min-height:160px" placeholder="把想拆的文章贴进来"></textarea>
+        <div class="btn-row">
+          <button id="dissect-gen">生成拆解框架</button>
+          <span class="small">离线给框架引导；配 AI 可直接填内容。</span>
+        </div>
+        <div id="dissect-result" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- 设置 -->
+    <section id="settings" class="tab" style="display:none">
+      <h2>⚙️ AI 设置（可选）</h2>
+      <p class="sub">填了你自己的 OpenAI 兼容接口，标题/写稿/复盘/拆解会用 AI 生成；不填也能用模板与手动模式。</p>
+      <div class="card">
+        <div class="kv"><label>接口地址</label><input id="set-endpoint" placeholder="https://api.openai.com/v1/chat/completions"></div>
+        <div class="kv"><label>API Key</label><input id="set-key" type="password" placeholder="sk-..."></div>
+        <div class="kv"><label>模型</label><input id="set-model" placeholder="gpt-4o-mini"></div>
+        <div class="btn-row"><button id="set-save">保存</button><button class="ghost" id="set-test">测试连接</button></div>
+        <div id="set-status" class="small" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <h3>📡 多端同步（可选）</h3>
+        <p class="sub" style="margin-bottom:12px">把本地数据（选题/排期/草稿/任务）同步到一个同步服务，手机和电脑共用同一份。同一个「同步密钥」即同一份数据。</p>
+        <div class="kv"><label>同步服务地址</label><input id="sync-url" placeholder="http://10.19.3.191:3000 或 https://你的域名"></div>
+        <div class="kv"><label>同步密钥</label><input id="sync-key" placeholder="自定义一串，如 gzh-suchen-2026"></div>
+        <div class="btn-row">
+          <button id="sync-upload">↑ 上传到云端</button>
+          <button class="ghost" id="sync-download">↓ 从云端拉取</button>
+          <button class="soft" id="sync-export">导出备份文件</button>
+          <button class="soft" id="sync-import">导入备份文件</button>
+        </div>
+        <div id="sync-status" class="small" style="margin-top:10px"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="sync-file" accept=".json" style="display:none">
+
+<script>
+(function(){
+  "use strict";
+  const $ = (s,r=document)=>r.querySelector(s);
+  const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+  const store = {
+    get(k,def){ try{const v=localStorage.getItem("gzh_"+k);return v?JSON.parse(v):def;}catch(e){return def;} },
+    set(k,v){ localStorage.setItem("gzh_"+k, JSON.stringify(v)); }
+  };
+  function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),1800); }
+
+  /* ---- nav ---- */
+  $$(".nav-btn").forEach(b=>b.addEventListener("click",()=>{
+    $$(".nav-btn").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    const tab=b.dataset.tab;
+    $$(".tab").forEach(s=>s.style.display = (s.id===tab)?"block":"none");
+    location.hash = tab;
+  }));
+  if(location.hash){ const h=location.hash.slice(1); const btn=$(`.nav-btn[data-tab="${h}"]`); if(btn){btn.click();} }
+
+  /* ---- AI ---- */
+  const AI = {
+    cfg(){ return store.get("ai",{endpoint:"",key:"",model:""}); },
+    ok(){ const c=this.cfg(); return !!(c.endpoint&&c.key&&c.model); },
+    async chat(system, user){
+      const c=this.cfg();
+      const r=await fetch(c.endpoint,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+c.key},
+        body:JSON.stringify({model:c.model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.8})});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const j=await r.json();
+      return j.choices[0].message.content;
+    }
+  };
+
+  /* ===== 模块1 排期 ===== */
+  function renderSchedule(){
+    const data=store.get("schedule",[]);
+    const body=$("#sch-body"); const empty=$("#sch-empty");
+    body.innerHTML="";
+    if(!data.length){ empty.style.display="block"; return; }
+    empty.style.display="none";
+    data.forEach((it,i)=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${esc(it.date)}</td><td>${esc(it.col)}</td><td>${esc(it.topic)}</td><td>${esc(it.form)}</td><td><button class="ghost sm" data-i="${i}">删</button></td>`;
+      tr.querySelector("button").onclick=()=>{ const d=store.get("schedule",[]); d.splice(i,1); store.set("schedule",d); renderSchedule(); };
+      body.appendChild(tr);
+    });
+  }
+  $("#sch-add").onclick=()=>{
+    const date=$("#sch-date").value.trim(), col=$("#sch-col").value, topic=$("#sch-topic").value.trim(), form=$("#sch-form").value;
+    if(!date&&!topic){ toast("日期和主题至少填一个"); return; }
+    const d=store.get("schedule",[]); d.push({date,col,topic,form}); store.set("schedule",d);
+    $("#sch-date").value=""; $("#sch-topic").value=""; renderSchedule(); toast("已加入排期");
+  };
+  $("#sch-clear").onclick=()=>{ if(confirm("清空整张排期表？")){ store.set("schedule",[]); renderSchedule(); } };
+  renderSchedule();
+
+  /* ===== 模块2 选题库 ===== */
+  const GROUPS={b:"流量爆款",g:"专业干货",w:"低压力随笔"};
+  function renderTopics(){
+    const data=store.get("topics",[]);
+    const box=$("#topic-list"); const empty=$("#topic-empty");
+    box.innerHTML="";
+    if(!data.length){ empty.style.display="block"; return; }
+    empty.style.display="none";
+    data.forEach((t,i)=>{
+      const pillCls = t.group==="b"?"b":t.group==="g"?"g":"w";
+      const div=document.createElement("div"); div.className="topic";
+      div.innerHTML=`<div class="t-head"><div class="t-title">${esc(t.title)}</div>
+        <div class="t-ops"><span class="pill ${pillCls}">${GROUPS[t.group]}</span>
+        <button class="ghost sm" data-i="${i}">删</button></div></div>
+        <div class="t-angle">${esc(t.angle||"（无角度）")}</div>
+        <div class="t-meta">${esc(t.date)} · ${t.status||"待写"}</div>`;
+      div.querySelector("button").onclick=()=>{ const d=store.get("topics",[]); d.splice(i, 1); store.set("topics",d); renderTopics(); };
+      box.appendChild(div);
+    });
+  }
+  function addTopic(title, angle, group){
+    const d=store.get("topics",[]);
+    d.unshift({title, angle, group, status:"待写", date:new Date().toISOString().slice(0,10)});
+    store.set("topics",d); renderTopics();
+  }
+  $("#frag-to-topic").onclick=async()=>{
+    const txt=$("#frag-input").value.trim();
+    if(!txt){ toast("先写点碎片"); return; }
+    const lines=txt.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+    if(AI.ok()){
+      for(const frag of lines){
+        toast("AI 提炼中…");
+        try{
+          const sys="你是公众号随笔号助手。把用户的一句碎片想法，扩展成一个选题：返回JSON {title, angle}。title是吸引人的短文标题，angle是一句写作角度说明可写哪些内容。只返回JSON。";
+          const out=await AI.chat(sys, frag);
+          const m=out.match(/\{[\s\S]*\}/); const o=m?JSON.parse(m[0]):{title:frag,angle:"从碎片「"+frag+"」延展"};
+          addTopic(o.title||frag, (o.angle||"")+"（源：「"+frag+"」）", "w");
+        }catch(e){ addTopic("（待打磨）"+frag.slice(0,12), "从碎片「"+frag+"」延展", "w"); }
+      }
+      toast("已用 AI 提炼并入库");
+    }else{
+      lines.forEach(frag=>addTopic("（待打磨）"+frag.slice(0,14), "从碎片「"+frag+"」延展成选题", "w"));
+      toast("已入库 "+lines.length+" 条（待打磨）");
+    }
+    $("#frag-input").value="";
+  };
+  $("#topic-export").onclick=()=>{
+    const data=store.get("topics",[]);
+    if(!data.length){ toast("选题库为空"); return; }
+    let csv="组别,标题,写作角度,状态,创建日期\n";
+    data.forEach(t=>{ csv+=`"${csvEsc(GROUPS[t.group])}","${csvEsc(t.title)}","${csvEsc(t.angle||"")}","${csvEsc(t.status||"待写")}","${t.date}"\n`; });
+    download("选题库.csv", csv);
+  };
+  $("#topic-copy").onclick=()=>{
+    const data=store.get("topics",[]);
+    if(!data.length){ toast("选题库为空"); return; }
+    let t="组别\t标题\t写作角度\t状态\n";
+    data.forEach(x=>{ t+=`${GROUPS[x.group]}\t${x.title}\t${x.angle||""}\t${x.status||"待写"}\n`; });
+    navigator.clipboard.writeText(t).then(()=>toast("已复制，可直接粘进 Excel")).catch(()=>toast("复制失败"));
+  };
+  function csvEsc(s){ return String(s).replace(/"/g,'""'); }
+  function download(name, content){
+    const blob=new Blob(["\ufeff"+content],{type:"text/csv;charset=utf-8"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  }
+  renderTopics();
+
+  /* ===== 模块3 写稿 ===== */
+  function renderDrafts(){
+    const box=$("#draft-list"); const d=store.get("drafts",[]);
+    if(!d.length){ box.innerHTML='<div class="empty">还没有保存的草稿</div>'; return; }
+    box.innerHTML="";
+    d.forEach((dr,i)=>{
+      const div=document.createElement("div"); div.className="topic";
+      div.innerHTML=`<div class="t-head"><div class="t-title">${esc(dr.title||"（无标题）")}</div>
+        <div class="t-ops"><button class="ghost sm" data-load="${i}">载入</button><button class="ghost sm" data-del="${i}">删</button></div></div>
+        <div class="t-angle">${esc(dr.col)} · ${esc(dr.style)} · ${esc(dr.date)}</div>`;
+      div.querySelector("[data-load]").onclick=()=>{ $("#draft-title").value=dr.title||""; $("#draft-col").value=dr.col; $("#draft-style").value=dr.style; $("#draft-body").value=dr.body; toast("已载入"); };
+      div.querySelector("[data-del]").onclick=()=>{ const arr=store.get("drafts",[]); arr.splice(i,1); store.set("drafts",arr); renderDrafts(); };
+      box.appendChild(div);
+    });
+  }
+  $("#draft-save").onclick=()=>{
+    const title=$("#draft-title").value.trim(), col=$("#draft-col").value, style=$("#draft-style").value, body=$("#draft-body").value;
+    if(!body.trim()&&!title){ toast("标题和正文至少填一个"); return; }
+    const d=store.get("drafts",[]);
+    d.unshift({title,col,style,body,date:new Date().toISOString().slice(0,10)});
+    store.set("drafts",d); toast("草稿已保存");
+  };
+  $("#draft-list-btn").onclick=()=>{ const box=$("#draft-list"); box.style.display = box.style.display==="none"?"block":"none"; renderDrafts(); };
+  $("#draft-prompt").onclick=()=>{
+    const title=$("#draft-title").value.trim()||"（待定）", col=$("#draft-col").value, style=$("#draft-style").value, body=$("#draft-body").value;
+    const prompt=`【角色】公众号全栈助推助手\n【账号设定】纯粹自我记录随笔号，写给自己、随缘遇见同频读者；栏目：${col}；语气：${style}，真实松弛、允许碎碎念，拒绝硬造爆款。\n【本次任务】请根据以下素材，写一篇公众号初稿：钩子开头 + 分段正文（每段短、适配手机阅读）+ 结尾总结与互动引导。\n【素材/提纲】${body||"（用户只有主题，请帮忙构思）"}\n【要求】写完后附 3 个备选标题 + 1 条摘要，并标注这是 AI 初稿需人工润色。`;
+    navigator.clipboard.writeText(prompt).then(()=>toast("写作 Prompt 已复制，可发给任意 AI")).catch(()=>toast("复制失败"));
+  };
+
+  /* ===== 模块4 标题摘要 ===== */
+  $("#title-gen").onclick=async()=>{
+    const theme=$("#title-theme").value.trim();
+    if(!theme){ toast("先填主题"); return; }
+    const box=$("#title-result"); box.style.display="block";
+    if(AI.ok()){
+      box.innerHTML='<div class="result">AI 生成中…</div>';
+      try{
+        const sys="你是公众号标题党（良性版）助手。请根据用户给的主题和正文，输出：10条标题（悬念好奇型4/干货价值型3/共情故事型3）、2条摘要、4条封面slogan。用清晰分段，纯文本。";
+        const out=await AI.chat(sys, "主题："+theme+"\n正文片段："+($("#title-text").value.trim()||"（无）"));
+        box.innerHTML='<div class="result"><h4>AI 生成结果</h4>'+esc(out)+'</div>';
+        return;
+      }catch(e){ box.innerHTML='<div class="result">AI 调用失败（'+e.message+'），改用离线模板：</div>'; }
+    }
+    // offline templates
+    const t=theme;
+    const titles=[
+      "悬念好奇型：","▸ 为什么聊「"+t+"」的人，最后都悄悄变了？","▸ 「"+t+"」这件事，我观察了好久才敢说","▸ 关于"+t+"，你可能一直理解反了","▸ 我花了很久才接受的"+t+"真相",
+      "干货价值型：","▸ "+t+"的5个实操方法（新手也能用）","▸ 一文讲清"+t+"，建议收藏","▸ 做"+t+"前，先搞懂这3件事","▸ "+t+"避坑指南：我踩过的雷",
+      "共情故事型：","▸ 那天我卡在"+t+"上，才懂了这件事","▸ 写给也在为"+t+"挣扎的你","▸ 承认吧，"+t+"真的很磨人","▸ 不慌，我和"+t+"和解了"
+    ].join("\n");
+    const sum="摘要1：本文从个人体验出发，聊聊「"+t+"」的真实感受与可落地做法，不灌鸡汤。\n摘要2：关于「"+t+"」，我整理了几个踩过坑后的小经验，写给同样在摸索的你。";
+    const slog="slogan：慢慢来，比较快 ｜ 写给也在摸索的你 ｜ 不慌，先动一笔 ｜ 真实比完美重要";
+    box.innerHTML='<div class="result"><h4>离线模板（配置 AI 可更贴合）</h4>'+esc(titles)+"\n\n"+esc(sum)+"\n\n"+esc(slog)+'</div>';
+  };
+
+  /* ===== 模块5 复盘 ===== */
+  $$("#review-scores input").forEach(r=>r.addEventListener("input",()=>{ r.parentNode.querySelector(".val").textContent=r.value; }));
+  $("#review-gen").onclick=async()=>{
+    const text=$("#review-text").value.trim();
+    if(!text){ toast("先贴全文"); return; }
+    const box=$("#review-result"); box.style.display="block";
+    const scores=$$("#review-scores input").map(r=>({k:r.dataset.k,v:+r.value}));
+    const avg=(scores.reduce((a,b)=>a+b.v,0)/scores.length).toFixed(1);
+    if(AI.ok()){
+      box.innerHTML='<div class="result">AI 复盘生成中…</div>';
+      try{
+        const sys="你是温和的稿件复盘助手。请基于用户文章做复盘：1)优点 2)现存具体问题 3)逐条可落地修改建议(哪里删/补) 4)2个迭代方向。语气鼓励、不考核数据，只看是否表达出作者自己。";
+        const out=await AI.chat(sys, text);
+        box.innerHTML='<div class="result"><h4>平均分 '+avg+'/5 ｜ AI 复盘</h4>'+esc(out)+'</div>';
+        return;
+      }catch(e){ box.innerHTML='<div class="result">AI 失败（'+e.message+'），改用模板：</div>'; }
+    }
+    let r="【平均分 "+avg+"/5】\n";
+    scores.forEach(s=>{ r+="· "+s.k+"："+s.v+"/5\n"; });
+    r+="\n优点：\n（写下这篇里你最满意、最像自己的部分）\n\n现存问题：\n（哪段啰嗦？哪段没讲清？哪里像在说教？）\n\n可落地建议：\n- 删：…\n- 补：…\n\n迭代方向：\n1. …\n2. …";
+    box.innerHTML='<div class="result"><h4>复盘模板（按上面填空）</h4>'+esc(r)+'</div>';
+  };
+
+  /* ===== 模块6 督促 ===== */
+  function renderTasks(){
+    const data=store.get("tasks",[]);
+    const box=$("#task-list"); box.innerHTML="";
+    if(!data.length){ $("#task-meter").style.display="none"; $("#task-summary").textContent=""; return; }
+    data.forEach((t,i)=>{
+      const div=document.createElement("div"); div.className="task"+(t.done?" done":"");
+      div.innerHTML=`<input type="checkbox" ${t.done?"checked":""} data-i="${i}"><div class="t-text">${esc(t.text)}</div><button class="ghost sm" data-del="${i}">删</button>`;
+      div.querySelector("input").onchange=e=>{ const d=store.get("tasks",[]); d[i].done=e.target.checked; store.set("tasks",d); renderTasks(); };
+      div.querySelector("[data-del]").onclick=()=>{ const d=store.get("tasks",[]); d.splice(i,1); store.set("tasks",d); renderTasks(); };
+      box.appendChild(div);
+    });
+    const done=data.filter(t=>t.done).length;
+    $("#task-meter").style.display="block"; $("#task-bar").style.width=(done/data.length*100)+"%";
+    $("#task-summary").textContent=`完成 ${done}/${data.length} · 没完成也别急，下次调小一点`;
+  }
+  $("#task-add").onclick=()=>{
+    const v=$("#task-input").value.trim();
+    if(!v){ toast("先写个极小任务"); return; }
+    const d=store.get("tasks",[]); d.push({text:v,done:false});
+    store.set("tasks",d); $("#task-input").value=""; renderTasks(); toast("已加入，去动一笔");
+  };
+  renderTasks();
+  $("#stuck-note").value=store.get("stuck","")||"";
+  $("#stuck-note").addEventListener("blur",()=>store.set("stuck",$("#stuck-note").value));
+
+  /* ===== 模块7 拆解 ===== */
+  $("#dissect-gen").onclick=async()=>{
+    const text=$("#dissect-text").value.trim();
+    if(!text){ toast("先贴范文"); return; }
+    const box=$("#dissect-result"); box.style.display="block";
+    if(AI.ok()){
+      box.innerHTML='<div class="result">AI 拆解中…</div>';
+      try{
+        const sys="你是写作拆解助手。请拆解用户提供的文章：1)文章结构 2)开篇钩子 3)段落逻辑 4)结尾套路 5)标题思路 6)可借鉴点（强调只借鉴不抄袭）。";
+        const out=await AI.chat(sys, text);
+        box.innerHTML='<div class="result">'+esc(out)+'</div>';
+        return;
+      }catch(e){ box.innerHTML='<div class="result">AI 失败（'+e.message+'），改用框架：</div>'; }
+    }
+    const f=`【文章结构】\n（这篇分了几块？每块讲什么？）\n\n【开篇钩子】\n（第一句怎么抓住人的？）\n\n【段落逻辑】\n（每段之间怎么衔接？）\n\n【结尾套路】\n（怎么收尾、有没有引导互动？）\n\n【标题思路】\n（标题用了哪类：悬念/干货/共情？）\n\n【可借鉴点】\n（哪一处我能用在自己随笔里？只借鉴不抄袭）`;
+    box.innerHTML='<div class="result">'+esc(f)+'</div>';
+  };
+
+  /* ===== 设置 ===== */
+  (function(){ const c=AI.cfg(); $("#set-endpoint").value=c.endpoint||""; $("#set-key").value=c.key||""; $("#set-model").value=c.model||""; })();
+  $("#set-save").onclick=()=>{
+    store.set("ai",{endpoint:$("#set-endpoint").value.trim(),key:$("#set-key").value.trim(),model:$("#set-model").value.trim()});
+    $("#set-status").innerHTML='<span class="ok">已保存</span>';
+  };
+  $("#set-test").onclick=async()=>{
+    const c={endpoint:$("#set-endpoint").value.trim(),key:$("#set-key").value.trim(),model:$("#set-model").value.trim()};
+    if(!c.endpoint||!c.key||!c.model){ toast("三项都要填"); return; }
+    $("#set-status").textContent="测试中…";
+    try{ const out=await fetch(c.endpoint,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+c.key},body:JSON.stringify({model:c.model,messages:[{role:"user",content:"hi"}],max_tokens:5})});
+      $("#set-status").innerHTML = out.ok?'<span class="ok">连接成功</span>':'<span style="color:var(--red)">失败：HTTP '+out.status+'</span>';
+    }catch(e){ $("#set-status").innerHTML='<span style="color:var(--red)">失败：'+e.message+'</span>'; }
+  };
+
+  /* ===== 多端同步 ===== */
+  function collectAll(){
+    const out={};
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k&&k.indexOf("gzh_")===0){ try{ out[k]=JSON.parse(localStorage.getItem(k)); }catch(e){ out[k]=localStorage.getItem(k); } }
+    }
+    return out;
+  }
+  function applyAll(data){
+    const keys=[];
+    for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.indexOf("gzh_")===0) keys.push(k); }
+    keys.forEach(k=>localStorage.removeItem(k));
+    Object.keys(data).forEach(k=>{ if(k.indexOf("gzh_")===0) localStorage.setItem(k, JSON.stringify(data[k])); });
+  }
+  const SY={ url(){return $("#sync-url").value.trim();}, key(){return $("#sync-key").value.trim();} };
+  $("#sync-url").value=store.get("sync_url","")||""; $("#sync-key").value=store.get("sync_key","")||"";
+  $("#sync-url").addEventListener("blur",()=>store.set("sync_url",$("#sync-url").value.trim()));
+  $("#sync-key").addEventListener("blur",()=>store.set("sync_key",$("#sync-key").value.trim()));
+
+  async function syncUpload(){
+    const url=SY.url(), key=SY.key();
+    if(!url||!key){ $("#sync-status").innerHTML='<span style="color:var(--red)">先填同步地址和密钥</span>'; return; }
+    $("#sync-status").textContent="上传中…";
+    try{
+      const payload={updatedAt:Date.now(), data:collectAll()};
+      const r=await fetch(url.replace(/\/$/,"")+"/sync?key="+encodeURIComponent(key),{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      store.set("sync_last", Date.now());
+      $("#sync-status").innerHTML='<span class="ok">已上传 · '+new Date().toLocaleString()+'</span>';
+    }catch(e){ $("#sync-status").innerHTML='<span style="color:var(--red)">上传失败：'+e.message+'</span>'; }
+  }
+  async function syncDownload(){
+    const url=SY.url(), key=SY.key();
+    if(!url||!key){ $("#sync-status").innerHTML='<span style="color:var(--red)">先填同步地址和密钥</span>'; return; }
+    $("#sync-status").textContent="下载中…";
+    try{
+      const r=await fetch(url.replace(/\/$/,"")+"/sync?key="+encodeURIComponent(key));
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      const j=await r.json();
+      if(!j.data){ $("#sync-status").textContent="云端暂无数据"; return; }
+      applyAll(j.data);
+      renderSchedule(); renderTopics(); renderTasks();
+      $("#stuck-note").value=store.get("stuck","")||"";
+      $("#sync-status").innerHTML='<span class="ok">已拉取 · 云端更新于 '+new Date(j.updatedAt).toLocaleString()+'</span>';
+      toast("已从云端同步");
+    }catch(e){ $("#sync-status").innerHTML='<span style="color:var(--red)">拉取失败：'+e.message+'</span>'; }
+  }
+  $("#sync-upload").onclick=syncUpload;
+  $("#sync-download").onclick=syncDownload;
+  $("#sync-export").onclick=()=>{
+    const blob=new Blob([JSON.stringify({updatedAt:Date.now(),data:collectAll()},null,2)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="gzh-backup-"+new Date().toISOString().slice(0,10)+".json"; a.click();
+    $("#sync-status").textContent="已导出备份文件（本地兜底，可随时导入）";
+  };
+  $("#sync-import").onclick=()=>$("#sync-file").click();
+  $("#sync-file").onchange=async(e)=>{
+    const f=e.target.files[0]; if(!f) return;
+    try{
+      const text=await f.text(); const j=JSON.parse(text);
+      if(!j.data) throw new Error("文件格式不对");
+      applyAll(j.data); renderSchedule(); renderTopics(); renderTasks();
+      $("#stuck-note").value=store.get("stuck","")||"";
+      $("#sync-status").innerHTML='<span class="ok">已从备份文件导入</span>'; toast("已导入备份");
+    }catch(err){ $("#sync-status").innerHTML='<span style="color:var(--red)">导入失败：'+err.message+'</span>'; }
+    e.target.value="";
+  };
+
+  /* ===== PWA 注册 ===== */
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",()=>{ navigator.serviceWorker.register("service-worker.js").catch(()=>{}); });
+  }
+
+  function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+})();
+</script>
+</body>
+</html>
