@@ -343,6 +343,11 @@
       <h2>⚙️ AI 设置（可选）</h2>
       <p class="sub">填了你自己的 OpenAI 兼容接口，标题/写稿/复盘/拆解会用 AI 生成；不填也能用模板与手动模式。</p>
       <div class="card">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+          <span class="small" style="margin:0">服务商预设：</span>
+          <button class="ghost" style="padding:6px 12px" onclick="presetAI('qwen')">通义千问</button>
+          <button class="ghost" style="padding:6px 12px" onclick="presetAI('openai')">OpenAI</button>
+        </div>
         <div class="kv"><label>接口地址</label><input id="set-endpoint" placeholder="https://api.openai.com/v1/chat/completions"></div>
         <div class="kv"><label>API Key</label><input id="set-key" type="password" placeholder="sk-..."></div>
         <div class="kv"><label>模型</label><input id="set-model" placeholder="gpt-4o-mini"></div>
@@ -618,6 +623,11 @@
   };
 
   /* ===== 设置 ===== */
+  window.presetAI=function(p){
+    if(p==='qwen'){ $("#set-endpoint").value="https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"; $("#set-model").value="qwen-plus"; }
+    else if(p==='openai'){ $("#set-endpoint").value="https://api.openai.com/v1/chat/completions"; $("#set-model").value="gpt-4o-mini"; }
+    toast("已填入 "+(p==='qwen'?"通义千问":"OpenAI")+" 配置，请填写 API Key");
+  };
   (function(){ const c=AI.cfg(); $("#set-endpoint").value=c.endpoint||""; $("#set-key").value=c.key||""; $("#set-model").value=c.model||""; })();
   $("#set-save").onclick=()=>{
     store.set("ai",{endpoint:$("#set-endpoint").value.trim(),key:$("#set-key").value.trim(),model:$("#set-model").value.trim()});
