@@ -286,6 +286,7 @@
         <textarea id="draft-body" style="min-height:200px" placeholder="直接写，或先写几句要点，再用「生成写作 Prompt」让 AI 扩成初稿。"></textarea>
         <div class="btn-row">
           <button id="draft-save">保存草稿</button>
+          <button class="ghost" id="draft-gen-ai">AI 生成初稿</button>
           <button class="ghost" id="draft-prompt">生成写作 Prompt</button>
           <button class="soft" id="draft-list-btn">我的草稿</button>
         </div>
@@ -421,6 +422,10 @@
     location.hash = tab;
   }));
   if(location.hash){ const h=location.hash.slice(1); const btn=$(`.nav-btn[data-tab="${h}"]`); if(btn){btn.click();} }
+  function switchTab(tab){
+    const btn=$(`.nav-btn[data-tab="${tab}"]`);
+    if(btn) btn.click();
+  }
 
   /* ---- AI ---- */
   const AI = {
@@ -472,10 +477,12 @@
       const div=document.createElement("div"); div.className="topic";
       div.innerHTML=`<div class="t-head"><div class="t-title">${esc(t.title)}</div>
         <div class="t-ops"><span class="pill ${pillCls}">${GROUPS[t.group]}</span>
-        <button class="ghost sm" data-i="${i}">删</button></div></div>
+        <button class="soft sm" data-draft="${i}">生成初稿</button>
+        <button class="ghost sm" data-del="${i}">删</button></div></div>
         <div class="t-angle">${esc(t.angle||"（无角度）")}</div>
         <div class="t-meta">${esc(t.date)} · ${t.status||"待写"}</div>`;
-      div.querySelector("button").onclick=()=>{ const d=store.get("topics",[]); d.splice(i, 1); store.set("topics",d); renderTopics(); };
+      div.querySelector("[data-del]").onclick=()=>{ const d=store.get("topics",[]); d.splice(i, 1); store.set("topics",d); renderTopics(); };
+      div.querySelector("[data-draft]").onclick=()=>startDraftFromTopic(i);
       box.appendChild(div);
     });
   }
@@ -554,6 +561,37 @@
     const prompt=`【角色】公众号全栈助推助手\n【账号设定】纯粹自我记录随笔号，写给自己、随缘遇见同频读者；栏目：${col}；语气：${style}，真实松弛、允许碎碎念，拒绝硬造爆款。\n【本次任务】请根据以下素材，写一篇公众号初稿：钩子开头 + 分段正文（每段短、适配手机阅读）+ 结尾总结与互动引导。\n【素材/提纲】${body||"（用户只有主题，请帮忙构思）"}\n【要求】写完后附 3 个备选标题 + 1 条摘要，并标注这是 AI 初稿需人工润色。`;
     navigator.clipboard.writeText(prompt).then(()=>toast("写作 Prompt 已复制，可发给任意 AI")).catch(()=>toast("复制失败"));
   };
+
+  async function generateAIDraft(){
+    const title=$("#draft-title").value.trim();
+    const col=$("#draft-col").value;
+    const style=$("#draft-style").value;
+    const body=$("#draft-body").value.trim();
+    if(!title&&!body){ toast("标题或正文至少填一个"); return; }
+    if(!AI.ok()){ toast("先配置 AI 才能生成初稿"); switchTab("settings"); return; }
+    const btn=$("#draft-gen-ai"); const orig=btn.textContent;
+    btn.textContent="生成中…"; btn.disabled=true;
+    try{
+      const sys=`你是公众号随笔号写作助手。账号定位：纯粹自我记录随笔号，写给自己、随缘遇见同频读者；栏目：${col}；语气：${style}，真实松弛、允许碎碎念，拒绝硬造爆款、拒绝焦虑营销。请根据用户提供的标题和素材，写一篇完整的公众号推文初稿：钩子开头 + 分段正文（每段短、适配手机阅读）+ 结尾总结与一句互动引导。只返回正文，不要额外总结。`;
+      const out=await AI.chat(sys, `标题：${title||"（待定）"}\n素材/提纲：${body||"（请围绕标题自由发挥）"}`);
+      $("#draft-body").value=out;
+      toast("AI 初稿已生成");
+    }catch(e){ toast("生成失败："+e.message); }
+    finally{ btn.textContent=orig; btn.disabled=false; }
+  }
+  $("#draft-gen-ai").onclick=generateAIDraft;
+
+  function startDraftFromTopic(i){
+    const d=store.get("topics",[]); const t=d[i]; if(!t) return;
+    $("#draft-title").value=t.title||"";
+    $("#draft-body").value=t.angle||"";
+    switchTab("write");
+    if(AI.ok()){
+      generateAIDraft();
+    }else{
+      toast("已载入选题，配置 AI 后可一键生成初稿");
+    }
+  }
 
   /* ===== 模块4 标题摘要 ===== */
   $("#title-gen").onclick=async()=>{
