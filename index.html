@@ -317,13 +317,7 @@
       <div class="card">
         <label>粘贴推文全文</label>
         <textarea id="review-text" style="min-height:160px" placeholder="把写好的推文贴进来"></textarea>
-        <div id="review-scores">
-          <div class="score"><span class="small" style="min-width:110px">开篇吸引力</span><input type="range" min="1" max="5" value="3" data-k="开篇吸引力"><span class="val">3</span></div>
-          <div class="score"><span class="small" style="min-width:110px">逻辑流畅度</span><input type="range" min="1" max="5" value="3" data-k="逻辑流畅度"><span class="val">3</span></div>
-          <div class="score"><span class="small" style="min-width:110px">可读性</span><input type="range" min="1" max="5" value="3" data-k="可读性"><span class="val">3</span></div>
-          <div class="score"><span class="small" style="min-width:110px">结尾互动性</span><input type="range" min="1" max="5" value="3" data-k="结尾互动性"><span class="val">3</span></div>
-        </div>
-        <div class="btn-row"><button id="review-gen">生成复盘</button></div>
+        <div class="btn-row"><button id="review-gen">生成复盘</button><span class="small">AI 会自动从四个维度打分，不用你手动评</span></div>
         <div id="review-result" style="display:none"></div>
       </div>
     </section>
@@ -588,7 +582,27 @@
   };
 
   /* ===== 模块5 复盘 ===== */
-  $$("#review-scores input").forEach(r=>r.addEventListener("input",()=>{ r.parentNode.querySelector(".val").textContent=r.value; }));
+  const REVIEW_DIMS=["开篇吸引力","逻辑流畅度","可读性","结尾互动性"];
+  function parseReviewScores(text){
+    const scores=[]; let avg=null;
+    const lines=text.split(/\n/);
+    for(const line of lines){
+      const m=line.match(/^\s*(开篇吸引力|逻辑流畅度|可读性|结尾互动性)[：:]\s*(\d+(?:\.\d+)?)(?:\s*\/\s*5)?/i);
+      if(m){ scores.push({k:m[1],v:parseFloat(m[2])}); continue; }
+      const am=line.match(/^\s*平均分[：:]\s*(\d+(?:\.\d+)?)(?:\s*\/\s*5)?/i);
+      if(am){ avg=parseFloat(am[1]); }
+    }
+    // 补全缺失维度
+    REVIEW_DIMS.forEach(k=>{ if(!scores.find(s=>s.k===k)) scores.push({k:k,v:3}); });
+    if(avg===null) avg=(scores.reduce((a,b)=>a+b.v,0)/scores.length).toFixed(1);
+    return {scores,avg};
+  }
+  function stripScoreBlock(text){
+    // 去掉开头的打分块，避免复盘正文重复显示分数
+    let t=text.replace(/^\s*(开篇吸引力|逻辑流畅度|可读性|结尾互动性|平均分)[：:]\s*\d+(?:\.\d+)?(?:\s*\/\s*5)?\s*\n?/gim,'');
+    t=t.replace(/^\s*---\s*\n/m,'').trim();
+    return t || text.trim();
+  }
   function reviewScoreHead(avg,scores){
     const pct=Math.round(avg/5*100);
     const dim=scores.map(s=>'<span class="review-dim">'+esc(s.k)+'<b>'+s.v+'/5</b></span>').join('');
@@ -598,16 +612,18 @@
     const text=$("#review-text").value.trim();
     if(!text){ toast("先贴全文"); return; }
     const box=$("#review-result"); box.style.display="block";
-    const scores=$$("#review-scores input").map(r=>({k:r.dataset.k,v:+r.value}));
-    const avg=(scores.reduce((a,b)=>a+b.v,0)/scores.length).toFixed(1);
+    let scores=REVIEW_DIMS.map(k=>({k:k,v:3})), avg="3.0";
     if(AI.ok()){
-      box.innerHTML='<div class="result">AI 复盘生成中…</div>';
+      box.innerHTML='<div class="result">AI 正在读文章并打分…</div>';
       try{
-        const sys="你是温和的稿件复盘助手。请基于用户文章做复盘，按下面 markdown 结构输出（标题前带 emoji 更佳）：\n\n## 一、这篇文章最打动人的优点\n1. **小标题**\n具体说明…\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **小标题**\n具体说明…\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …\n\n语气鼓励、不考核数据，只看是否表达出作者自己。";
+        const sys="你是温和的稿件复盘助手。请严格按以下格式输出：\n\n1）先给出四个维度评分（1-5分，可带0.5小数），格式必须如下：\n开篇吸引力:4/5\n逻辑流畅度:3/5\n可读性:4/5\n结尾互动性:3/5\n平均分:3.5/5\n\n2）然后空一行，用 `---` 分隔，再输出复盘内容，结构如下（标题前可带 emoji）：\n\n## 一、这篇文章最打动人的优点\n1. **小标题**\n具体说明…\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **小标题**\n具体说明…\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …\n\n语气鼓励、不考核数据，只看是否表达出作者自己。";
         const out=await AI.chat(sys, text);
-        box.innerHTML='<div class="review-report">'+reviewScoreHead(avg,scores)+'<div class="review-body">'+renderReviewBody(md2html(out))+'</div></div>';
+        const parsed=parseReviewScores(out);
+        scores=parsed.scores; avg=parsed.avg;
+        const body=stripScoreBlock(out);
+        box.innerHTML='<div class="review-report">'+reviewScoreHead(avg,scores)+'<div class="review-body">'+renderReviewBody(md2html(body))+'</div></div>';
         return;
-      }catch(e){ box.innerHTML='<div class="result">AI 失败（'+e.message+'），改用模板：</div>'; }
+      }catch(e){ box.innerHTML='<div class="result">AI 失败（'+e.message+'），改用离线模板：</div>'; }
     }
     let r="## 一、这篇文章最打动人的优点\n1. **真实感**\n（写下这篇里你最满意、最像自己的部分）\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **节奏/结构**\n（哪段啰嗦？哪段没讲清？哪里像在说教？）\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …";
     box.innerHTML='<div class="review-report">'+reviewScoreHead(avg,scores)+'<div class="review-body">'+renderReviewBody(md2html(r))+'</div></div>';
