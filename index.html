@@ -112,6 +112,8 @@
   .chip:hover{background:#ece0f6}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f2329;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
   .toast.show{opacity:1}
+  #update-banner{position:fixed;top:0;left:0;right:0;z-index:60;background:var(--accent);color:#fff;font-size:13px;padding:10px 14px;display:flex;align-items:center;justify-content:center;gap:10px}
+  #update-banner button{background:#fff;color:var(--accent);padding:5px 14px;border-radius:8px;font-size:12px}
 
   /* 桌面端：底部导航居中、增加底部留白 */
   @media (min-width:761px){
@@ -367,6 +369,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="update-banner" hidden>✨ 已发布新版本，<button id="update-reload">点击刷新</button> 即可更新</div>
 <input type="file" id="sync-file" accept=".json" style="display:none">
 
 <script>
@@ -704,9 +707,24 @@
     e.target.value="";
   };
 
-  /* ===== PWA 注册 ===== */
+  /* ===== PWA 注册 + 更新提示 ===== */
   if("serviceWorker" in navigator){
-    window.addEventListener("load",()=>{ navigator.serviceWorker.register("service-worker.js").catch(()=>{}); });
+    window.addEventListener("load",()=>{
+      navigator.serviceWorker.register("service-worker.js").then(reg=>{
+        // 发现新版本（SW 脚本更新并安装完成）：提示用户刷新
+        reg.addEventListener("updatefound",()=>{
+          const sw=reg.installing;
+          sw.addEventListener("statechange",()=>{
+            if(sw.state==="installed" && navigator.serviceWorker.controller){
+              const b=document.getElementById("update-banner");
+              if(b) b.hidden=false;
+            }
+          });
+        });
+      }).catch(()=>{});
+    });
+    const reloadBtn=document.getElementById("update-reload");
+    if(reloadBtn) reloadBtn.addEventListener("click",()=>location.reload());
   }
 
   function esc(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
