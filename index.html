@@ -382,10 +382,9 @@
       </div>
 
       <div class="card">
-        <h3>📡 多端同步（可选）</h3>
-        <p class="sub" style="margin-bottom:12px">把本地数据（选题/排期/草稿/任务）同步到一个同步服务，手机和电脑共用同一份。同一个「同步密钥」即同一份数据。</p>
-        <div class="kv"><label>同步服务地址</label><input id="sync-url" placeholder="http://10.19.3.191:3000 或 https://你的域名"></div>
-        <div class="kv"><label>同步密钥</label><input id="sync-key" placeholder="自定义一串，如 gzh-suchen-2026"></div>
+        <h3>📡 云端同步（Supabase）</h3>
+        <p class="sub" style="margin-bottom:12px">手机和电脑填<b>同一个同步码</b>即共用同一份数据（选题/排期/草稿/任务）。数据存在你自己的 Supabase 项目，同步码即访问口令——知道码才能读写那一行的数据。</p>
+        <div class="kv"><label>同步码</label><input id="sync-key" placeholder="自定义一串，如 gzh-suchen-2026"></div>
         <div class="btn-row">
           <button id="sync-upload">↑ 上传到云端</button>
           <button class="ghost" id="sync-download">↓ 从云端拉取</button>
@@ -746,36 +745,37 @@
     keys.forEach(k=>localStorage.removeItem(k));
     Object.keys(data).forEach(k=>{ if(k.indexOf("gzh_")===0) localStorage.setItem(k, JSON.stringify(data[k])); });
   }
-  const SY={ url(){return $("#sync-url").value.trim();}, key(){return $("#sync-key").value.trim();} };
-  $("#sync-url").value=store.get("sync_url","")||""; $("#sync-key").value=store.get("sync_key","")||"";
-  $("#sync-url").addEventListener("blur",()=>store.set("sync_url",$("#sync-url").value.trim()));
+  const SB={ url:"https://hialdedlgtqvvddxllsg.supabase.co",
+    key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhpYWxkZWRsZ3RxdnZkZHhsbHNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxMDQ5ODgsImV4cCI6MjEwMDY4MDk4OH0.yhuamgynQV8mm0u67OdyGAkEtiXCbCELU3M4msvLlLE",
+    headers(){ return { "apikey":this.key, "Authorization":"Bearer "+this.key, "Content-Type":"application/json" }; } };
+  const syncKey=()=>$("#sync-key").value.trim();
+  $("#sync-key").value=store.get("sync_key","")||"";
   $("#sync-key").addEventListener("blur",()=>store.set("sync_key",$("#sync-key").value.trim()));
 
   async function syncUpload(){
-    const url=SY.url(), key=SY.key();
-    if(!url||!key){ $("#sync-status").innerHTML='<span style="color:var(--red)">先填同步地址和密钥</span>'; return; }
+    const key=syncKey();
+    if(!key){ $("#sync-status").innerHTML='<span style="color:var(--red)">先填同步码</span>'; return; }
     $("#sync-status").textContent="上传中…";
     try{
-      const payload={updatedAt:Date.now(), data:collectAll()};
-      const r=await fetch(url.replace(/\/$/,"")+"/sync?key="+encodeURIComponent(key),{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-      if(!r.ok) throw new Error("HTTP "+r.status);
+      const r=await fetch(SB.url+"/rest/v1/gzh_sync",{method:"POST",headers:Object.assign(SB.headers(),{"Prefer":"resolution=merge-duplicates"}),body:JSON.stringify({code:key, data:collectAll()})});
+      if(!r.ok) throw new Error("HTTP "+r.status+" "+((await r.text()).slice(0,140)));
       store.set("sync_last", Date.now());
       $("#sync-status").innerHTML='<span class="ok">已上传 · '+new Date().toLocaleString()+'</span>';
     }catch(e){ $("#sync-status").innerHTML='<span style="color:var(--red)">上传失败：'+e.message+'</span>'; }
   }
   async function syncDownload(){
-    const url=SY.url(), key=SY.key();
-    if(!url||!key){ $("#sync-status").innerHTML='<span style="color:var(--red)">先填同步地址和密钥</span>'; return; }
+    const key=syncKey();
+    if(!key){ $("#sync-status").innerHTML='<span style="color:var(--red)">先填同步码</span>'; return; }
     $("#sync-status").textContent="下载中…";
     try{
-      const r=await fetch(url.replace(/\/$/,"")+"/sync?key="+encodeURIComponent(key));
+      const r=await fetch(SB.url+"/rest/v1/gzh_sync?code=eq."+encodeURIComponent(key)+"&select=code,data,updated_at",{headers:SB.headers()});
       if(!r.ok) throw new Error("HTTP "+r.status);
-      const j=await r.json();
-      if(!j.data){ $("#sync-status").textContent="云端暂无数据"; return; }
-      applyAll(j.data);
+      const arr=await r.json();
+      if(!arr.length || !arr[0].data){ $("#sync-status").textContent="云端暂无该同步码的数据"; return; }
+      applyAll(arr[0].data);
       renderSchedule(); renderTopics(); renderTasks();
       $("#stuck-note").value=store.get("stuck","")||"";
-      $("#sync-status").innerHTML='<span class="ok">已拉取 · 云端更新于 '+new Date(j.updatedAt).toLocaleString()+'</span>';
+      $("#sync-status").innerHTML='<span class="ok">已拉取 · 云端更新于 '+new Date(arr[0].updated_at).toLocaleString()+'</span>';
       toast("已从云端同步");
     }catch(e){ $("#sync-status").innerHTML='<span style="color:var(--red)">拉取失败：'+e.message+'</span>'; }
   }
