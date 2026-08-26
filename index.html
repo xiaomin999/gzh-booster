@@ -158,6 +158,22 @@
   .main.has-banner{padding-top:52px}
   #update-banner button{background:#fff;color:var(--accent);padding:5px 14px;border-radius:8px;font-size:12px}
 
+  /* 我的故事 */
+  .story-card{background:linear-gradient(135deg,#f7f0ff 0%,#fff 60%);border:1px solid #ece0f6;border-radius:16px;padding:22px 24px;margin-bottom:18px;box-shadow:var(--shadow)}
+  .story-card p{margin:0 0 12px;line-height:1.85;color:#3a3346}
+  .story-card p:last-child{margin-bottom:0}
+  .story-mark{font-size:14px;color:var(--accent);font-weight:700;margin-bottom:12px}
+  .flow-steps{border:1px solid var(--line);border-radius:14px;padding:16px 20px;background:#fff}
+  .flow-steps h3{margin:0 0 12px;font-size:15px}
+  .flow-steps ol{margin:0;padding-left:20px}
+  .flow-steps li{margin:8px 0;line-height:1.65}
+  /* 知识库 */
+  .perf-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .factor-item{border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:9px;background:#fff}
+  .factor-item .f-text{white-space:pre-wrap;line-height:1.7;font-size:13px}
+  .factor-item .f-ops{margin-top:7px;display:flex;gap:8px;align-items:center}
+  .factor-item .f-from{font-size:11px;color:#9aa0ab;margin-right:auto}
+
   /* 桌面端：底部导航居中、增加底部留白 */
   @media (min-width:761px){
     .sidebar{justify-content:center;padding-bottom:12px}
@@ -175,7 +191,9 @@
 <div class="wrap">
   <aside class="sidebar">
     <div class="brand">📚 公众号助推助手<small>随笔号 · 不催更 · 松弛写</small></div>
-    <button class="nav-btn active" data-tab="plan"><span class="em">📌</span>定位&amp;排期</button>
+    <button class="nav-btn active" data-tab="story"><span class="em">🌟</span>我的故事</button>
+    <button class="nav-btn" data-tab="kb"><span class="em">📚</span>知识库</button>
+    <button class="nav-btn" data-tab="plan"><span class="em">📌</span>定位&amp;排期</button>
     <button class="nav-btn" data-tab="topics"><span class="em">💡</span>选题库</button>
     <button class="nav-btn" data-tab="write"><span class="em">✍️</span>写稿</button>
     <button class="nav-btn" data-tab="title"><span class="em">🏷️</span>标题摘要</button>
@@ -195,8 +213,39 @@
       </div>
     </div>
 
+    <!-- 我的故事 -->
+    <section id="story" class="tab">
+      <h2>🌟 我的故事 · 为什么做这个工具</h2>
+      <p class="sub">下面这段是我（和你）的真实经历，这个工具就是为了复刻这套流程而生。</p>
+      <div class="story-card">
+        <div class="story-mark">学 AI 一个月，我的公众号开始赚钱了</div>
+        <p>不是大钱。但够了。够让我知道，这件事能走下去。</p>
+        <p>一个月前，我对 AI 的理解还停留在"聊天机器人"。觉得它就是个玩具，问它几句，它回你几句，用完就关了。</p>
+        <p>一个月后，它帮我出选题、写初稿、配图、盯进度。</p>
+        <p>我写公众号断断续续也一年了。之前最大的问题不是不想写。是没时间写，是一个人，没人出题，没人看稿，没人问你今天发不发。写着写着，就断了。</p>
+        <p>最近一个月不一样了。每天晚上八点半，孩子写作业，我坐在旁边打开电脑。</p>
+        <p>选题不用自己憋——我出方向，AI 自己去我的知识库找素材。</p>
+        <p>初稿不用从零写——它根据我的知识库出一版，我再改。</p>
+        <p>配图不用满网找——它直接生成，一分钟搞定。</p>
+        <p>以前一篇稿子从选题到发布，要磨几个小时。现在几分钟搞定。</p>
+        <p>但最难的不是写。是每天坐下来写。有人帮你跨过这一步，就不一样了。</p>
+        <p>我还把我写过的文章全部喂给它。有小爆的，低阅读的。我让 AI 帮我提取爆款的因子，存入 Skill。同时，让它分析我的阅读量低的文章。扬长避短。</p>
+      </div>
+      <div class="flow-steps">
+        <h3>🧭 这套流程，这个工具都能复刻</h3>
+        <ol>
+          <li><b>建知识库</b>：把写过的文章（小爆的、低阅读的）喂进「📚 知识库」。</li>
+          <li><b>AI 提取爆款因子</b>：让 AI 从小爆款里提炼可复用的因子，存进「爆款因子库」。</li>
+          <li><b>AI 分析低阅读</b>：让 AI 指出低阅读的问题，记成「改进笔记」，扬长避短。</li>
+          <li><b>选题更聪明</b>：在「💡 选题库」点「从知识库生成选题」，AI 结合你的因子和教训出题。</li>
+          <li><b>初稿更快</b>：在「✍️ 写稿」点「AI 生成初稿」，会自动带上你的爆款因子；再点「配图提示词」拿配图思路。</li>
+          <li><b>每天坐下来</b>：用「🚀 行动督促」把"坐下来写"拆成微小任务，有人催你动一笔。</li>
+        </ol>
+      </div>
+    </section>
+
     <!-- 模块1 定位&排期 -->
-    <section id="plan" class="tab">
+    <section id="plan" class="tab" style="display:none">
       <h2>📌 账号定位 &amp; 栏目排期</h2>
       <p class="sub">账号定位已固定（随笔号），这里只做排期表。任务别排太满，防完不成摆烂。</p>
       <div class="card">
@@ -250,8 +299,9 @@
         <textarea id="frag-input" placeholder="例如：今天又被自己拖延气到了 / 减脂第7天突然不想动 / 看了篇讲多巴胺的文章很有触动"></textarea>
         <div class="btn-row">
           <button id="frag-to-topic">转成备选选题并入库</button>
-          <span class="small" id="frag-tip">未配置 AI 时，直接把碎片存为「待打磨」选题；配置 AI 后可一键提炼标题+角度。</span>
+          <button class="soft" id="topic-from-kb">📚 从知识库生成选题</button>
         </div>
+        <div class="btn-row"><span class="small" id="frag-tip">未配置 AI 时，直接把碎片存为「待打磨」选题；配置 AI 后可一键提炼标题+角度。「从知识库生成选题」会用你沉淀的爆款因子 + 低阅读教训出题。</span></div>
       </div>
       <div class="card">
         <h3>选题清单</h3>
@@ -296,10 +346,12 @@
         <div class="btn-row">
           <button id="draft-save">保存草稿</button>
           <button class="ghost" id="draft-gen-ai">AI 生成初稿</button>
+          <button class="ghost" id="draft-img-prompt">✨ 配图提示词</button>
           <button class="ghost" id="draft-prompt">生成写作 Prompt</button>
           <button class="soft" id="draft-list-btn">我的草稿</button>
         </div>
         <div id="draft-list" style="margin-top:12px;display:none"></div>
+        <div id="draft-img-result" style="display:none"></div>
       </div>
     </section>
 
@@ -403,6 +455,51 @@
         <h3>我的策略库</h3>
         <div id="str-list" style="margin-top:8px"></div>
         <div id="str-empty" class="empty" style="display:none">还没有记录，先加一条策略或优化要点吧。</div>
+      </div>
+    </section>
+
+    <!-- 模块 知识库 -->
+    <section id="kb" class="tab" style="display:none">
+      <h2>📚 我的文章知识库</h2>
+      <p class="sub">把写过的文章喂进来（小爆的、低阅读的都行）。AI 帮你提取爆款因子、分析低阅读原因，沉淀成可复用的「爆款因子库」和「改进笔记」，反哺选题与初稿。</p>
+      <div class="card">
+        <h3>录入一篇文章</h3>
+        <label>标题</label>
+        <input id="kb-title" placeholder="如：学AI一个月，我的公众号开始赚钱了">
+        <label>正文（贴你发过的原文）</label>
+        <textarea id="kb-body" style="min-height:150px" placeholder="把文章正文贴进来"></textarea>
+        <div class="perf-row">
+          <label style="margin:0">表现</label>
+          <select id="kb-perf" style="max-width:170px">
+            <option value="hit">🔥 小爆款</option>
+            <option value="low">📉 低阅读</option>
+            <option value="normal">普通</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button id="kb-add">保存文章</button>
+          <button class="ghost" id="kb-cancel" style="display:none">取消</button>
+        </div>
+        <div id="kb-status" class="small" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <h3>我的文章库</h3>
+        <div id="kb-list" style="margin-top:8px"></div>
+        <div id="kb-empty" class="empty" style="display:none">还没录入文章。先把你发过的、小爆的或低阅读的文章喂进来。</div>
+      </div>
+
+      <div class="card">
+        <h3>🔥 爆款因子库 <span class="small" id="kb-hit-count"></span></h3>
+        <p class="sub" style="margin-bottom:10px">从你的小爆款里提炼出的可复用因子，会自动注入「写稿」的 AI 初稿和「选题库」的生成。</p>
+        <div id="kb-hit-list"></div>
+        <div id="kb-hit-empty" class="empty" style="display:none">还没有爆款因子。去文章库里点「✨ 提取爆款因子」。</div>
+      </div>
+
+      <div class="card">
+        <h3>📉 低阅读改进笔记 <span class="small" id="kb-low-count"></span></h3>
+        <div id="kb-low-list"></div>
+        <div id="kb-low-empty" class="empty" style="display:none">还没有改进笔记。去低阅读文章里点「🔍 分析低阅读」。</div>
       </div>
     </section>
 
@@ -613,7 +710,9 @@
     const btn=$("#draft-gen-ai"); const orig=btn.textContent;
     btn.textContent="生成中…"; btn.disabled=true;
     try{
-      const sys=`你是公众号随笔号写作助手。账号定位：纯粹自我记录随笔号，写给自己、随缘遇见同频读者；栏目：${col}；语气：${style}，真实松弛、允许碎碎念，拒绝硬造爆款、拒绝焦虑营销。请根据用户提供的标题和素材，写一篇完整的公众号推文初稿：钩子开头 + 分段正文（每段短、适配手机阅读）+ 结尾总结与一句互动引导。只返回正文，不要额外总结。`;
+      let sys=`你是公众号随笔号写作助手。账号定位：纯粹自我记录随笔号，写给自己、随缘遇见同频读者；栏目：${col}；语气：${style}，真实松弛、允许碎碎念，拒绝硬造爆款、拒绝焦虑营销。请根据用户提供的标题和素材，写一篇完整的公众号推文初稿：钩子开头 + 分段正文（每段短、适配手机阅读）+ 结尾总结与一句互动引导。只返回正文，不要额外总结。`;
+      const kbc=kbContext();
+      if(kbc) sys+="\n\n【你沉淀的爆款因子与低阅读教训，写稿时尽量贴合，但保持随笔真实感】\n"+kbc;
       const out=await AI.chat(sys, `标题：${title||"（待定）"}\n素材/提纲：${body||"（请围绕标题自由发挥）"}`);
       $("#draft-body").value=out;
       toast("AI 初稿已生成");
@@ -621,6 +720,19 @@
     finally{ btn.textContent=orig; btn.disabled=false; }
   }
   $("#draft-gen-ai").onclick=generateAIDraft;
+
+  $("#draft-img-prompt").onclick=async()=>{
+    const title=$("#draft-title").value.trim(); const body=$("#draft-body").value.trim();
+    const box=$("#draft-img-result"); box.style.display="block";
+    if(!title&&!body){ toast("标题或正文至少填一个"); return; }
+    if(!AI.ok()){ box.innerHTML='<div class="result">配置 AI 才能生成配图提示词。离线思路：根据标题想一个画面感强的封面——主体 + 氛围 + 配色 + 风格，例如「'+esc(title||"今日随笔")+'」的暖色手绘插画，旁边配一杯茶。</div>'; return; }
+    box.innerHTML='<div class="result">AI 构思配图中…</div>';
+    try{
+      const sys="你是公众号配图提示词助手。根据用户给的标题和正文，输出 1 条中文配图提示词（画面主体+氛围+配色+风格，适合做公众号封面/文中插图，温暖真实不浮夸），再附 1 句构图说明。纯文本。";
+      const out=await AI.chat(sys, "标题："+(title||"（待定）")+"\n正文片段："+(body||"（无）"));
+      box.innerHTML='<div class="result"><h4>✨ 配图提示词</h4>'+esc(out)+'</div>';
+    }catch(e){ box.innerHTML='<div class="result">生成失败：'+e.message+'</div>'; }
+  };
 
   function startDraftFromTopic(i){
     const d=store.get("topics",[]); const t=d[i]; if(!t) return;
@@ -822,6 +934,140 @@
   };
   renderStrategies();
 
+  /* ===== 知识库 ===== */
+  function perfLabel(p){ return p==="hit"?"🔥 小爆款":p==="low"?"📉 低阅读":"普通"; }
+  function perfCls(p){ return p==="hit"?"b":p==="low"?"w":""; }
+  function renderKB(){
+    const data=store.get("kb",[]);
+    const box=$("#kb-list"); box.innerHTML="";
+    if(!data.length){ $("#kb-empty").style.display="block"; return; }
+    $("#kb-empty").style.display="none";
+    data.forEach((a)=>{
+      const div=document.createElement("div"); div.className="str-item collapsed";
+      const cls=perfCls(a.perf);
+      let ops=`<button class="ghost sm" data-edit="${a.id}">编辑</button><button class="ghost sm" data-del="${a.id}">删</button>`;
+      if(a.perf==="hit") ops=`<button class="soft sm" data-factor="${a.id}">✨ 提取爆款因子</button>`+ops;
+      if(a.perf==="low") ops=`<button class="soft sm" data-low="${a.id}">🔍 分析低阅读</button>`+ops;
+      div.innerHTML=`<div class="t-head"><div class="t-title"><span class="str-caret">▾</span>${esc(a.title||"（无标题）")}</div>
+        <div class="t-ops">${ops}</div></div>
+        <div class="str-meta"><span class="pill ${cls}">${perfLabel(a.perf)}</span><span class="str-date">${esc(a.date||"")}</span></div>
+        <div class="str-content">${esc(a.body||"")}${a.factors?'<br><br><b>爆款因子：</b><br>'+esc(a.factors):''}${a.lowadvice?'<br><br><b>低阅读分析：</b><br>'+esc(a.lowadvice):''}</div>`;
+      div.querySelector(".t-title").onclick=()=>div.classList.toggle("collapsed");
+      div.querySelector("[data-edit]").onclick=()=>startEditKB(a.id);
+      div.querySelector("[data-del]").onclick=()=>{ const d=store.get("kb",[]); const i=d.findIndex(x=>x.id===a.id); if(i>=0){ d.splice(i,1); store.set("kb",d); renderKB(); toast("已删除"); } };
+      const fb=div.querySelector("[data-factor]"); if(fb) fb.onclick=()=>aiExtractFactors(a.id);
+      const lb=div.querySelector("[data-low]"); if(lb) lb.onclick=()=>aiAnalyzeLow(a.id);
+      box.appendChild(div);
+    });
+  }
+  function renderHitFactors(){
+    const data=store.get("hitfactors",[]);
+    const box=$("#kb-hit-list"); box.innerHTML="";
+    $("#kb-hit-count").textContent = data.length?("（"+data.length+" 条）"):"";
+    if(!data.length){ $("#kb-hit-empty").style.display="block"; return; }
+    $("#kb-hit-empty").style.display="none";
+    data.forEach((f)=>{
+      const div=document.createElement("div"); div.className="factor-item";
+      div.innerHTML=`<div class="f-text">${esc(f.text)}</div><div class="f-ops"><span class="f-from">来自：${esc(f.from||"")}</span><button class="ghost sm" data-del="${f.id}">删</button></div>`;
+      div.querySelector("[data-del]").onclick=()=>{ const d=store.get("hitfactors",[]); const i=d.findIndex(x=>x.id===f.id); if(i>=0){ d.splice(i,1); store.set("hitfactors",d); renderHitFactors(); } };
+      box.appendChild(div);
+    });
+  }
+  function renderLowNotes(){
+    const data=store.get("lownotes",[]);
+    const box=$("#kb-low-list"); box.innerHTML="";
+    $("#kb-low-count").textContent = data.length?("（"+data.length+" 条）"):"";
+    if(!data.length){ $("#kb-low-empty").style.display="block"; return; }
+    $("#kb-low-empty").style.display="none";
+    data.forEach((n)=>{
+      const div=document.createElement("div"); div.className="factor-item";
+      div.innerHTML=`<div class="f-text">${esc(n.text)}</div><div class="f-ops"><span class="f-from">来自：${esc(n.from||"")}</span><button class="ghost sm" data-del="${n.id}">删</button></div>`;
+      div.querySelector("[data-del]").onclick=()=>{ const d=store.get("lownotes",[]); const i=d.findIndex(x=>x.id===n.id); if(i>=0){ d.splice(i,1); store.set("lownotes",d); renderLowNotes(); } };
+      box.appendChild(div);
+    });
+  }
+  function kbContext(){
+    const hits=store.get("hitfactors",[]); const lows=store.get("lownotes",[]);
+    let s="";
+    if(hits.length){ s+="【爆款因子】\n"+hits.map((f,i)=>(i+1)+". "+f.text).join("\n")+"\n"; }
+    if(lows.length){ s+="【低阅读教训】\n"+lows.map((n,i)=>(i+1)+". "+n.text).join("\n")+"\n"; }
+    return s.trim();
+  }
+  let editKbId=null;
+  function startEditKB(id){
+    const d=store.get("kb",[]); const a=d.find(x=>x.id===id); if(!a) return;
+    editKbId=id;
+    $("#kb-title").value=a.title||""; $("#kb-body").value=a.body||""; $("#kb-perf").value=a.perf||"normal";
+    $("#kb-add").textContent="保存修改"; $("#kb-cancel").style.display=""; switchTab("kb"); $("#kb-title").focus();
+  }
+  $("#kb-cancel").onclick=()=>{ editKbId=null; $("#kb-title").value=""; $("#kb-body").value=""; $("#kb-perf").value="normal"; $("#kb-add").textContent="保存文章"; $("#kb-cancel").style.display="none"; $("#kb-status").textContent=""; };
+  $("#kb-add").onclick=()=>{
+    const title=$("#kb-title").value.trim(); const body=$("#kb-body").value.trim(); const perf=$("#kb-perf").value;
+    if(!title&&!body){ toast("标题或正文至少填一个"); return; }
+    const d=store.get("kb",[]);
+    if(editKbId){
+      const i=d.findIndex(x=>x.id===editKbId);
+      if(i>=0){ d[i]={...d[i], title, body, perf}; }
+      editKbId=null; $("#kb-add").textContent="保存文章"; $("#kb-cancel").style.display="none";
+    }else{
+      d.unshift({id:"k"+Date.now()+Math.random().toString(36).slice(2,6), title, body, perf, factors:"", lowadvice:"", date:new Date().toISOString().slice(0,10)});
+    }
+    store.set("kb",d);
+    $("#kb-title").value=""; $("#kb-body").value=""; $("#kb-perf").value="normal"; $("#kb-status").textContent="";
+    renderKB(); toast("已保存");
+  };
+  async function aiExtractFactors(id){
+    const d=store.get("kb",[]); const a=d.find(x=>x.id===id); if(!a){ return; }
+    if(!AI.ok()){ toast("先配置 AI 才能提取"); switchTab("settings"); return; }
+    const btn=document.querySelector(`[data-factor="${id}"]`); const orig=btn?btn.textContent:""; if(btn){btn.textContent="提取中…"; btn.disabled=true;}
+    try{
+      const sys="你是公众号爆款分析助手。请分析用户的小爆款文章，提取 3-6 条可复用的「爆款因子」（标题技巧/开头方式/情绪钩子/结构/话题角度等），每条具体、可操作、口语化。直接逐条列出，不要编号前缀以外的解释。";
+      const out=await AI.chat(sys, "标题："+(a.title||"（无）")+"\n正文："+(a.body||"（无）"));
+      const lines=out.split(/\n+/).map(s=>s.replace(/^[\d．.、\-\*]\s*/,"").trim()).filter(Boolean);
+      a.factors=lines.join("\n");
+      const hf=store.get("hitfactors",[]);
+      lines.forEach(t=>hf.unshift({id:"h"+Date.now()+Math.random().toString(36).slice(2,5), text:t, from:a.title||"小爆款"}));
+      store.set("kb",d); store.set("hitfactors",hf);
+      renderKB(); renderHitFactors();
+      toast("已提取 "+lines.length+" 条爆款因子");
+    }catch(e){ $("#kb-status").innerHTML='<span style="color:var(--red)">提取失败：'+e.message+'</span>'; }
+    finally{ if(btn){btn.textContent=orig; btn.disabled=false;} }
+  }
+  async function aiAnalyzeLow(id){
+    const d=store.get("kb",[]); const a=d.find(x=>x.id===id); if(!a){ return; }
+    if(!AI.ok()){ toast("先配置 AI 才能分析"); switchTab("settings"); return; }
+    const btn=document.querySelector(`[data-low="${id}"]`); const orig=btn?btn.textContent:""; if(btn){btn.textContent="分析中…"; btn.disabled=true;}
+    try{
+      const sys="你是公众号阅读诊断助手。请分析用户的低阅读文章，指出 2-4 个可能拉低阅读的具体原因（开头不抓人/标题平淡/话题太小众/结构松散等），并给对应的改进建议。直接逐条列出「问题 → 建议」，口语化。";
+      const out=await AI.chat(sys, "标题："+(a.title||"（无）")+"\n正文："+(a.body||"（无）"));
+      const lines=out.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+      a.lowadvice=lines.join("\n");
+      const ln=store.get("lownotes",[]);
+      ln.unshift({id:"l"+Date.now()+Math.random().toString(36).slice(2,5), text:lines.join("\n"), from:a.title||"低阅读"});
+      store.set("kb",d); store.set("lownotes",ln);
+      renderKB(); renderLowNotes();
+      toast("已记录低阅读改进笔记");
+    }catch(e){ $("#kb-status").innerHTML='<span style="color:var(--red)">分析失败：'+e.message+'</span>'; }
+    finally{ if(btn){btn.textContent=orig; btn.disabled=false;} }
+  }
+  $("#topic-from-kb").onclick=async()=>{
+    if(!AI.ok()){ toast("需先配置 AI 才能基于知识库出题"); switchTab("settings"); return; }
+    const kbc=kbContext();
+    if(!kbc){ toast("知识库还是空的，先去喂几篇文章"); switchTab("kb"); return; }
+    const btn=$("#topic-from-kb"); const orig=btn.textContent; btn.textContent="生成中…"; btn.disabled=true;
+    try{
+      const sys="你是公众号随笔号选题助手。用户沉淀了以下「爆款因子」和「低阅读教训」，请基于它们生成 4 个新的备选选题。返回 JSON 数组，每项 {title, angle}。title 是吸引人的短文标题，angle 是一句写作角度。只返回 JSON 数组。";
+      const out=await AI.chat(sys, kbc);
+      const m=out.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
+      if(Array.isArray(arr)&&arr.length){
+        arr.forEach(o=>addTopic(o.title||"（待打磨）", (o.angle||"")+"（源自知识库）", "w"));
+        toast("已基于知识库生成 "+arr.length+" 个选题");
+      }else toast("AI 没返回有效选题");
+    }catch(e){ toast("生成失败："+e.message); }
+    finally{ btn.textContent=orig; btn.disabled=false; }
+  };
+  renderKB(); renderHitFactors(); renderLowNotes();
+
   /* ===== 设置 ===== */
   window.presetAI=function(p){
     if(p==='qwen'){ $("#set-endpoint").value="https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"; $("#set-model").value="qwen-plus"; }
@@ -885,7 +1131,7 @@
       const arr=await r.json();
       if(!arr.length || !arr[0].data){ $("#sync-status").textContent="云端暂无该同步码的数据"; return; }
       applyAll(arr[0].data);
-      renderSchedule(); renderTopics(); renderTasks(); renderStrategies();
+      renderSchedule(); renderTopics(); renderTasks(); renderStrategies(); renderKB(); renderHitFactors(); renderLowNotes();
       $("#stuck-note").value=store.get("stuck","")||"";
       $("#sync-status").innerHTML='<span class="ok">已拉取 · 云端更新于 '+new Date(arr[0].updated_at).toLocaleString()+'</span>';
       toast("已从云端同步");
@@ -904,7 +1150,7 @@
     try{
       const text=await f.text(); const j=JSON.parse(text);
       if(!j.data) throw new Error("文件格式不对");
-      applyAll(j.data); renderSchedule(); renderTopics(); renderTasks(); renderStrategies();
+      applyAll(j.data); renderSchedule(); renderTopics(); renderTasks(); renderStrategies(); renderKB(); renderHitFactors(); renderLowNotes();
       $("#stuck-note").value=store.get("stuck","")||"";
       $("#sync-status").innerHTML='<span class="ok">已从备份文件导入</span>'; toast("已导入备份");
     }catch(err){ $("#sync-status").innerHTML='<span style="color:var(--red)">导入失败：'+err.message+'</span>'; }
