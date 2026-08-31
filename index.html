@@ -504,9 +504,12 @@
   "use strict";
   const $ = (s,r=document)=>r.querySelector(s);
   const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+  const SYNC_CTRL=["gzh_sync_key","gzh_sync_last","gzh_meta"];
+  function isDataKey(full){ return typeof full==="string" && full.startsWith("gzh_") && !SYNC_CTRL.includes(full); }
+  const _rawSet=(k,v)=>localStorage.setItem("gzh_"+k, JSON.stringify(v));
   const store = {
     get(k,def){ try{const v=localStorage.getItem("gzh_"+k);return v?JSON.parse(v):def;}catch(e){return def;} },
-    set(k,v){ localStorage.setItem("gzh_"+k, JSON.stringify(v)); }
+    set(k,v){ _rawSet(k,v); const full="gzh_"+k; if(isDataKey(full)){ const m=JSON.parse(localStorage.getItem("gzh_meta")||"{}"); m[full]=Date.now(); localStorage.setItem("gzh_meta", JSON.stringify(m)); } }
   };
   function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),1800); }
 
@@ -1049,20 +1052,49 @@
     }catch(e){ $("#set-status").innerHTML='<span style="color:var(--red)">失败：'+e.message+'</span>'; }
   };
 
-  /* ===== 多端同步 ===== */
+  /* ===== 多端同步（合并式，不再整包覆盖） ===== */
   function collectAll(){
     const out={};
     for(let i=0;i<localStorage.length;i++){
       const k=localStorage.key(i);
-      if(k&&k.indexOf("gzh_")===0){ try{ out[k]=JSON.parse(localStorage.getItem(k)); }catch(e){ out[k]=localStorage.getItem(k); } }
+      if(isDataKey(k)){ try{ out[k]=JSON.parse(localStorage.getItem(k)); }catch(e){ out[k]=localStorage.getItem(k); } }
     }
     return out;
   }
-  function applyAll(data){
-    const keys=[];
-    for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.indexOf("gzh_")===0) keys.push(k); }
-    keys.forEach(k=>localStorage.removeItem(k));
-    Object.keys(data).forEach(k=>{ if(k.indexOf("gzh_")===0) localStorage.setItem(k, JSON.stringify(data[k])); });
+  function getMeta(){ try{ return JSON.parse(localStorage.getItem("gzh_meta")||"{}"); }catch(e){ return {}; } }
+  // 数组：有 id 按 id 合并（同 id 取较新一侧），无 id 按内容去重合并；标量：取较新修改时间的一侧
+  function canon(x){ // 与 key 顺序无关的规范化签名（jsonb 会重排 key，必须忽略顺序）
+    if(x===null||typeof x!=="object") return JSON.stringify(x);
+    if(Array.isArray(x)) return "["+x.map(canon).join(",")+"]";
+    const ks=Object.keys(x).sort();
+    return "{"+ks.map(k=>JSON.stringify(k)+":"+canon(x[k])).join(",")+"}";
+  }
+  function mergeArr(l,r,lt,rt){
+    const lId=l.length>0&&l.every(x=>x&&typeof x==="object"&&x.id);
+    const rId=r.length>0&&r.every(x=>x&&typeof x==="object"&&x.id);
+    if(lId&&rId){ const map={}; const order=(rt>=lt)?[...l,...r]:[...r,...l]; order.forEach(x=>{ if(x&&x.id) map[x.id]=x; }); return Object.values(map); }
+    const seen=new Set(), res=[];
+    [...l,...r].forEach(x=>{ const key=(x&&typeof x==="object")?canon(x):String(x); if(!seen.has(key)){ seen.add(key); res.push(x); } });
+    return res;
+  }
+  function mergeSync(L,Lm,R,Rm){
+    const out={}; const keys=new Set([...Object.keys(L||{}),...Object.keys(R||{})]);
+    keys.forEach(k=>{
+      if(!isDataKey(k)) return;
+      const l=L[k], r=R[k];
+      if(l===undefined&&r===undefined) return;
+      if(Array.isArray(l)&&Array.isArray(r)) out[k]=mergeArr(l,r,(Lm&&Lm[k])||0,(Rm&&Rm[k])||0);
+      else if(Array.isArray(l)&&r===undefined) out[k]=l.slice();
+      else if(Array.isArray(r)&&l===undefined) out[k]=r.slice();
+      else { const lt=(Lm&&Lm[k])||0, rt=(Rm&&Rm[k])||0; out[k]=(rt>=lt)?r:l; }
+    });
+    return out;
+  }
+  function persistMerged(merged,mMeta){
+    Object.keys(merged).forEach(k=>{ if(isDataKey(k)) localStorage.setItem(k, JSON.stringify(merged[k])); });
+    const local=getMeta();
+    Object.keys(mMeta||{}).forEach(k=>{ if(isDataKey(k)) local[k]=Math.max(local[k]||0, mMeta[k]||0); });
+    localStorage.setItem("gzh_meta", JSON.stringify(local));
   }
   const SB={ url:"https://rbmxgcholrcwjyzwnqmv.supabase.co",
     key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJibXhnY2hvbHJjd2p5enducW12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NjAyNzQsImV4cCI6MjEwMzEzNjI3NH0.q0iqUzOAGc1YuOUY9vb8sf4fl7JxTqg9BvHLc5xLP14",
@@ -1071,31 +1103,57 @@
   $("#sync-key").value=store.get("sync_key","")||"";
   $("#sync-key").addEventListener("blur",()=>store.set("sync_key",$("#sync-key").value.trim()));
 
+  async function pushMerged(merged,mMeta){
+    const payload=Object.assign({}, merged); payload._meta=mMeta||{};
+    const r=await fetch(SB.url+"/rest/v1/gzh_sync",{method:"POST",headers:Object.assign(SB.headers(),{"Prefer":"resolution=merge-duplicates"}),body:JSON.stringify({code:syncKey(), data:payload})});
+    if(!r.ok) throw new Error("HTTP "+r.status+" "+((await r.text()).slice(0,140)));
+  }
+  async function readRemote(){
+    const rd={data:{},meta:{}};
+    try{
+      const r=await fetch(SB.url+"/rest/v1/gzh_sync?code=eq."+encodeURIComponent(syncKey())+"&select=code,data",{headers:SB.headers()});
+      if(r.ok){ const arr=await r.json(); if(arr.length&&arr[0].data){ const d=arr[0].data; rd.meta=d._meta||{}; delete d._meta; rd.data=d; } }
+    }catch(e){}
+    return rd;
+  }
   async function syncUpload(){
     const key=syncKey();
     if(!key){ $("#sync-status").innerHTML='<span style="color:var(--red)">先填同步码</span>'; return; }
-    $("#sync-status").textContent="上传中…";
+    $("#sync-status").textContent="上传中（先合并云端）…";
     try{
-      const r=await fetch(SB.url+"/rest/v1/gzh_sync",{method:"POST",headers:Object.assign(SB.headers(),{"Prefer":"resolution=merge-duplicates"}),body:JSON.stringify({code:key, data:collectAll()})});
-      if(!r.ok) throw new Error("HTTP "+r.status+" "+((await r.text()).slice(0,140)));
+      const remote=await readRemote();
+      const L=collectAll(), Lm=getMeta();
+      const merged=mergeSync(L,Lm,remote.data,remote.meta);
+      const mMeta=Object.assign({},Lm); Object.keys(remote.meta||{}).forEach(k=>{ if(isDataKey(k)) mMeta[k]=Math.max(mMeta[k]||0, remote.meta[k]||0); });
+      await pushMerged(merged, mMeta);
       store.set("sync_last", Date.now());
-      $("#sync-status").innerHTML='<span class="ok">已上传 · '+new Date().toLocaleString()+'</span>';
+      $("#sync-status").innerHTML='<span class="ok">已上传（已与云端合并）· '+new Date().toLocaleString()+'</span>';
+      toast("已与云端合并上传");
     }catch(e){ $("#sync-status").innerHTML='<span style="color:var(--red)">上传失败：'+e.message+'</span>'; }
   }
   async function syncDownload(){
     const key=syncKey();
     if(!key){ $("#sync-status").innerHTML='<span style="color:var(--red)">先填同步码</span>'; return; }
-    $("#sync-status").textContent="下载中…";
+    $("#sync-status").textContent="下载中（合并到本地）…";
     try{
       const r=await fetch(SB.url+"/rest/v1/gzh_sync?code=eq."+encodeURIComponent(key)+"&select=code,data,updated_at",{headers:SB.headers()});
       if(!r.ok) throw new Error("HTTP "+r.status);
       const arr=await r.json();
       if(!arr.length || !arr[0].data){ $("#sync-status").textContent="云端暂无该同步码的数据"; return; }
-      applyAll(arr[0].data);
+      const rd=arr[0].data; const Rm=rd._meta||{}; delete rd._meta; const R=rd;
+      const L=collectAll(), Lm=getMeta();
+      const merged=mergeSync(L,Lm,R,Rm);
+      const mMeta=Object.assign({},Lm,Rm);
+      persistMerged(merged, mMeta);
       renderSchedule(); renderTopics(); renderTasks(); renderStrategies(); renderKB(); renderHitFactors(); renderLowNotes();
       $("#stuck-note").value=store.get("stuck","")||"";
-      $("#sync-status").innerHTML='<span class="ok">已拉取 · 云端更新于 '+new Date(arr[0].updated_at).toLocaleString()+'</span>';
-      toast("已从云端同步");
+      // 把合并后的完整结果也写回云端，让两端真正收敛
+      try{ await pushMerged(merged, mMeta);
+        $("#sync-status").innerHTML='<span class="ok">已合并（本地+云端内容已合并并同步到云端）</span>';
+      }catch(e){
+        $("#sync-status").innerHTML='<span class="ok">已合并到本地</span> <span style="color:var(--red)">（但回写云端失败：'+e.message+'，稍后点一次上传即可）</span>';
+      }
+      toast("已合并云端内容，未覆盖本地");
     }catch(e){ $("#sync-status").innerHTML='<span style="color:var(--red)">拉取失败：'+e.message+'</span>'; }
   }
   $("#sync-upload").onclick=syncUpload;
@@ -1103,7 +1161,7 @@
   $("#sync-export").onclick=()=>{
     const blob=new Blob([JSON.stringify({updatedAt:Date.now(),data:collectAll()},null,2)],{type:"application/json"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="gzh-backup-"+new Date().toISOString().slice(0,10)+".json"; a.click();
-    $("#sync-status").textContent="已导出备份文件（本地兜底，可随时导入）";
+    $("#sync-status").textContent="已导出备份文件（本地兜底，可随时导入合并）";
   };
   $("#sync-import").onclick=()=>$("#sync-file").click();
   $("#sync-file").onchange=async(e)=>{
@@ -1111,9 +1169,12 @@
     try{
       const text=await f.text(); const j=JSON.parse(text);
       if(!j.data) throw new Error("文件格式不对");
-      applyAll(j.data); renderSchedule(); renderTopics(); renderTasks(); renderStrategies(); renderKB(); renderHitFactors(); renderLowNotes();
+      const L=collectAll(), Lm=getMeta();
+      const merged=mergeSync(L,Lm,j.data,{});
+      persistMerged(merged, Object.assign({},Lm));
+      renderSchedule(); renderTopics(); renderTasks(); renderStrategies(); renderKB(); renderHitFactors(); renderLowNotes();
       $("#stuck-note").value=store.get("stuck","")||"";
-      $("#sync-status").innerHTML='<span class="ok">已从备份文件导入</span>'; toast("已导入备份");
+      $("#sync-status").innerHTML='<span class="ok">已从备份文件合并导入</span>'; toast("已合并导入备份");
     }catch(err){ $("#sync-status").innerHTML='<span style="color:var(--red)">导入失败：'+err.message+'</span>'; }
     e.target.value="";
   };
