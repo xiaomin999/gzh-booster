@@ -151,7 +151,11 @@
   .copy{margin-left:auto}
   .chip{background:var(--accent-soft);color:#7a5aa8;border-radius:8px;padding:8px 10px;font-size:12.5px;margin:6px 0;cursor:pointer;border:1px solid #ece0f6}
   .chip:hover{background:#ece0f6}
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f2329;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f2329;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50;display:flex;align-items:center;gap:14px;max-width:90vw}
+  .toast.show{opacity:1}
+  .toast.has-action{pointer-events:auto}
+  .toast .toast-action{background:transparent;border:none;color:#f0c2ff;font-weight:700;cursor:pointer;font-size:13px;padding:0;white-space:nowrap}
+  .toast .toast-action:hover{text-decoration:underline}
   .toast.show{opacity:1}
   #update-banner{position:fixed;top:0;left:0;right:0;z-index:60;background:var(--accent);color:#fff;font-size:13px;padding:10px 14px;display:none;align-items:center;justify-content:center;gap:10px}
   #update-banner.show{display:flex}
@@ -511,7 +515,21 @@
     get(k,def){ try{const v=localStorage.getItem("gzh_"+k);return v?JSON.parse(v):def;}catch(e){return def;} },
     set(k,v){ _rawSet(k,v); const full="gzh_"+k; if(isDataKey(full)){ const m=JSON.parse(localStorage.getItem("gzh_meta")||"{}"); m[full]=Date.now(); localStorage.setItem("gzh_meta", JSON.stringify(m)); } }
   };
-  function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),1800); }
+  function toast(msg, action){
+    const t=$("#toast");
+    t.innerHTML="";
+    const span=document.createElement("span"); span.textContent=msg; t.appendChild(span);
+    t.classList.remove("has-action");
+    clearTimeout(t._t);
+    if(action){
+      const b=document.createElement("button"); b.className="toast-action"; b.textContent=action.text||"撤回";
+      b.onclick=()=>{ clearTimeout(t._t); t.classList.remove("show"); action.onClick&&action.onClick(); };
+      t.appendChild(b);
+      t.classList.add("has-action");
+    }
+    t.classList.add("show");
+    t._t=setTimeout(()=>t.classList.remove("show"), action?5000:1800);
+  }
 
   /* ---- nav ---- */
   $$(".nav-btn").forEach(b=>b.addEventListener("click",()=>{
@@ -646,7 +664,15 @@
         <div class="t-ops"><button class="ghost sm" data-load="${i}">载入</button><button class="ghost sm" data-del="${i}">删</button></div></div>
         <div class="t-angle">${esc(dr.col)} · ${esc(dr.style)} · ${esc(dr.date)}</div>`;
       div.querySelector("[data-load]").onclick=()=>{ $("#draft-title").value=dr.title||""; $("#draft-col").value=dr.col; $("#draft-style").value=dr.style; $("#draft-body").value=dr.body; toast("已载入"); };
-      div.querySelector("[data-del]").onclick=()=>{ const arr=store.get("drafts",[]); arr.splice(i,1); store.set("drafts",arr); renderDrafts(); };
+      div.querySelector("[data-del]").onclick=()=>{
+        const arr=store.get("drafts",[]);
+        const removed=arr.splice(i,1)[0];
+        store.set("drafts",arr); renderDrafts();
+        toast("已删除草稿「"+(removed.title||"（无标题）")+"」", {
+          text:"撤回",
+          onClick:()=>{ const a=store.get("drafts",[]); a.splice(Math.min(i,a.length),0,removed); store.set("drafts",a); renderDrafts(); }
+        });
+      };
       box.appendChild(div);
     });
   }
