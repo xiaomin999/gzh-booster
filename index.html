@@ -655,7 +655,7 @@
     if(!body.trim()&&!title){ toast("标题和正文至少填一个"); return; }
     const d=store.get("drafts",[]);
     d.unshift({title,col,style,body,date:new Date().toISOString().slice(0,10)});
-    store.set("drafts",d); toast("草稿已保存");
+    store.set("drafts",d); renderDrafts(); toast("草稿已保存");
   };
   $("#draft-list-btn").onclick=()=>{ const box=$("#draft-list"); box.style.display = box.style.display==="none"?"block":"none"; renderDrafts(); };
   $("#draft-prompt").onclick=()=>{
