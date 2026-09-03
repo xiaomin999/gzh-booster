@@ -132,6 +132,12 @@
   .review-section.todo::before{background:#a855f7}
   .review-section.next::before{background:#3b82f6}
   .review-section.action::before{background:#10b981}
+  /* QA 追问气泡 */
+  .qa{margin:12px 0;padding:11px 13px;border-radius:11px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+  .qa-q{background:var(--accent-soft);color:#5a3d8a;margin-left:28px}
+  .qa-a{background:#f7f8fb;border:1px solid var(--line);margin-right:28px}
+  .qa-a .review-section{margin-bottom:10px}
+  .qa-a .review-section:last-child{margin-bottom:0}
   .review-section h3,.review-section h4{margin-top:0}
   @media (max-width:760px){
     .review-scorehead{flex-direction:column;align-items:flex-start;gap:12px}
@@ -345,6 +351,12 @@
         <textarea id="review-text" style="min-height:160px" placeholder="把写好的推文贴进来"></textarea>
         <div class="btn-row"><button id="review-gen">生成复盘</button><span class="small">AI 会自动从四个维度打分，不用你手动评</span></div>
         <div id="review-result" style="display:none"></div>
+        <div id="review-qa" style="display:none;margin-top:16px;border-top:1px dashed var(--line);padding-top:14px">
+          <label>针对这篇稿子，提出你的改进问题</label>
+          <textarea id="review-q" style="min-height:70px" placeholder="例如：结尾还能怎么改得更自然？第二段是不是太啰嗦了？标题能不能更有钩子？"></textarea>
+          <div class="btn-row"><button id="review-ask">提问</button><span class="small">AI 会基于你贴的全文回答</span></div>
+          <div id="review-qa-list"></div>
+        </div>
       </div>
     </section>
 
@@ -804,11 +816,33 @@
         scores=parsed.scores; avg=parsed.avg;
         const body=stripScoreBlock(out);
         box.innerHTML='<div class="review-report">'+reviewScoreHead(avg,scores)+'<div class="review-body">'+renderReviewBody(md2html(body))+'</div></div>';
+        $("#review-qa").style.display="block";
         return;
       }catch(e){ box.innerHTML='<div class="result">AI 失败（'+e.message+'），改用离线模板：</div>'; }
     }
     let r="## 一、这篇文章最打动人的优点\n1. **真实感**\n（写下这篇里你最满意、最像自己的部分）\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **节奏/结构**\n（哪段啰嗦？哪段没讲清？哪里像在说教？）\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …\n\n---\n\n## 五、具体可执行的改进动作清单\n- **改哪里**：结尾\n- **做什么**：补一句互动邀请，让读者从「看完」变成「想回话」\n- **示例话术**：「你有类似的经历吗？欢迎在评论区留下你的故事，我会认真看。」\n- **预期效果**：提升结尾互动性，让文章更像一场对话。";
     box.innerHTML='<div class="review-report">'+reviewScoreHead(avg,scores)+'<div class="review-body">'+renderReviewBody(md2html(r))+'</div></div>';
+    $("#review-qa").style.display="block";
+  };
+  $("#review-ask").onclick=async()=>{
+    const text=$("#review-text").value.trim();
+    const q=$("#review-q").value.trim();
+    if(!text){ toast("先贴全文再提问"); return; }
+    if(!q){ toast("先写下你的问题"); return; }
+    if(!AI.ok()){ toast("先配置 AI 才能提问"); switchTab("settings"); return; }
+    const btn=$("#review-ask"); const orig=btn.textContent; btn.textContent="思考中…"; btn.disabled=true;
+    const list=$("#review-qa-list");
+    const qb=document.createElement("div"); qb.className="qa qa-q"; qb.textContent=q; list.appendChild(qb);
+    const ab=document.createElement("div"); ab.className="qa qa-a"; ab.innerHTML='<span class="small">AI 思考中…</span>'; list.appendChild(ab);
+    try{
+      const sys="你是温和的稿件复盘助手，只从「是否表达出作者自己」给建议，不考核数据。用户会提供自己的一篇推文全文，并提出一个关于如何改进的具体问题。请基于原文，给出具体、可落地、口语化的回答；必要时引用原文一两句，或给出可直接粘贴进稿件的示例话术。语气鼓励、不空谈。";
+      const userMsg="【我的稿件全文】\n"+text+"\n\n【我的问题】\n"+q;
+      const out=await AI.chat(sys, userMsg);
+      ab.innerHTML=renderReviewBody(md2html(out));
+      $("#review-q").value="";
+    }catch(e){
+      ab.innerHTML='<span style="color:var(--red)">提问失败：'+e.message+'</span>';
+    }finally{ btn.textContent=orig; btn.disabled=false; }
   };
 
   /* ===== 模块6 督促 ===== */
