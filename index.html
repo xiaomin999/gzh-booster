@@ -131,6 +131,7 @@
   .review-section.problem::before{background:#f59e0b}
   .review-section.todo::before{background:#a855f7}
   .review-section.next::before{background:#3b82f6}
+  .review-section.action::before{background:#10b981}
   .review-section h3,.review-section h4{margin-top:0}
   @media (max-width:760px){
     .review-scorehead{flex-direction:column;align-items:flex-start;gap:12px}
@@ -797,7 +798,7 @@
     if(AI.ok()){
       box.innerHTML='<div class="result">AI 正在读文章并打分…</div>';
       try{
-        const sys="你是温和的稿件复盘助手。请严格按以下格式输出：\n\n1）先给出四个维度评分（1-5分，可带0.5小数），格式必须如下：\n开篇吸引力:4/5\n逻辑流畅度:3/5\n可读性:4/5\n结尾互动性:3/5\n平均分:3.5/5\n\n2）然后空一行，用 `---` 分隔，再输出复盘内容，结构如下（标题前可带 emoji）：\n\n## 一、这篇文章最打动人的优点\n1. **小标题**\n具体说明…\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **小标题**\n具体说明…\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …\n\n语气鼓励、不考核数据，只看是否表达出作者自己。";
+        const sys="你是温和的稿件复盘助手。请严格按以下格式输出：\n\n1）先给出四个维度评分（1-5分，可带0.5小数），格式必须如下：\n开篇吸引力:4/5\n逻辑流畅度:3/5\n可读性:4/5\n结尾互动性:3/5\n平均分:3.5/5\n\n2）然后空一行，用 `---` 分隔，再输出复盘内容，结构如下（标题前可带 emoji）：\n\n## 一、这篇文章最打动人的优点\n1. **小标题**\n具体说明…\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **小标题**\n具体说明…\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …\n\n---\n\n## 五、具体可执行的改进动作清单\n给出 3–5 条能直接落笔的改动，每条格式如下：\n- **改哪里**：开头 / 中间 / 结尾 / 标题\n- **做什么**：加什么内容、删什么内容、调整顺序\n- **示例话术**：给出一两句可以直接写进原文的参考文案（可直接粘贴）\n- **预期效果**：点明这处改动会让读者产生什么反应\n\n特别要针对「结尾」给出明确的可操作建议：比如加一句互动邀请、补一个金句回勾、留一个开放式问题等。每条示例话术必须口语化、符合随笔号松弛风格。\n\n语气鼓励、不考核数据，只看是否表达出作者自己。";
         const out=await AI.chat(sys, text);
         const parsed=parseReviewScores(out);
         scores=parsed.scores; avg=parsed.avg;
@@ -806,7 +807,7 @@
         return;
       }catch(e){ box.innerHTML='<div class="result">AI 失败（'+e.message+'），改用离线模板：</div>'; }
     }
-    let r="## 一、这篇文章最打动人的优点\n1. **真实感**\n（写下这篇里你最满意、最像自己的部分）\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **节奏/结构**\n（哪段啰嗦？哪段没讲清？哪里像在说教？）\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …";
+    let r="## 一、这篇文章最打动人的优点\n1. **真实感**\n（写下这篇里你最满意、最像自己的部分）\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **节奏/结构**\n（哪段啰嗦？哪段没讲清？哪里像在说教？）\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …\n\n---\n\n## 五、具体可执行的改进动作清单\n- **改哪里**：结尾\n- **做什么**：补一句互动邀请，让读者从「看完」变成「想回话」\n- **示例话术**：「你有类似的经历吗？欢迎在评论区留下你的故事，我会认真看。」\n- **预期效果**：提升结尾互动性，让文章更像一场对话。";
     box.innerHTML='<div class="review-report">'+reviewScoreHead(avg,scores)+'<div class="review-body">'+renderReviewBody(md2html(r))+'</div></div>';
   };
 
@@ -1286,6 +1287,7 @@
       else if(/问题|不足|可优化|缺陷|bug|槽点/.test(text)) cls+=' problem';
       else if(/建议|修改|落地|怎么改|删|补/.test(text)) cls+=' todo';
       else if(/方向|迭代|下一步|升级|延伸/.test(text)) cls+=' next';
+      else if(/可执行|改进动作|实操|示例话术|落笔/.test(text)) cls+=' action';
       const wrap=document.createElement('div'); wrap.className=cls;
       sec.forEach(n=>wrap.appendChild(n));
       out.appendChild(wrap);
