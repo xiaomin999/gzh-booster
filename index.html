@@ -143,7 +143,7 @@
   .data-drop.drag{background:var(--accent-soft);border-color:var(--accent)}
   .data-drop .small{margin:0}
   .data-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
-  .data-thumb{position:relative;width:120px;height:120px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#f3f4f6}
+  .data-thumb{position:relative;width:120px;height:120px;flex:0 0 120px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#f3f4f6}
   .data-thumb img{width:100%;height:100%;object-fit:cover}
   .data-thumb .thumb-x{position:absolute;top:4px;right:4px;width:22px;height:22px;border:none;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .data-thumb .thumb-x:hover{background:var(--red)}
@@ -608,6 +608,7 @@
     async chatVision(system, images, extra){
       const c=this.cfg();
       const model=(extra&&extra.model)||c.model;
+      if(!/vl|vision|gpt-4o|claude-3|gemini|kimi|pixtral|llava|qwen2-vl|qwen-vl|internvl/i.test(model||"")) throw new Error("当前模型 "+model+" 不支持图片分析，请在「视觉模型」处填写如 qwen-vl-plus、qwen-vl-max、gpt-4o 等视觉模型");
       const arr=Array.isArray(images)?images:[images];
       const userContent=arr.map(u=>({type:"image_url", image_url:{url:u}}));
       const t=(extra&&extra.text)?extra.text:"请综合分析这些公众号后台数据截图：先逐张复述能读到的关键数字与趋势，再交叉对比、分析可能的具体原因，最后给 3-4 条可落地的改进动作。";
@@ -1141,6 +1142,31 @@
 
   /* ===== 模块9 数据分析（多图） ===== */
   let dataImages=[];
+  function compressImage(dataUrl, maxWidth, quality){
+    return new Promise((resolve)=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement("canvas");
+        let w=img.width, h=img.height;
+        if(w>maxWidth){ h=Math.round(h*maxWidth/w); w=maxWidth; }
+        canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext("2d");
+        ctx.fillStyle="#fff"; ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror=()=>resolve(dataUrl);
+      img.src=dataUrl;
+    });
+  }
+  (function(){
+    const c=AI.cfg(); const v=$("#data-vmodel");
+    if(v.value.trim()) return;
+    if(!/vl|vision|gpt-4o|claude-3|gemini|kimi|pixtral|llava|qwen2-vl|qwen-vl|internvl/i.test(c.model||"")){
+      if(/dashscope|qwen|aliyun/.test(c.endpoint||"")) v.value="qwen-vl-plus";
+      else if(/openai/.test(c.endpoint||"")) v.value="gpt-4o";
+    }
+  })();
   function renderDataThumbs(){
     const box=$("#data-thumbs"); box.innerHTML="";
     dataImages.forEach((u,i)=>{
@@ -1169,14 +1195,17 @@
   $("#data-gen").onclick=async()=>{
     if(!dataImages.length){ toast("先上传或粘贴至少一张后台数据截图"); return; }
     if(!AI.ok()){ toast("先配置 AI 才能分析"); switchTab("settings"); return; }
+    if(dataImages.length>8){ toast("一次最多传 8 张，请先移除几张"); return; }
     const box=$("#data-result"); box.style.display="block";
-    box.innerHTML='<div class="result">AI 正在识别 '+(dataImages.length>1?dataImages.length+" 张截图":"截图")+' 数据并分析原因…</div>';
     const btn=$("#data-gen"); const orig=btn.textContent; btn.textContent="分析中…"; btn.disabled=true;
     const note=$("#data-note").value.trim();
     const vmodel=$("#data-vmodel").value.trim();
     const sys="你是公众号数据分析助手。用户会贴一张或多张公众号后台数据截图（阅读量、转发、收藏、涨粉、分享率、完读率、关注来源、时段分布等）。请：1）先逐张客观复述你能从图里读到的关键数字与趋势；2）若有多张，交叉对比、分析可能的具体原因（内容选题、标题、推送时间、封面、粉丝结构、选题匹配度等）；3）给出 3-4 条可落地的改进动作，每条说明改什么、预期效果。语气务实、不说空话。如果用户补充了背景，请结合背景判断。";
     try{
-      const out=await AI.chatVision(sys, dataImages, {text: note?("【我的补充背景】\n"+note):"", model:vmodel});
+      box.innerHTML='<div class="result">正在压缩 '+(dataImages.length>1?dataImages.length+" 张":"1 张")+' 图片…</div>';
+      const compressed=await Promise.all(dataImages.map(u=>compressImage(u,1280,0.8)));
+      box.innerHTML='<div class="result">AI 正在识别 '+(compressed.length>1?compressed.length+" 张截图":"截图")+' 数据并分析原因…</div>';
+      const out=await AI.chatVision(sys, compressed, {text: note?("【我的补充背景】\n"+note):"", model:vmodel});
       box.innerHTML='<div class="review-report"><div class="review-body">'+renderReviewBody(md2html(out))+'</div></div>';
     }catch(e){
       box.innerHTML='<div class="result" style="color:var(--red)">分析失败：'+e.message+'<br><br>若提示模型不支持图片，请在上方「视觉模型」填一个支持图片的模型（如 qwen-vl-plus、qwen-vl-max、gpt-4o），或在 AI 设置里把模型改成视觉模型后重试。</div>';
