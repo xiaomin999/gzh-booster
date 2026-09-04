@@ -142,6 +142,12 @@
   .data-drop{border:1px dashed var(--line);border-radius:10px;padding:16px;text-align:center;background:#fafbfc;display:flex;flex-direction:column;align-items:center;gap:8px}
   .data-drop.drag{background:var(--accent-soft);border-color:var(--accent)}
   .data-drop .small{margin:0}
+  .data-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .data-thumb{position:relative;width:120px;height:120px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#f3f4f6}
+  .data-thumb img{width:100%;height:100%;object-fit:cover}
+  .data-thumb .thumb-x{position:absolute;top:4px;right:4px;width:22px;height:22px;border:none;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .data-thumb .thumb-x:hover{background:var(--red)}
+  .data-count{margin-top:6px;color:var(--muted);font-size:12px}
   .review-section h3,.review-section h4{margin-top:0}
   @media (max-width:760px){
     .review-scorehead{flex-direction:column;align-items:flex-start;gap:12px}
@@ -489,18 +495,16 @@
       <h2>📊 公众号数据分析</h2>
       <p class="sub">粘贴或上传后台数据截图（阅读 / 涨粉 / 分享 / 转化等），AI 帮你分析具体原因与改进方向。</p>
       <div class="card">
-        <label>上传 / 粘贴后台数据截图</label>
+        <label>上传 / 粘贴后台数据截图（可多张，综合分析）</label>
         <div id="data-drop" class="data-drop">
-          <input type="file" id="data-file" accept="image/*" hidden>
+          <input type="file" id="data-file" accept="image/*" multiple hidden>
           <button class="ghost" id="data-pick" type="button">选择图片</button>
-          <span class="small">或把截图直接 Ctrl/⌘+V 粘贴到此处，也可拖拽进来</span>
+          <span class="small">可多选；或把截图直接 Ctrl/⌘+V 粘贴，也可把多张一起拖拽进来</span>
         </div>
-        <div id="data-preview" style="display:none;margin-top:10px">
-          <img id="data-img" style="max-width:100%;max-height:360px;border:1px solid var(--line);border-radius:10px">
-          <div style="margin-top:6px"><button class="ghost sm" id="data-clear" type="button">移除</button></div>
-        </div>
+        <div id="data-thumbs" class="data-thumbs"></div>
+        <div id="data-count" class="data-count" style="display:none"></div>
         <label>补充说明（选填）</label>
-        <textarea id="data-note" style="min-height:60px" placeholder="例如：这篇是周三晚发的，标题是《…》，最近阅读持续下滑；或这是某个时间段的趋势图"></textarea>
+        <textarea id="data-note" style="min-height:60px" placeholder="例如：这些分别是周三、周四的推送数据；或这是同一篇在不同时间段的趋势图。说明越具体，分析越准"></textarea>
         <label>视觉模型（选填，需支持图片）</label>
         <input id="data-vmodel" placeholder="留空则用 AI 设置里的模型（建议 qwen-vl-plus / gpt-4o）">
         <div class="btn-row"><button id="data-gen" type="button">分析数据</button><span class="small">需要支持图片的模型</span></div>
@@ -601,11 +605,12 @@
       const j=await r.json();
       return j.choices[0].message.content;
     },
-    async chatVision(system, image, extra){
+    async chatVision(system, images, extra){
       const c=this.cfg();
       const model=(extra&&extra.model)||c.model;
-      const userContent=[{type:"image_url", image_url:{url:image}}];
-      const t=(extra&&extra.text)?extra.text:"请分析这张公众号后台数据截图，先复述关键数字与趋势，再分析可能原因，最后给改进建议。";
+      const arr=Array.isArray(images)?images:[images];
+      const userContent=arr.map(u=>({type:"image_url", image_url:{url:u}}));
+      const t=(extra&&extra.text)?extra.text:"请综合分析这些公众号后台数据截图：先逐张复述能读到的关键数字与趋势，再交叉对比、分析可能的具体原因，最后给 3-4 条可落地的改进动作。";
       userContent.push({type:"text", text:t});
       const r=await fetch(c.endpoint,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+c.key},
         body:JSON.stringify({model:model, messages:[{role:"system",content:system},{role:"user",content:userContent}], temperature:0.6})});
@@ -1134,43 +1139,44 @@
   };
   renderKB(); renderHitFactors(); renderLowNotes();
 
-  /* ===== 模块9 数据分析 ===== */
-  let dataImage=null;
-  function setDataImage(dataUrl){
-    dataImage=dataUrl;
-    $("#data-img").src=dataUrl;
-    $("#data-preview").style.display="block";
-    $("#data-drop").style.display="none";
+  /* ===== 模块9 数据分析（多图） ===== */
+  let dataImages=[];
+  function renderDataThumbs(){
+    const box=$("#data-thumbs"); box.innerHTML="";
+    dataImages.forEach((u,i)=>{
+      const d=document.createElement("div"); d.className="data-thumb";
+      d.innerHTML='<img src="'+u+'"><button class="thumb-x" data-i="'+i+'" type="button" title="移除">×</button>';
+      d.querySelector(".thumb-x").onclick=()=>{ dataImages.splice(i,1); renderDataThumbs(); };
+      box.appendChild(d);
+    });
+    const cnt=$("#data-count");
+    if(dataImages.length){ cnt.style.display="block"; cnt.textContent="已选 "+dataImages.length+" 张"+(dataImages.length>1?"（将合并分析）":""); }
+    else cnt.style.display="none";
   }
-  function clearDataImage(){
-    dataImage=null;
-    $("#data-preview").style.display="none";
-    $("#data-drop").style.display="flex";
-    $("#data-file").value="";
-  }
+  function addDataImage(dataUrl){ dataImages.push(dataUrl); renderDataThumbs(); }
+  function clearDataImages(){ dataImages=[]; renderDataThumbs(); }
   $("#data-pick").onclick=()=>$("#data-file").click();
-  $("#data-file").onchange=e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>setDataImage(rd.result); rd.readAsDataURL(f); };
-  $("#data-clear").onclick=clearDataImage;
+  $("#data-file").onchange=e=>{ const fs=e.target.files; if(!fs||!fs.length) return; [].forEach.call(fs,f=>{ const rd=new FileReader(); rd.onload=()=>addDataImage(rd.result); rd.readAsDataURL(f); }); $("#data-file").value=""; };
   const dataDrop=$("#data-drop");
   dataDrop.addEventListener("dragover",e=>{e.preventDefault();dataDrop.classList.add("drag");});
   dataDrop.addEventListener("dragleave",e=>dataDrop.classList.remove("drag"));
-  dataDrop.addEventListener("drop",e=>{e.preventDefault();dataDrop.classList.remove("drag"); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith("image/")){ const rd=new FileReader(); rd.onload=()=>setDataImage(rd.result); rd.readAsDataURL(f); }});
+  dataDrop.addEventListener("drop",e=>{e.preventDefault();dataDrop.classList.remove("drag"); const fs=e.dataTransfer.files; if(fs&&fs.length){ [].forEach.call(fs,f=>{ if(f&&f.type.startsWith("image/")){ const rd=new FileReader(); rd.onload=()=>addDataImage(rd.result); rd.readAsDataURL(f); } }); }});
   document.addEventListener("paste",e=>{
     if($("#data").style.display==="none") return;
     const items=e.clipboardData&&e.clipboardData.items; if(!items) return;
-    for(const it of items){ if(it.type&&it.type.startsWith("image/")){ const f=it.getAsFile(); if(!f) continue; const rd=new FileReader(); rd.onload=()=>setDataImage(rd.result); rd.readAsDataURL(f); e.preventDefault(); return; } }
+    for(const it of items){ if(it.type&&it.type.startsWith("image/")){ const f=it.getAsFile(); if(!f) continue; const rd=new FileReader(); rd.onload=()=>addDataImage(rd.result); rd.readAsDataURL(f); e.preventDefault(); return; } }
   });
   $("#data-gen").onclick=async()=>{
-    if(!dataImage){ toast("先上传或粘贴一张后台数据截图"); return; }
+    if(!dataImages.length){ toast("先上传或粘贴至少一张后台数据截图"); return; }
     if(!AI.ok()){ toast("先配置 AI 才能分析"); switchTab("settings"); return; }
     const box=$("#data-result"); box.style.display="block";
-    box.innerHTML='<div class="result">AI 正在识别截图数据并分析原因…</div>';
+    box.innerHTML='<div class="result">AI 正在识别 '+(dataImages.length>1?dataImages.length+" 张截图":"截图")+' 数据并分析原因…</div>';
     const btn=$("#data-gen"); const orig=btn.textContent; btn.textContent="分析中…"; btn.disabled=true;
     const note=$("#data-note").value.trim();
     const vmodel=$("#data-vmodel").value.trim();
-    const sys="你是公众号数据分析助手。用户会贴一张公众号后台数据截图（阅读量、转发、收藏、涨粉、分享率、完读率、关注来源、时段分布等）。请：1）先客观复述你能从图里读到的关键数字与趋势；2）分析可能的具体原因（内容选题、标题、推送时间、封面、粉丝结构、选题匹配度等）；3）给出 3-4 条可落地的改进动作，每条说明改什么、预期效果。语气务实、不说空话。如果用户补充了背景，请结合背景判断。";
+    const sys="你是公众号数据分析助手。用户会贴一张或多张公众号后台数据截图（阅读量、转发、收藏、涨粉、分享率、完读率、关注来源、时段分布等）。请：1）先逐张客观复述你能从图里读到的关键数字与趋势；2）若有多张，交叉对比、分析可能的具体原因（内容选题、标题、推送时间、封面、粉丝结构、选题匹配度等）；3）给出 3-4 条可落地的改进动作，每条说明改什么、预期效果。语气务实、不说空话。如果用户补充了背景，请结合背景判断。";
     try{
-      const out=await AI.chatVision(sys, dataImage, {text: note?("【我的补充背景】\n"+note):"", model:vmodel});
+      const out=await AI.chatVision(sys, dataImages, {text: note?("【我的补充背景】\n"+note):"", model:vmodel});
       box.innerHTML='<div class="review-report"><div class="review-body">'+renderReviewBody(md2html(out))+'</div></div>';
     }catch(e){
       box.innerHTML='<div class="result" style="color:var(--red)">分析失败：'+e.message+'<br><br>若提示模型不支持图片，请在上方「视觉模型」填一个支持图片的模型（如 qwen-vl-plus、qwen-vl-max、gpt-4o），或在 AI 设置里把模型改成视觉模型后重试。</div>';
