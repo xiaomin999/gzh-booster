@@ -600,10 +600,13 @@
     async chat(system, user){
       const c=this.cfg();
       const r=await fetch(c.endpoint,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+c.key},
-        body:JSON.stringify({model:c.model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.8})});
-      if(!r.ok) throw new Error("HTTP "+r.status);
+        body:JSON.stringify({model:c.model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.8,max_tokens:4096})});
+      if(!r.ok) throw new Error("HTTP "+r.status+" "+(await r.text()).slice(0,200));
       const j=await r.json();
-      return j.choices[0].message.content;
+      const choice=j.choices[0];
+      let text=choice.message.content||"";
+      if(choice.finish_reason==="length") text+="\n\n⚠️ 输出被模型截断（token 不足），建议精简全文或分多次复盘。";
+      return text;
     },
     async chatVision(system, images, extra){
       const c=this.cfg();
