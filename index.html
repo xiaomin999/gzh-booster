@@ -95,6 +95,14 @@
   .topic .t-meta{color:#9aa0ab;font-size:11px;margin-top:6px}
   .topic .t-ops{display:flex;gap:6px}
   .topic .t-ops button{padding:4px 9px;font-size:11px}
+  .hot-card{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;background:linear-gradient(180deg,#fffdfa 0%,#fff 100%);border-left:4px solid var(--amber)}
+  .hot-card .hc-title{font-weight:700;font-size:15px;color:#8a5a17;margin-bottom:8px}
+  .hot-card .hc-row{display:flex;gap:8px;margin-top:6px;font-size:12.5px;line-height:1.55}
+  .hot-card .hc-k{flex:0 0 86px;color:var(--muted);font-size:11.5px;padding-top:1px}
+  .hot-card .hc-v{color:var(--ink);flex:1}
+  .hot-card .hc-ops{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .hot-card .hc-ops button{padding:4px 10px;font-size:11px}
+  .small{color:var(--muted);font-size:11.5px}
   .str-item{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:10px}
   .str-item .t-title{cursor:pointer;user-select:none}
   .str-item .str-caret{display:inline-block;color:var(--muted);font-size:11px;margin-right:6px;transition:transform .15s}
@@ -215,6 +223,7 @@
     <button class="nav-btn active" data-tab="kb"><span class="em">📚</span>知识库</button>
     <button class="nav-btn" data-tab="plan"><span class="em">📌</span>定位&amp;排期</button>
     <button class="nav-btn" data-tab="topics"><span class="em">💡</span>选题库</button>
+    <button class="nav-btn" data-tab="hot"><span class="em">🔥</span>爆款选题</button>
     <button class="nav-btn" data-tab="write"><span class="em">✍️</span>写稿</button>
     <button class="nav-btn" data-tab="title"><span class="em">🏷️</span>标题摘要</button>
     <button class="nav-btn" data-tab="review"><span class="em">🔍</span>稿件复盘</button>
@@ -297,6 +306,39 @@
         </div>
         <div id="topic-list" style="margin-top:14px"></div>
         <div id="topic-empty" class="empty" style="display:none">选题库空空，先把上面的碎片丢进来，或手动加一条。</div>
+      </div>
+    </section>
+
+    <!-- 模块2.5 爆款选题 -->
+    <section id="hot" class="tab" style="display:none">
+      <h2>🔥 爆款选题</h2>
+      <p class="sub">觉得定位人群阅读量上不去？这里基于你的栏目人设 + 目标人群 + 你对自己瓶颈的判断，生成「更对路、更容易被点开」的爆款潜力选题，并解释为什么能爆、对谁爆。</p>
+      <div class="card">
+        <h3>生成条件</h3>
+        <div class="row">
+          <div><label>栏目（决定人设基调）</label><select id="hot-col"></select></div>
+          <div><label>生成数量</label>
+            <select id="hot-count">
+              <option value="4">4 个</option>
+              <option value="6">6 个</option>
+              <option value="3">3 个</option>
+            </select>
+          </div>
+        </div>
+        <label>目标人群（选填，留空让 AI 从你栏目推断）</label>
+        <input id="hot-aud" placeholder="例如：25-35 岁职场女性 / 同样在自我成长里挣扎的人 / 刚开始理财的小白">
+        <label>你觉得自己阅读量不高的原因（选填）</label>
+        <textarea id="hot-bottle" style="min-height:70px" placeholder="例如：标题太内敛没人点 / 写得太像日记只有老读者看 / 选题太小众缺乏共鸣点 / 发布时间不对。写越具体，选题越对症。"></textarea>
+        <div class="btn-row">
+          <button id="hot-gen">生成爆款潜力选题</button>
+          <button class="ghost" id="hot-clear">清空结果</button>
+        </div>
+        <div class="small" id="hot-tip">未配置 AI 时，会给出一组通用爆款角度模板（仍需你结合栏目落地）。配置 AI 后点「生成」即可产出贴合你账号的选题。</div>
+      </div>
+      <div class="card">
+        <h3>爆款潜力选题 <span class="small">（生成后可一键加入选题库 / 生成初稿）</span></h3>
+        <div id="hot-list"></div>
+        <div id="hot-empty" class="empty" style="display:none">还没有生成，先在上方设定条件点「生成爆款潜力选题」。</div>
       </div>
     </section>
 
@@ -638,11 +680,12 @@
   }
   function fillColumnSelects(){
     const cols=getColumns();
-    const sch=$("#sch-col"); const draft=$("#draft-col");
+    const sch=$("#sch-col"); const draft=$("#draft-col"); const hot=$("#hot-col");
     const rest='<option value="（休息）">（休息 / 不更）</option>';
     const opts=cols.map(c=>`<option value="${esc(fullName(c))}">${esc(fullName(c))}</option>`).join('');
     if(sch) sch.innerHTML=opts+rest;
     if(draft) draft.innerHTML=opts;
+    if(hot) hot.innerHTML=opts;
   }
   function renderColumnEditor(){
     const box=$("#col-editor"); if(!box) return;
@@ -778,6 +821,82 @@
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click();
   }
   renderTopics();
+
+  /* ===== 模块2.5 爆款选题 ===== */
+  function renderHot(){
+    const data=store.get("hotlist",[]);
+    const box=$("#hot-list"); const empty=$("#hot-empty");
+    box.innerHTML="";
+    if(!data.length){ empty.style.display="block"; return; }
+    empty.style.display="none";
+    data.forEach((t,i)=>{
+      const variants=Array.isArray(t.variants)&&t.variants.length?t.variants.map(v=>esc(v)).join(" ／ "):"（无）";
+      const div=document.createElement("div"); div.className="hot-card";
+      div.innerHTML=`
+        <div class="hc-title">${esc(t.title)}</div>
+        <div class="hc-row"><span class="hc-k">🔥 为什么能爆</span><div class="hc-v">${esc(t.why||"（无）")}</div></div>
+        <div class="hc-row"><span class="hc-k">🎯 对路人群</span><div class="hc-v">${esc(t.audience||"（无）")}</div></div>
+        <div class="hc-row"><span class="hc-k">✍️ 写作角度</span><div class="hc-v">${esc(t.angle||"（无）")}</div></div>
+        <div class="hc-row"><span class="hc-k">🏷️ 标题变体</span><div class="hc-v">${variants}</div></div>
+        <div class="hc-row"><span class="hc-k">💡 开头钩子</span><div class="hc-v">${esc(t.hook||"（无）")}</div></div>
+        <div class="hc-ops">
+          <button class="soft sm" data-add="${i}">加入选题库</button>
+          <button class="ghost sm" data-draft="${i}">生成初稿</button>
+          <button class="ghost sm" data-copy="${i}">复制</button>
+        </div>`;
+      div.querySelector("[data-add]").onclick=()=>{
+        addTopic(t.title, "爆款潜力｜"+(t.why||"")+" 角度："+(t.angle||"")+(t.hook?(" 开头：「"+t.hook+"」"):""), "b");
+        toast("已加入选题库（流量爆款）");
+      };
+      div.querySelector("[data-draft]").onclick=()=>{
+        $("#draft-title").value=t.title||"";
+        $("#draft-body").value=(t.angle||"")+(t.hook?("\n\n开头钩子：「"+t.hook+"」"):"")+(t.why?("\n\n可重点打的情绪点："+t.why):"");
+        switchTab("write");
+        if(AI.ok()) generateAIDraft(); else toast("已载入选题，配置 AI 后可一键生成初稿");
+      };
+      div.querySelector("[data-copy]").onclick=()=>{
+        const txt=`标题：${t.title}\n为什么能爆：${t.why||""}\n对路人群：${t.audience||""}\n写作角度：${t.angle||""}\n标题变体：${Array.isArray(t.variants)?t.variants.join(" / "):""}\n开头钩子：${t.hook||""}`;
+        navigator.clipboard.writeText(txt).then(()=>toast("已复制")).catch(()=>toast("复制失败"));
+      };
+      box.appendChild(div);
+    });
+  }
+  $("#hot-gen").onclick=async()=>{
+    const col=$("#hot-col").value;
+    const aud=$("#hot-aud").value.trim();
+    const bottle=$("#hot-bottle").value.trim();
+    const n=parseInt($("#hot-count").value,10)||4;
+    const btn=$("#hot-gen"); const orig=btn.textContent;
+    if(AI.ok()){
+      btn.textContent="生成中…"; btn.disabled=true;
+      try{
+        const sys="你是公众号爆款选题策划专家，擅长把小众随笔号的内容潜力挖掘成高传播选题，但绝不鼓励标题党、不违背'纯粹自我记录随笔号'的人设。请基于用户给的栏目定位、目标人群（可能为空需你推断）、以及他对阅读量不高的判断，生成 N 个'爆款潜力'选题。每个选题返回 JSON 对象：{title, why, audience, angle, variants, hook}。title=吸引人但不夸张的短文标题；why=为什么这个选题容易爆（点出情绪/痛点/共鸣/悬念/反差/热点钩子中的哪几种，1-2 句）；audience=最对路的目标人群画像（身份/心境）；angle=一句内容角度说明可以怎么写；variants=2-3 个可选标题变体（字符串数组）；hook=能勾住人往下看的开头一句话。只返回 JSON 数组，不要其他文字。";
+        const user=`栏目定位：${col}\n目标人群：${aud||"（请根据栏目自行推断）"}\n我对阅读量不高的判断：${bottle||"（无，请按通用爆款逻辑把握）"}\n请生成 ${n} 个选题。`;
+        const out=await AI.chat(sys, user);
+        const m=out.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
+        if(Array.isArray(arr)&&arr.length){
+          arr.forEach(o=>{ if(!o.title) o.title="（待打磨）"; });
+          store.set("hotlist", arr);
+          renderHot();
+          toast("已生成 "+arr.length+" 个爆款潜力选题");
+        }else toast("AI 没返回有效选题，换个说法再试");
+      }catch(e){ toast("生成失败："+e.message); }
+      finally{ btn.textContent=orig; btn.disabled=false; }
+    }else{
+      const tmpl=[
+        {title:"写给也在为「"+(col||"生活")+"」挣扎的你", why:"强共情——把'我'换成'我们'，让同处境的人觉得'这说的不就是我吗'。", audience:"和你在同一处境里的普通人", angle:"用一段自己的真实卡点开场，再给一点点微小的出口。", variants:["写给也在为这件事挣扎的你","承认吧，这件事真的很磨人","不慌，我和它和解了"], hook:"昨天我又卡在同一个地方，然后突然想通了一件事。"},
+        {title:"我做「"+(col||"这件事")+"」踩过的 5 个坑", why:"干货+避坑天然高收藏，'踩坑'带真实感和可信度。", audience:"想上手但怕走弯路的新手", angle:"列 5 个自己真实踩过的雷，每条给一句怎么避。", variants:["我做XX踩过的5个坑","一文讲清XX，建议收藏","XX避坑指南：我替你试错了"], hook:"如果重来一次，这 5 个坑我一个都不想再踩。"},
+        {title:"关于「"+(col||"这件事")+"」，你可能一直理解反了", why:"认知颠覆引发好奇，点开率高。", audience:"有基础认知、愿意被刷新的人", angle:"先抛一个常见误解，再用自己的体验把它翻过来。", variants:["你可能一直理解反了","聊XX前，先搞懂这3件事","这件事，我观察好久才敢说"], hook:"我以为我早就懂了，直到上个月栽了个跟头。"},
+        {title:"一个月里，我和「"+(col||"这件事")+"」的关系变了", why:"时间线+变化感制造追看欲，也容易被转发'给同样在变的人'。", audience:"处在变化期、想看见参照的人", angle:"用几个时间节点串起心态/做法的变化。", variants:["一个月，我和它的关系变了","慢慢来，比较快","不慌，先动一笔"], hook:"30 天前我绝对想不到，今天会这么平静地写它。"}
+      ];
+      const cut=tmpl.slice(0,Math.min(n,tmpl.length));
+      store.set("hotlist", cut);
+      renderHot();
+      toast("已给出 "+cut.length+" 个通用爆款角度（建议配置 AI 得更贴合）");
+    }
+  };
+  $("#hot-clear").onclick=()=>{ if(confirm("清空已生成的爆款选题？")){ store.set("hotlist",[]); renderHot(); } };
+  renderHot();
 
   /* ===== 模块3 写稿 ===== */
   function renderDrafts(){
