@@ -67,6 +67,15 @@
   textarea{resize:vertical;min-height:90px;line-height:1.6}
   .row{display:flex;gap:12px;flex-wrap:wrap}
   .row>*{flex:1;min-width:160px}
+  .col-editor{display:flex;flex-direction:column;gap:10px}
+  .col-item{display:flex;gap:8px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fafbfc}
+  .col-item .col-icon{width:44px;flex:0 0 44px;text-align:center}
+  .col-item .col-icon input{width:100%;text-align:center;font-size:16px;padding:6px 2px;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .col-item .col-main{flex:1;display:flex;flex-direction:column;gap:6px}
+  .col-item .col-main input,.col-item .col-main textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:#fff}
+  .col-item .col-main textarea{min-height:44px;resize:vertical}
+  .col-item .col-del{flex:0 0 auto;background:#fff;color:var(--red);border:1px solid #fecaca;padding:5px 9px;font-size:12px}
+  .col-add{margin-top:6px}
   button{
     background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:9px;
     cursor:pointer;font-size:13px;font-family:inherit;
@@ -219,9 +228,8 @@
   <main class="main">
     <div class="topbar">
       <div><b>固定设定</b>｜纯粹自我记录随笔号 · 写给自己 · 随缘遇见同频读者 · 不为涨粉变现</div>
-      <div class="tags">
-        <span>📝 生活成长碎记</span><span>🔧 折腾手记</span><span>✨ 片刻随感</span>
-        <span>灵感驱动 · 允许断更 · 不设 KPI</span>
+      <div class="tags" id="top-tags">
+        <span class="top-tag-fixed">灵感驱动 · 允许断更 · 不设 KPI</span>
       </div>
     </div>
 
@@ -230,12 +238,9 @@
       <h2>📌 账号定位 &amp; 栏目排期</h2>
       <p class="sub">账号定位已固定（随笔号），这里只做排期表。任务别排太满，防完不成摆烂。</p>
       <div class="card">
-        <h3>我的栏目</h3>
-        <div class="row">
-          <div><label>📝 生活成长碎记</label><div class="small">个人生活、成长中的真实片段与感悟</div></div>
-          <div><label>🔧 折腾手记</label><div class="small">折腾的事：Python、理财、工具、副业实验</div></div>
-          <div><label>✨ 片刻随感</label><div class="small">情绪、碎片念头、几百字也能发</div></div>
-        </div>
+        <h3>我的栏目 <span class="small">（点击即可改名 / 改描述，可增删）</span></h3>
+        <div id="col-editor" class="col-editor"></div>
+        <div class="btn-row" style="margin-top:10px"><button id="col-add" class="ghost sm" type="button">+ 添加栏目</button></div>
       </div>
       <div class="card">
         <h3>月度排期表</h3>
@@ -243,12 +248,7 @@
         <div class="row">
           <div><label>日期 / 周次</label><input id="sch-date" placeholder="如 8月第3周 / 0815"></div>
           <div><label>栏目</label>
-            <select id="sch-col">
-              <option value="📝 生活成长碎记">📝 生活成长碎记</option>
-              <option value="🔧 折腾手记">🔧 折腾手记</option>
-              <option value="✨ 片刻随感">✨ 片刻随感</option>
-              <option value="（休息）">（休息 / 不更）</option>
-            </select>
+            <select id="sch-col"><option value="（休息）">（休息 / 不更）</option></select>
           </div>
         </div>
         <div class="row">
@@ -308,11 +308,7 @@
         <div class="row">
           <div><label>标题（可空）</label><input id="draft-title" placeholder="先不取也行"></div>
           <div><label>栏目</label>
-            <select id="draft-col">
-              <option>📝 .生活成长碎记</option>
-              <option>🔧 折腾手记</option>
-              <option>✨ 片刻随感</option>
-            </select>
+            <select id="draft-col"></select>
           </div>
           <div><label>文风</label>
             <select id="draft-style">
@@ -627,6 +623,69 @@
     }
   };
 
+  /* ===== 栏目管理（供排期/写稿/顶部标签共用） ===== */
+  const DEFAULT_COLUMNS=[
+    {icon:"📝", name:"生活成长碎记", desc:"个人生活、成长中的真实片段与感悟"},
+    {icon:"🔧", name:"折腾手记", desc:"折腾的事：Python、理财、工具、副业实验"},
+    {icon:"✨", name:"片刻随感", desc:"情绪、碎片念头、几百字也能发"}
+  ];
+  function getColumns(){ return store.get("columns", DEFAULT_COLUMNS); }
+  function fullName(col){ return col.icon+" "+col.name; }
+  function renderTopTags(){
+    const wrap=$("#top-tags"); if(!wrap) return;
+    const cols=getColumns();
+    wrap.innerHTML=cols.map(c=>`<span>${esc(fullName(c))}</span>`).join('')+'<span class="top-tag-fixed">灵感驱动 · 允许断更 · 不设 KPI</span>';
+  }
+  function fillColumnSelects(){
+    const cols=getColumns();
+    const sch=$("#sch-col"); const draft=$("#draft-col");
+    const rest='<option value="（休息）">（休息 / 不更）</option>';
+    const opts=cols.map(c=>`<option value="${esc(fullName(c))}">${esc(fullName(c))}</option>`).join('');
+    if(sch) sch.innerHTML=opts+rest;
+    if(draft) draft.innerHTML=opts;
+  }
+  function renderColumnEditor(){
+    const box=$("#col-editor"); if(!box) return;
+    const cols=getColumns();
+    box.innerHTML="";
+    cols.forEach((c,i)=>{
+      const div=document.createElement("div"); div.className="col-item";
+      div.innerHTML=`<div class="col-icon"><input value="${esc(c.icon)}" data-idx="${i}" data-field="icon" placeholder="emoji" maxlength="3"></div>
+        <div class="col-main">
+          <input value="${esc(c.name)}" data-idx="${i}" data-field="name" placeholder="栏目名称">
+          <textarea data-idx="${i}" data-field="desc" placeholder="栏目描述（一句话说明这个栏目写什么）">${esc(c.desc)}</textarea>
+        </div>
+        <button class="col-del ghost sm" data-del="${i}">删除</button>`;
+      div.querySelectorAll('input,textarea').forEach(el=>{
+        el.onchange=()=>saveColumnFromEditor(i, el.dataset.field, el.value);
+        el.oninput=()=>{ if(el.dataset.field==="icon") el.value=el.value.slice(0,2); };
+      });
+      div.querySelector('[data-del]').onclick=()=>deleteColumn(i);
+      box.appendChild(div);
+    });
+  }
+  function saveColumnFromEditor(idx, field, value){
+    const cols=getColumns();
+    if(!cols[idx]) return;
+    cols[idx][field]=value.trim();
+    if(field==="icon") cols[idx][field]=value.trim().slice(0,2);
+    store.set("columns",cols);
+    renderTopTags(); fillColumnSelects();
+  }
+  function deleteColumn(idx){
+    const cols=getColumns();
+    if(cols.length<=1){ toast("至少保留一个栏目"); return; }
+    cols.splice(idx,1); store.set("columns",cols);
+    renderColumnEditor(); renderTopTags(); fillColumnSelects();
+  }
+  function addColumn(){
+    const cols=getColumns();
+    cols.push({icon:"🆕", name:"新栏目", desc:"在这里写这个栏目的定位"});
+    store.set("columns",cols);
+    renderColumnEditor(); renderTopTags(); fillColumnSelects();
+  }
+  const colAddBtn=$("#col-add"); if(colAddBtn) colAddBtn.onclick=addColumn;
+
   /* ===== 模块1 排期 ===== */
   function renderSchedule(){
     const data=store.get("schedule",[]);
@@ -648,6 +707,7 @@
     $("#sch-date").value=""; $("#sch-topic").value=""; renderSchedule(); toast("已加入排期");
   };
   $("#sch-clear").onclick=()=>{ if(confirm("清空整张排期表？")){ store.set("schedule",[]); renderSchedule(); } };
+  renderColumnEditor(); renderTopTags(); fillColumnSelects();
   renderSchedule();
 
   /* ===== 模块2 选题库 ===== */
@@ -1331,6 +1391,7 @@
       const merged=mergeSync(L,Lm,R,Rm);
       const mMeta=Object.assign({},Lm,Rm);
       persistMerged(merged, mMeta);
+      renderColumnEditor(); renderTopTags(); fillColumnSelects();
       renderSchedule(); renderTopics(); renderTasks(); renderStrategies(); renderKB(); renderHitFactors(); renderLowNotes();
       $("#stuck-note").value=store.get("stuck","")||"";
       // 把合并后的完整结果也写回云端，让两端真正收敛
@@ -1358,6 +1419,7 @@
       const L=collectAll(), Lm=getMeta();
       const merged=mergeSync(L,Lm,j.data,{});
       persistMerged(merged, Object.assign({},Lm));
+      renderColumnEditor(); renderTopTags(); fillColumnSelects();
       renderSchedule(); renderTopics(); renderTasks(); renderStrategies(); renderKB(); renderHitFactors(); renderLowNotes();
       $("#stuck-note").value=store.get("stuck","")||"";
       $("#sync-status").innerHTML='<span class="ok">已从备份文件合并导入</span>'; toast("已合并导入备份");
