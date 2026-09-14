@@ -19,6 +19,8 @@
     --green:#3aa675;
     --amber:#e0a73c;
     --red:#d9697a;
+    --ok:#3aa675;
+    --warn:#e0a73c;
     --radius:14px;
     --shadow:0 1px 3px rgba(20,20,40,.06),0 6px 18px rgba(20,20,40,.05);
   }
@@ -214,13 +216,33 @@
     .topbar{font-size:11.5px}
     .table-scroll{overflow-x:auto}
   }
+  /* 工作台总览 */
+  .wb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .wb-card h3{margin-top:0}
+  .wb-li{padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px;line-height:1.5}
+  .wb-li:last-child{border-bottom:none}
+  .wb-li b{color:var(--accent)}
+  .wb-note{margin-top:8px;font-size:12.5px;color:var(--muted)}
+  .wb-card .btn-row{margin-top:10px}
+  @media (max-width:760px){ .wb-grid{grid-template-columns:1fr} }
+  /* 数据分析沉淀动作 */
+  .data-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+  /* 发布前3问 */
+  .self-check{display:block;font-size:13.5px;line-height:1.9;cursor:pointer;color:var(--text)}
+  .self-check input{margin-right:6px;transform:translateY(1px)}
+  .self-check .ok{color:var(--ok)} .self-check .warn{color:var(--warn)}
+  .ok{color:var(--ok)} .warn{color:var(--warn)}
+  /* 一鱼多吃 */
+  .reuse-report{margin-top:10px;font-size:13.5px;line-height:1.7;white-space:pre-wrap}
+  .reuse-report h4{margin:10px 0 4px}
 </style>
 </head>
 <body data-page-node-id="uwcO4oHV1XxGg8pSWMKstM">
 <div class="wrap" data-page-node-id="8aorz0PUjEfCO6FAudA8VG">
   <aside class="sidebar" data-page-node-id="GetzZrzozsJZhjZeO2YrML">
     <div class="brand" data-page-node-id="HCsktZAFnxQM5XYpvBB7TM">📚 公众号助推助手<small data-page-node-id="JY0EFHS3SBUmqzPzlG7pZk">随笔号 · 不催更 · 松弛写</small></div>
-    <button class="nav-btn active" data-tab="plan" data-page-node-id="H7QNAvJsyBQMuDgE8ko1ZY"><span class="em" data-page-node-id="hmoLwiAGww54GLp2C409Bj">📌</span>定位&amp;排期</button>
+    <button class="nav-btn active" data-tab="workbench"><span class="em">🧩</span>工作台</button>
+    <button class="nav-btn" data-tab="plan" data-page-node-id="H7QNAvJsyBQMuDgE8ko1ZY"><span class="em" data-page-node-id="hmoLwiAGww54GLp2C409Bj">📌</span>定位&amp;排期</button>
     <button class="nav-btn" data-tab="kb" data-page-node-id="dGHfEy4egnQe0k5qds3duP"><span class="em" data-page-node-id="rj5btsF6veDGCVrdPxlcAo">📚</span>知识库</button>
     <button class="nav-btn" data-tab="hot" data-page-node-id="lkzu8241g4p4qI1p87omJM"><span class="em" data-page-node-id="PikMuLABdrTbNvyTmvd12j">🔥</span>爆款选题</button>
     <button class="nav-btn" data-tab="topics" data-page-node-id="lxdexKXPLQLtFa3i6nYRoM"><span class="em" data-page-node-id="WFUX32Aw5Vn9EU4dmBijx8">💡</span>选题库</button>
@@ -243,7 +265,34 @@
     </div>
 
     <!-- 模块1 定位&排期 -->
-    <section id="plan" class="tab" data-page-node-id="fLRkfzHt31ILaahMsterPh">
+    <!-- 工作台总览（飞轮中台） -->
+    <section id="workbench" class="tab" data-page-node-id="wbNodeMain">
+      <h2 data-page-node-id="wbNodeH2">🧩 工作台 · 今日总览</h2>
+      <p class="sub" data-page-node-id="wbNodeSub">把最该写、最该跟的摊在一屏。系统越用越懂你的读者——「📊 数据分析」看完点「沉淀」，会自动回流到知识库，反哺「🔥 爆款选题」与「✍️ 写稿」。</p>
+      <div class="wb-grid">
+        <div class="card wb-card" data-page-node-id="wbNode1">
+          <h3 data-page-node-id="wbNode1h">🔥 今日推荐选题 TOP5</h3>
+          <div id="wb-hot" data-page-node-id="wbHot"></div>
+          <div class="btn-row"><button class="ghost sm" onclick="switchTab('hot')">去爆款选题</button></div>
+        </div>
+        <div class="card wb-card" data-page-node-id="wbNode2">
+          <h3 data-page-node-id="wbNode2h">📌 本周排期</h3>
+          <div id="wb-sch" data-page-node-id="wbSch"></div>
+          <div class="btn-row"><button class="ghost sm" onclick="switchTab('plan')">去排期</button></div>
+        </div>
+        <div class="card wb-card" data-page-node-id="wbNode3">
+          <h3 data-page-node-id="wbNode3h">✅ 我的待办</h3>
+          <div id="wb-tasks" data-page-node-id="wbTasks"></div>
+          <div class="btn-row"><button class="ghost sm" onclick="switchTab('push')">去行动督促</button></div>
+        </div>
+        <div class="card wb-card" data-page-node-id="wbNode4">
+          <h3 data-page-node-id="wbNode4h">🧠 飞轮状态</h3>
+          <div id="wb-fly" data-page-node-id="wbFly"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="plan" class="tab" style="display:none" data-page-node-id="fLRkfzHt31ILaahMsterPh">
       <h2 data-page-node-id="89hmnNEg1ceChjdvmR2ro9">📌 账号定位 &amp; 栏目排期</h2>
       <p class="sub" data-page-node-id="K4DN4uxGQ3OKJmfIvVXzb5">账号定位已固定（随笔号），这里只做排期表。任务别排太满，防完不成摆烂。</p>
       <div class="card" data-page-node-id="LMg8iPNHNQ2Apl9xwMGtK4">
@@ -371,6 +420,25 @@
         </div>
         <div id="draft-list" style="margin-top:12px;display:none" data-page-node-id="3GqZVWsVDD6tp7by0SA0GY"></div>
         <div id="draft-img-result" style="display:none" data-page-node-id="E36NppGH0evXdditfk5noM"></div>
+      </div>
+
+      <div class="card" data-page-node-id="wbScNode">
+        <h3 data-page-node-id="wbScH">✅ 发布前 3 问（自检清单）</h3>
+        <p class="sub" data-page-node-id="wbScSub">发布前过一遍，套用复盘那 4 个维度。全勾上再发出去，心里更稳。</p>
+        <label class="self-check"><input type="checkbox" id="sc-1"> ① 开头钩子够勾人吗？能不能让人第一句就想往下看</label>
+        <label class="self-check"><input type="checkbox" id="sc-2"> ② 有共鸣点吗？读到的人会不会觉得「这说的不就是我」</label>
+        <label class="self-check"><input type="checkbox" id="sc-3"> ③ 结尾有互动钩子吗？有没有留一句邀请评论 / 抛个问题 / 金句回勾</label>
+        <div id="sc-result" class="small" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card" data-page-node-id="wbReuseNode">
+        <h3 data-page-node-id="wbReuseH">🐟 一鱼多吃（一篇切多形态）</h3>
+        <p class="sub" data-page-node-id="wbReuseSub">一篇终稿自动切分身，边际成本趋零：小红书卡片文案、朋友圈短文、微博/头条镜像、短视频口播稿。随笔号也用得上（公众号 + 小红书 + 朋友圈）。</p>
+        <div class="btn-row" data-page-node-id="wbReuseBtns">
+          <button id="draft-reuse" data-page-node-id="wbReuseBtn">切分身</button>
+          <button class="ghost" id="draft-reuse-copy" data-page-node-id="wbReuseCopy">复制全部</button>
+        </div>
+        <div id="draft-reuse-result" style="display:none" data-page-node-id="wbReuseRes"></div>
       </div>
     </section>
 
@@ -567,6 +635,17 @@
         <div id="set-status" class="small" style="margin-top:10px" data-page-node-id="Em0Ph0ZXzsFFSz9tqqmkoA"></div>
       </div>
 
+      <div class="card" data-page-node-id="wbModelCard">
+        <h3 data-page-node-id="wbModelH">🎛️ 按任务选模型（可选）</h3>
+        <p class="sub" data-page-node-id="wbModelSub">决定生死的环节（写稿/标题/复盘）用强模型，铺量环节（选题/拆解）用默认模型。留空则都用上方「模型」。</p>
+        <div class="kv" data-page-node-id="wbM1"><label data-page-node-id="wbM1l">写稿初稿</label><input id="set-m-write" placeholder="如 gpt-4o / claude-3-5-sonnet"></div>
+        <div class="kv" data-page-node-id="wbM2"><label data-page-node-id="wbM2l">标题摘要</label><input id="set-m-title" placeholder="留空=默认模型"></div>
+        <div class="kv" data-page-node-id="wbM3"><label data-page-node-id="wbM3l">稿件复盘</label><input id="set-m-review" placeholder="留空=默认模型"></div>
+        <div class="kv" data-page-node-id="wbM4"><label data-page-node-id="wbM4l">爆款选题</label><input id="set-m-hot" placeholder="留空=默认模型"></div>
+        <div class="kv" data-page-node-id="wbM5"><label data-page-node-id="wbM5l">知识库分析</label><input id="set-m-kb" placeholder="留空=默认模型"></div>
+        <div class="kv" data-page-node-id="wbM6"><label data-page-node-id="wbM6l">数据分析(视觉)</label><input id="set-m-data" placeholder="如 qwen-vl-plus / gpt-4o"></div>
+      </div>
+
       <div class="card" data-page-node-id="YQXeK1oeo05zSaTZP4DOuN">
         <h3 data-page-node-id="mHYL4ssDY2r7FyW0LY6E1b">📡 云端同步（Supabase）</h3>
         <p class="sub" style="margin-bottom:12px" data-page-node-id="ckmN0BEsMRLRgyViA3AHif">手机和电脑填<b data-page-node-id="lwi6eBI69iome55RfSiFR9">同一个同步码</b>即共用同一份数据（选题/排期/草稿/任务）。数据存在你自己的 Supabase 项目，同步码即访问口令——知道码才能读写那一行的数据。</p>
@@ -620,9 +699,10 @@
     $$(".nav-btn").forEach(x=>x.classList.remove("active"));
     b.classList.add("active");
     const tab=b.dataset.tab;
-    $$(".tab").forEach(s=>s.style.display = (s.id===tab)?"block":"none");
-    location.hash = tab;
-  }));
+      $$(".tab").forEach(s=>s.style.display = (s.id===tab)?"block":"none");
+      location.hash = tab;
+      if(tab==="workbench") renderWorkbench();
+    }));
   const _h=location.hash?location.hash.slice(1):"";
   const _btn=_h?$(`.nav-btn[data-tab="${_h}"]`):$(".nav-btn.active");
   if(_btn) _btn.click();
@@ -631,14 +711,43 @@
     if(btn) btn.click();
   }
 
+  /* ---- 按任务选模型（可选覆盖） ---- */
+  function taskModel(task){ const m=store.get("ai_tasks",{}); return (m&&m[task])||""; }
+
+  /* ---- 工作台总览（飞轮中台） ---- */
+  function renderWorkbench(){
+    const hot=store.get("hotlist",[]).slice(0,5);
+    const wbHot=$("#wb-hot");
+    if(wbHot) wbHot.innerHTML = hot.length? hot.map(t=>'<div class="wb-li">'+esc(t.title)+'</div>').join('') : '<div class="empty">还没有爆款选题，去「🔥 爆款选题」生成</div>';
+
+    const sch=store.get("schedule",[]);
+    const wbSch=$("#wb-sch");
+    if(wbSch){
+      const now=new Date(); now.setHours(0,0,0,0);
+      const end=new Date(now.getTime()+7*86400000);
+      const items=sch.filter(it=>{ if(!it.date) return false; const d=new Date(it.date+"T00:00:00"); return d>=now && d<=end; })
+                     .sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+      wbSch.innerHTML = items.length? items.map(it=>'<div class="wb-li"><b>'+esc(it.date)+'</b> '+esc(it.col)+' · '+esc(it.topic)+'</div>').join('') : '<div class="empty">本周还没排期，去「📌 定位&amp;排期」</div>';
+    }
+
+    const tasks=store.get("tasks",[]).filter(t=>!t.done);
+    const wbTasks=$("#wb-tasks");
+    if(wbTasks) wbTasks.innerHTML = tasks.length? tasks.slice(0,5).map(t=>'<div class="wb-li">'+esc(t.text)+'</div>').join('') : '<div class="empty">没有待办，松一口气 ✨</div>';
+
+    const hf=store.get("hitfactors",[]).length, ln=store.get("lownotes",[]).length, kb=store.get("kb",[]).length;
+    const wbFly=$("#wb-fly");
+    if(wbFly) wbFly.innerHTML = '<div class="wb-li">📚 文章库：'+kb+' 篇</div><div class="wb-li">🔥 爆款因子：'+hf+' 条</div><div class="wb-li">📉 低阅读教训：'+ln+' 条</div><div class="wb-note">看完数据去「📊 数据分析」点「沉淀」，让系统自己越写越懂你 🔄</div>';
+  }
+
   /* ---- AI ---- */
   const AI = {
     cfg(){ return store.get("ai",{endpoint:"",key:"",model:""}); },
     ok(){ const c=this.cfg(); return !!(c.endpoint&&c.key&&c.model); },
-    async chat(system, user){
+    async chat(system, user, modelOverride){
       const c=this.cfg();
+      const model=(modelOverride&&modelOverride.trim())?modelOverride.trim():c.model;
       const r=await fetch(c.endpoint,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+c.key},
-        body:JSON.stringify({model:c.model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.8,max_tokens:4096})});
+        body:JSON.stringify({model:model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.8,max_tokens:4096})});
       if(!r.ok) throw new Error("HTTP "+r.status+" "+(await r.text()).slice(0,200));
       const j=await r.json();
       const choice=j.choices[0];
@@ -872,7 +981,7 @@
       try{
         const sys="你是公众号爆款选题策划专家，擅长把小众随笔号的内容潜力挖掘成高传播选题，但绝不鼓励标题党、不违背'纯粹自我记录随笔号'的人设。请基于用户给的栏目定位、目标人群（可能为空需你推断）、以及他对阅读量不高的判断，生成 N 个'爆款潜力'选题。每个选题返回 JSON 对象：{title, why, audience, angle, variants, hook}。title=吸引人但不夸张的短文标题；why=为什么这个选题容易爆（点出情绪/痛点/共鸣/悬念/反差/热点钩子中的哪几种，1-2 句）；audience=最对路的目标人群画像（身份/心境）；angle=一句内容角度说明可以怎么写；variants=2-3 个可选标题变体（字符串数组）；hook=能勾住人往下看的开头一句话。只返回 JSON 数组，不要其他文字。";
         const user=`栏目定位：${col}\n目标人群：${aud||"（请根据栏目自行推断）"}\n我对阅读量不高的判断：${bottle||"（无，请按通用爆款逻辑把握）"}\n请生成 ${n} 个选题。`;
-        const out=await AI.chat(sys, user);
+        const out=await AI.chat(sys, user, taskModel('hot'));
         const m=out.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
         if(Array.isArray(arr)&&arr.length){
           arr.forEach(o=>{ if(!o.title) o.title="（待打磨）"; });
@@ -948,7 +1057,7 @@
       let sys=`你是公众号随笔号写作助手。账号定位：纯粹自我记录随笔号，写给自己、随缘遇见同频读者；栏目：${col}；语气：${style}，真实松弛、允许碎碎念，拒绝硬造爆款、拒绝焦虑营销。请根据用户提供的标题和素材，写一篇完整的公众号推文初稿：钩子开头 + 分段正文（每段短、适配手机阅读）+ 结尾总结与一句互动引导。只返回正文，不要额外总结。`;
       const kbc=kbContext();
       if(kbc) sys+="\n\n【你沉淀的爆款因子与低阅读教训，写稿时尽量贴合，但保持随笔真实感】\n"+kbc;
-      const out=await AI.chat(sys, `标题：${title||"（待定）"}\n素材/提纲：${body||"（请围绕标题自由发挥）"}`);
+      const out=await AI.chat(sys, `标题：${title||"（待定）"}\n素材/提纲：${body||"（请围绕标题自由发挥）"}`, taskModel('write'));
       $("#draft-body").value=out;
       toast("AI 初稿已生成");
     }catch(e){ toast("生成失败："+e.message); }
@@ -967,6 +1076,47 @@
       const out=await AI.chat(sys, "标题："+(title||"（待定）")+"\n正文片段："+(body||"（无）"));
       box.innerHTML='<div class="result"><h4>✨ 配图提示词</h4>'+esc(out)+'</div>';
     }catch(e){ box.innerHTML='<div class="result">生成失败：'+e.message+'</div>'; }
+  };
+
+  /* 发布前 3 问自检 */
+  function updateSelfCheck(){
+    const c=[$("#sc-1"),$("#sc-2"),$("#sc-3")];
+    const names=["① 开头钩子","② 共鸣点","③ 结尾互动钩子"];
+    const missing=c.map((x,i)=>x&&!x.checked?names[i]:null).filter(Boolean);
+    const el=$("#sc-result"); if(!el) return;
+    if(missing.length===0) el.innerHTML='<span class="ok">三项都过了 ✅ 放心发，结尾记得留个互动。</span>';
+    else el.innerHTML='<span class="warn">还差 '+(3-c.filter(x=>x.checked).length)+' 项：'+missing.join("、")+'</span>';
+  }
+  ["sc-1","sc-2","sc-3"].forEach(id=>{ const el=$("#"+id); if(el) el.onchange=updateSelfCheck; });
+
+  /* 一鱼多吃：一篇切多形态 */
+  $("#draft-reuse").onclick=async()=>{
+    const title=$("#draft-title").value.trim();
+    const body=$("#draft-body").value.trim();
+    const box=$("#draft-reuse-result"); box.style.display="block";
+    if(!title&&!body){ toast("标题或正文至少填一个"); return; }
+    const btn=$("#draft-reuse"); const orig=btn.textContent; btn.textContent="切分中…"; btn.disabled=true;
+    const sys="你是公众号内容多形态复用助手。用户是随笔号。请基于用户提供的标题和正文，产出 4 种形态的复用文案，严格按下面格式输出（每部分标题用 #### 开头，不要其他多余文字）：\n#### 小红书卡片文案\n（适合小红书的图文笔记：吸睛标题+emoji分段+口语化+话题标签）\n#### 朋友圈短文\n（300字内，松弛真实，像随手发的一条）\n#### 微博/头条镜像\n（适合微博、头条的短讯版，带一句钩子）\n#### 短视频口播稿\n（1分钟口播稿：开场钩子+2-3个要点+结尾引导，口语化可直接念）\n保持随笔真实感，不硬造爆款。";
+    try{
+      if(AI.ok()){
+        box.innerHTML='<div class="result">AI 切分身中…</div>';
+        const out=await AI.chat(sys, "标题："+(title||"（待定）")+"\n正文："+(body||"（无）"), taskModel('write'));
+        box.innerHTML='<div class="reuse-report">'+renderReviewBody(md2html(out))+'</div>';
+        box.dataset.raw=out;
+      }else{
+        const t=title||"今日随笔";
+        const tmpl="#### 小红书卡片文案\n「"+t+"」｜一篇写给也在摸索的你 ✍️\n（贴正文里的真实片段，配 emoji 分段，文末加 #随笔 #自我成长 #日常记录）\n\n#### 朋友圈短文\n今天写「"+t+"」的时候，突然想通了一点小事。不慌，慢慢来，比较快。\n\n#### 微博/头条镜像\n聊「"+t+"」：一件小事带来的小提醒，写给同样在摸索的你。\n\n#### 短视频口播稿\n（开场）你有没有过这种时候——（正文钩子）；（要点）我后来想明白的是…；（结尾）你有过类似经历吗？评论区聊聊。";
+        box.innerHTML='<div class="reuse-report">'+esc(tmpl)+'</div>';
+        box.dataset.raw=tmpl;
+        toast("已给出通用分身模板（配置 AI 可更贴合）");
+      }
+    }catch(e){ box.innerHTML='<div class="result" style="color:var(--red)">切分失败：'+e.message+'</div>'; }
+    finally{ btn.textContent=orig; btn.disabled=false; }
+  };
+  $("#draft-reuse-copy").onclick=()=>{
+    const raw=$("#draft-reuse-result").dataset.raw||$("#draft-reuse-result").innerText||"";
+    if(!raw.trim()){ toast("先切分身再复制"); return; }
+    navigator.clipboard.writeText(raw).then(()=>toast("已复制全部分身")).catch(()=>toast("复制失败"));
   };
 
   function startDraftFromTopic(i){
@@ -990,7 +1140,7 @@
       box.innerHTML='<div class="result">AI 生成中…</div>';
       try{
         const sys="你是公众号标题党（良性版）助手。请根据用户给的主题和正文，输出：10条标题（悬念好奇型4/干货价值型3/共情故事型3）、2条摘要、4条封面slogan。用清晰分段，纯文本。";
-        const out=await AI.chat(sys, "主题："+theme+"\n正文片段："+($("#title-text").value.trim()||"（无）"));
+        const out=await AI.chat(sys, "主题："+theme+"\n正文片段："+($("#title-text").value.trim()||"（无）"), taskModel('title'));
         box.innerHTML='<div class="result"><h4>AI 生成结果</h4>'+esc(out)+'</div>';
         return;
       }catch(e){ box.innerHTML='<div class="result">AI 调用失败（'+e.message+'），改用离线模板：</div>'; }
@@ -1043,7 +1193,7 @@
       box.innerHTML='<div class="result">AI 正在读文章并打分…</div>';
       try{
         const sys="你是温和的稿件复盘助手。请严格按以下格式输出：\n\n1）先给出四个维度评分（1-5分，可带0.5小数），格式必须如下：\n开篇吸引力:4/5\n逻辑流畅度:3/5\n可读性:4/5\n结尾互动性:3/5\n平均分:3.5/5\n\n2）然后空一行，用 `---` 分隔，再输出复盘内容，结构如下（标题前可带 emoji）：\n\n## 一、这篇文章最打动人的优点\n1. **小标题**\n具体说明…\n\n---\n\n## 二、现存几个具体可优化的小问题\n1. **小标题**\n具体说明…\n\n---\n\n## 三、逐条可落地的修改建议\n- **删**：…\n- **补**：…\n\n---\n\n## 四、2 个迭代方向\n1. …\n2. …\n\n---\n\n## 五、具体可执行的改进动作清单\n给出 3–5 条能直接落笔的改动，每条格式如下：\n- **改哪里**：开头 / 中间 / 结尾 / 标题\n- **做什么**：加什么内容、删什么内容、调整顺序\n- **示例话术**：给出一两句可以直接写进原文的参考文案（可直接粘贴）\n- **预期效果**：点明这处改动会让读者产生什么反应\n\n特别要针对「结尾」给出明确的可操作建议：比如加一句互动邀请、补一个金句回勾、留一个开放式问题等。每条示例话术必须口语化、符合随笔号松弛风格。\n\n语气鼓励、不考核数据，只看是否表达出作者自己。";
-        const out=await AI.chat(sys, text);
+        const out=await AI.chat(sys, text, taskModel('review'));
         const parsed=parseReviewScores(out);
         scores=parsed.scores; avg=parsed.avg;
         const body=stripScoreBlock(out);
@@ -1069,7 +1219,7 @@
     try{
       const sys="你是温和的稿件复盘助手，只从「是否表达出作者自己」给建议，不考核数据。用户会提供自己的一篇推文全文，并提出一个关于如何改进的具体问题。请基于原文，给出具体、可落地、口语化的回答；必要时引用原文一两句，或给出可直接粘贴进稿件的示例话术。语气鼓励、不空谈。";
       const userMsg="【我的稿件全文】\n"+text+"\n\n【我的问题】\n"+q;
-      const out=await AI.chat(sys, userMsg);
+      const out=await AI.chat(sys, userMsg, taskModel('review'));
       ab.innerHTML=renderReviewBody(md2html(out));
       $("#review-q").value="";
     }catch(e){
@@ -1112,7 +1262,7 @@
       box.innerHTML='<div class="result">AI 拆解中…</div>';
       try{
         const sys="你是写作拆解助手。请拆解用户提供的文章：1)文章结构 2)开篇钩子 3)段落逻辑 4)结尾套路 5)标题思路 6)可借鉴点（强调只借鉴不抄袭）。";
-        const out=await AI.chat(sys, text);
+        const out=await AI.chat(sys, text, taskModel('dissect'));
         box.innerHTML='<div class="result">'+esc(out)+'</div>';
         return;
       }catch(e){ box.innerHTML='<div class="result">AI 失败（'+e.message+'），改用框架：</div>'; }
@@ -1182,7 +1332,7 @@
     const btn=$("#str-ai"); const orig=btn.textContent; btn.textContent="展开中…"; btn.disabled=true;
     try{
       const sys="你是公众号运营策略助手。用户是随笔号，定位：纯粹自我记录随笔号，不为涨粉变现。请把用户的一条策略/优化要点，展开成 3-6 条可执行的优化清单，每条具体、可落地、口语化，不要空话套话。";
-      const out=await AI.chat(sys, `要点：${title}\n${content}`);
+      const out=await AI.chat(sys, `要点：${title}\n${content}`, taskModel('strategy'));
       $("#str-content").value=(content?content+"\n\n":"")+"【AI 展开】\n"+out;
       $("#str-status").innerHTML='<span class="ok">AI 已展开到内容框，确认无误再点「保存」</span>';
       toast("AI 已展开");
@@ -1279,7 +1429,7 @@
     const btn=document.querySelector(`[data-factor="${id}"]`); const orig=btn?btn.textContent:""; if(btn){btn.textContent="提取中…"; btn.disabled=true;}
     try{
       const sys="你是公众号爆款分析助手。请分析用户的小爆款文章，提取 3-6 条可复用的「爆款因子」（标题技巧/开头方式/情绪钩子/结构/话题角度等），每条具体、可操作、口语化。直接逐条列出，不要编号前缀以外的解释。";
-      const out=await AI.chat(sys, "标题："+(a.title||"（无）")+"\n正文："+(a.body||"（无）"));
+      const out=await AI.chat(sys, "标题："+(a.title||"（无）")+"\n正文："+(a.body||"（无）"), taskModel('kb'));
       const lines=out.split(/\n+/).map(s=>s.replace(/^[\d．.、\-\*]\s*/,"").trim()).filter(Boolean);
       a.factors=lines.join("\n");
       const hf=store.get("hitfactors",[]);
@@ -1296,7 +1446,7 @@
     const btn=document.querySelector(`[data-low="${id}"]`); const orig=btn?btn.textContent:""; if(btn){btn.textContent="分析中…"; btn.disabled=true;}
     try{
       const sys="你是公众号阅读诊断助手。请分析用户的低阅读文章，指出 2-4 个可能拉低阅读的具体原因（开头不抓人/标题平淡/话题太小众/结构松散等），并给对应的改进建议。直接逐条列出「问题 → 建议」，口语化。";
-      const out=await AI.chat(sys, "标题："+(a.title||"（无）")+"\n正文："+(a.body||"（无）"));
+      const out=await AI.chat(sys, "标题："+(a.title||"（无）")+"\n正文："+(a.body||"（无）"), taskModel('kb'));
       const lines=out.split(/\n+/).map(s=>s.trim()).filter(Boolean);
       a.lowadvice=lines.join("\n");
       const ln=store.get("lownotes",[]);
@@ -1314,7 +1464,7 @@
     const btn=$("#topic-from-kb"); const orig=btn.textContent; btn.textContent="生成中…"; btn.disabled=true;
     try{
       const sys="你是公众号随笔号选题助手。用户沉淀了以下「爆款因子」和「低阅读教训」，请基于它们生成 4 个新的备选选题。返回 JSON 数组，每项 {title, angle}。title 是吸引人的短文标题，angle 是一句写作角度。只返回 JSON 数组。";
-      const out=await AI.chat(sys, kbc);
+      const out=await AI.chat(sys, kbc, taskModel('hot'));
       const m=out.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
       if(Array.isArray(arr)&&arr.length){
         arr.forEach(o=>addTopic(o.title||"（待打磨）", (o.angle||"")+"（源自知识库）", "w"));
@@ -1327,6 +1477,7 @@
 
   /* ===== 模块9 数据分析（多图） ===== */
   let dataImages=[];
+  let lastDataResult="";
   function compressImage(dataUrl, maxWidth, quality){
     return new Promise((resolve)=>{
       const img=new Image();
@@ -1390,12 +1541,52 @@
       box.innerHTML='<div class="result">正在压缩 '+(dataImages.length>1?dataImages.length+" 张":"1 张")+' 图片…</div>';
       const compressed=await Promise.all(dataImages.map(u=>compressImage(u,1280,0.8)));
       box.innerHTML='<div class="result">AI 正在识别 '+(compressed.length>1?compressed.length+" 张截图":"截图")+' 数据并分析原因…</div>';
-      const out=await AI.chatVision(sys, compressed, {text: note?("【我的补充背景】\n"+note):"", model:vmodel});
-      box.innerHTML='<div class="review-report"><div class="review-body">'+renderReviewBody(md2html(out))+'</div></div>';
+      const out=await AI.chatVision(sys, compressed, {text: note?("【我的补充背景】\n"+note):"", model:vmodel||taskModel('data')});
+      lastDataResult=out;
+      box.innerHTML='<div class="review-report"><div class="review-body">'+renderReviewBody(md2html(out))+'</div><div class="data-actions"><button class="soft sm" id="data-deposit-low">📉 沉淀为低阅读教训</button><button class="soft sm" id="data-deposit-hit">🔥 萃取爆款因子</button><span class="small">沉淀后自动反哺「🔥 爆款选题」与「✍️ 写稿」</span></div></div>';
+      $("#data-deposit-low").onclick=()=>depositDataLesson('low');
+      $("#data-deposit-hit").onclick=()=>depositDataLesson('hit');
     }catch(e){
       box.innerHTML='<div class="result" style="color:var(--red)">分析失败：'+e.message+'<br><br>若提示模型不支持图片，请在上方「视觉模型」填一个支持图片的模型（如 qwen-vl-plus、qwen-vl-max、gpt-4o），或在 AI 设置里把模型改成视觉模型后重试。</div>';
     }finally{ btn.textContent=orig; btn.disabled=false; }
   };
+
+  /* 飞轮回流：把数据分析结论沉淀进知识库 */
+  function saveDataLesson(text, type, tag){
+    if(type==='low'){
+      const ln=store.get("lownotes",[]);
+      ln.unshift({id:"l"+Date.now()+Math.random().toString(36).slice(2,5), text:text, from:tag||"数据复盘"});
+      store.set("lownotes",ln); renderLowNotes();
+    }else{
+      const hf=store.get("hitfactors",[]);
+      hf.unshift({id:"h"+Date.now()+Math.random().toString(36).slice(2,5), text:text, from:tag||"数据复盘"});
+      store.set("hitfactors",hf); renderHitFactors();
+    }
+  }
+  async function depositDataLesson(type){
+    const raw=lastDataResult||($("#data-result").innerText||"");
+    if(!raw.trim()){ toast("先分析出结果再沉淀"); return; }
+    const btn=type==='low'?$("#data-deposit-low"):$("#data-deposit-hit");
+    const orig=btn?btn.textContent:""; if(btn){ btn.textContent="提炼中…"; btn.disabled=true; }
+    const isLow=type==='low';
+    try{
+      if(AI.ok()){
+        const sys=isLow
+          ? "请从下面的公众号数据分析报告里，提炼 3-5 条可复用的「低阅读改进教训」，每条一句具体做法，口语化、不空话。直接逐条列出，不要编号以外的解释。"
+          : "请从下面的公众号数据分析报告里，萃取 3-5 条可复用的「爆款因子」（选题方向/标题技巧/钩子/结构/发布时机等），每条一句，口语化。直接逐条列出，不要编号以外的解释。";
+        const out=await AI.chat(sys, raw, taskModel('kb'));
+        const lines=out.split(/\n+/).map(s=>s.replace(/^[\d．.、\-\*]\s*/,"").trim()).filter(Boolean);
+        saveDataLesson(lines.join("\n"), type, "来自数据复盘");
+        toast(isLow?("已沉淀 "+lines.length+" 条低阅读教训"):("已萃取 "+lines.length+" 条爆款因子"));
+      }else{
+        saveDataLesson(raw.replace(/\n+/g,"\n").slice(0,900), type, "（未提炼，原始分析）");
+        toast(isLow?"已保存低阅读分析（原始）":"已保存爆款因子（原始）");
+      }
+    }catch(e){
+      saveDataLesson(raw.slice(0,900), type, "（AI 提炼失败，存原始分析）");
+      toast("已保存原始分析");
+    }finally{ if(btn){ btn.textContent=orig; btn.disabled=false; } }
+  }
 
   /* ===== 设置 ===== */
   window.presetAI=function(p){
@@ -1403,9 +1594,12 @@
     else if(p==='openai'){ $("#set-endpoint").value="https://api.openai.com/v1/chat/completions"; $("#set-model").value="gpt-4o-mini"; }
     toast("已填入 "+(p==='qwen'?"通义千问":"OpenAI")+" 配置，请填写 API Key");
   };
-  (function(){ const c=AI.cfg(); $("#set-endpoint").value=c.endpoint||""; $("#set-key").value=c.key||""; $("#set-model").value=c.model||""; })();
+  (function(){ const c=AI.cfg(); $("#set-endpoint").value=c.endpoint||""; $("#set-key").value=c.key||""; $("#set-model").value=c.model||""; const tm=store.get("ai_tasks",{}); ["write","title","review","hot","kb","data","strategy","dissect"].forEach(k=>{ const el=$("#set-m-"+k); if(el) el.value=tm[k]||""; }); })();
   $("#set-save").onclick=()=>{
     store.set("ai",{endpoint:$("#set-endpoint").value.trim(),key:$("#set-key").value.trim(),model:$("#set-model").value.trim()});
+    const tasks={};
+    ["write","title","review","hot","kb","data","strategy","dissect"].forEach(k=>{ const v=$("#set-m-"+k).value.trim(); if(v) tasks[k]=v; });
+    store.set("ai_tasks",tasks);
     $("#set-status").innerHTML='<span class="ok">已保存</span>';
   };
   $("#set-test").onclick=async()=>{
@@ -1634,6 +1828,9 @@
     });
     return out.innerHTML;
   }
+
+  /* 启动：默认工作台渲染（默认 tab 为 workbench） */
+  renderWorkbench();
 })();
 </script>
 </body>
