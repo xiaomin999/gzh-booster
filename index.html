@@ -293,17 +293,17 @@
         <div class="card wb-card" data-page-node-id="wbNode1">
           <h3 data-page-node-id="wbNode1h">🔥 今日推荐选题 TOP5</h3>
           <div id="wb-hot" data-page-node-id="wbHot"></div>
-          <div class="btn-row"><button class="ghost sm" onclick="switchTab('hot')">去爆款选题</button></div>
+          <div class="btn-row"><button class="ghost sm wb-jump" data-jump="hot">去爆款选题</button></div>
         </div>
         <div class="card wb-card" data-page-node-id="wbNode2">
           <h3 data-page-node-id="wbNode2h">📌 本周排期</h3>
           <div id="wb-sch" data-page-node-id="wbSch"></div>
-          <div class="btn-row"><button class="ghost sm" onclick="switchTab('plan')">去排期</button></div>
+          <div class="btn-row"><button class="ghost sm wb-jump" data-jump="plan">去排期</button></div>
         </div>
         <div class="card wb-card" data-page-node-id="wbNode3">
           <h3 data-page-node-id="wbNode3h">✅ 我的待办</h3>
           <div id="wb-tasks" data-page-node-id="wbTasks"></div>
-          <div class="btn-row"><button class="ghost sm" onclick="switchTab('push')">去行动督促</button></div>
+          <div class="btn-row"><button class="ghost sm wb-jump" data-jump="push">去行动督促</button></div>
         </div>
         <div class="card wb-card" data-page-node-id="wbNode4">
           <h3 data-page-node-id="wbNode4h">🧠 飞轮状态</h3>
@@ -645,8 +645,8 @@
       <div class="card" data-page-node-id="tvln0hY71VlEGD5JhwuKy1">
         <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px" data-page-node-id="iDPqYtBovJU9MDzzfcFTkq">
           <span class="small" style="margin:0" data-page-node-id="scouS7hel5FoDGwZXebpSA">服务商预设：</span>
-          <button class="ghost" style="padding:6px 12px" onclick="presetAI('qwen')" data-page-node-id="sQHBuIARZ87k6iHb6lKwWG">通义千问</button>
-          <button class="ghost" style="padding:6px 12px" onclick="presetAI('openai')" data-page-node-id="JQiWmUuE9UaI0x92bKeK7C">OpenAI</button>
+          <button class="ghost ai-preset" style="padding:6px 12px" data-preset="qwen" data-page-node-id="sQHBuIARZ87k6iHb6lKwWG">通义千问</button>
+          <button class="ghost ai-preset" style="padding:6px 12px" data-preset="openai" data-page-node-id="JQiWmUuE9UaI0x92bKeK7C">OpenAI</button>
         </div>
         <div class="kv" data-page-node-id="EpUlb0B7g7SuY31MC5ybca"><label data-page-node-id="rN1thysXbZhSGEANLZjNxo">接口地址</label><input id="set-endpoint" placeholder="https://api.openai.com/v1/chat/completions" data-page-node-id="7uY5a6Tc4ZAHOIwAlggOhc"></div>
         <div class="kv" data-page-node-id="YDno7CLgvXtIBQLwxK72hM"><label data-page-node-id="iwaNXmiEQfjP9Fzt6X7Pwo">API Key</label><input id="set-key" type="password" placeholder="sk-..." data-page-node-id="6aqcEQ0XaREurnEHrV0V9H"></div>
@@ -753,6 +753,8 @@
     updateNavActive(tab);
     showTab(tab);
   }
+  // 工作台卡片跳转按钮（script 在 IIFE 中，不能用 inline onclick）
+  $$(".wb-jump").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.jump)));
 
   /* ---- 按任务选模型（可选覆盖） ---- */
   function taskModel(task){ const m=store.get("ai_tasks",{}); return (m&&m[task])||""; }
@@ -816,6 +818,20 @@
       return text;
     }
   };
+
+  function presetAI(type){
+    if(type==="qwen"){
+      $("#set-endpoint").value="https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
+      $("#set-model").value="qwen-plus";
+      $("#set-m-data").value="qwen-vl-plus";
+    }else if(type==="openai"){
+      $("#set-endpoint").value="https://api.openai.com/v1/chat/completions";
+      $("#set-model").value="gpt-4o-mini";
+      $("#set-m-data").value="gpt-4o";
+    }
+    toast("已填入预设，请补全 API Key 后保存");
+  }
+  $$(".ai-preset").forEach(b=>b.addEventListener("click",()=>presetAI(b.dataset.preset)));
 
   /* ===== 栏目管理（供排期/写稿/顶部标签共用） ===== */
   const DEFAULT_COLUMNS=[
