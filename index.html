@@ -48,6 +48,16 @@
   .nav-btn.active{background:var(--accent);color:#fff}
   .nav-btn .em{font-size:19px}
   .nav-btn.set{color:var(--muted);font-size:11px}
+  .nav-btn.more .em{font-size:22px;line-height:1}
+  /* 更多面板 */
+  .more-backdrop{position:fixed;inset:0;background:rgba(30,20,45,.35);z-index:35;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+  .more-backdrop.open{opacity:1;visibility:visible}
+  .more-panel{position:fixed;left:12px;right:12px;bottom:76px;z-index:36;background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 -6px 28px rgba(40,30,60,.18);padding:14px;transform:translateY(20px) scale(.98);opacity:0;visibility:hidden;transition:opacity .2s,transform .2s,visibility .2s;max-width:520px;margin:0 auto}
+  .more-panel.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+  .more-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .more-grid .nav-btn{padding:10px 4px;font-size:11px;border-radius:12px}
+  .more-grid .nav-btn .em{font-size:20px}
+  .nav-btn.more.active{background:var(--accent);color:#fff}
   /* main */
   .main{flex:1;overflow:auto;padding:24px 28px 96px}
   .topbar{
@@ -207,7 +217,8 @@
 
   /* 桌面端：底部导航居中、增加底部留白 */
   @media (min-width:761px){
-    .sidebar{justify-content:center;padding-bottom:12px}
+    .sidebar{justify-content:center;padding-bottom:12px;gap:8px}
+    .sidebar .nav-btn{flex:0 0 90px}
   }
   /* 手机端：底部导航可横向滚动，内容单列 */
   @media (max-width:760px){
@@ -215,6 +226,9 @@
     .row>*{min-width:100%}
     .topbar{font-size:11.5px}
     .table-scroll{overflow-x:auto}
+    .nav-btn{padding:7px 9px;font-size:11.5px}
+    .nav-btn .em{font-size:18px}
+    .nav-btn.more .em{font-size:20px}
   }
   /* 工作台总览 */
   .wb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
@@ -242,19 +256,25 @@
   <aside class="sidebar" data-page-node-id="GetzZrzozsJZhjZeO2YrML">
     <div class="brand" data-page-node-id="HCsktZAFnxQM5XYpvBB7TM">📚 公众号助推助手<small data-page-node-id="JY0EFHS3SBUmqzPzlG7pZk">随笔号 · 不催更 · 松弛写</small></div>
     <button class="nav-btn active" data-tab="workbench"><span class="em">🧩</span>工作台</button>
-    <button class="nav-btn" data-tab="plan" data-page-node-id="H7QNAvJsyBQMuDgE8ko1ZY"><span class="em" data-page-node-id="hmoLwiAGww54GLp2C409Bj">📌</span>定位&amp;排期</button>
-    <button class="nav-btn" data-tab="kb" data-page-node-id="dGHfEy4egnQe0k5qds3duP"><span class="em" data-page-node-id="rj5btsF6veDGCVrdPxlcAo">📚</span>知识库</button>
-    <button class="nav-btn" data-tab="hot" data-page-node-id="lkzu8241g4p4qI1p87omJM"><span class="em" data-page-node-id="PikMuLABdrTbNvyTmvd12j">🔥</span>爆款选题</button>
-    <button class="nav-btn" data-tab="topics" data-page-node-id="lxdexKXPLQLtFa3i6nYRoM"><span class="em" data-page-node-id="WFUX32Aw5Vn9EU4dmBijx8">💡</span>选题库</button>
-    <button class="nav-btn" data-tab="write" data-page-node-id="2zk8gtzwCIhOJ7pDo1nK4g"><span class="em" data-page-node-id="I3wxSrVsBjsQOo6j0HBxZs">✍️</span>写稿</button>
-    <button class="nav-btn" data-tab="title" data-page-node-id="9iDGqXzW9JE2qyPXRjOuzG"><span class="em" data-page-node-id="9izyWJgMqI8SlZUxL8ayks">🏷️</span>标题摘要</button>
-    <button class="nav-btn" data-tab="push" data-page-node-id="BFeBPH84NyoBPTrBurN8cz"><span class="em" data-page-node-id="un9nUnqAv3COZZqaUj5wlR">🚀</span>行动督促</button>
-    <button class="nav-btn" data-tab="data" data-page-node-id="a4xUYqzp09JbOkqFSxyJCa"><span class="em" data-page-node-id="AdTEsAeZKebQUwYNnPj3Qp">📊</span>数据分析</button>
-    <button class="nav-btn" data-tab="review" data-page-node-id="6Aic6LKGLkx18A0oZYhn6w"><span class="em" data-page-node-id="ai78E6L28rklIrk1I4GE7V">🔍</span>稿件复盘</button>
-    <button class="nav-btn" data-tab="dissect" data-page-node-id="CZHjOgJ6DSffa40dMDEE4f"><span class="em" data-page-node-id="Cb7LrlJIiUOfZyWwLwefzf">📖</span>范文拆解</button>
-    <button class="nav-btn" data-tab="strategy" data-page-node-id="QQvNCdMfHqsPqYWfwXCL2b"><span class="em" data-page-node-id="AowW6Z4I7bCHGP1aRMrLC5">🧭</span>运营策略</button>
-    <button class="nav-btn set" data-tab="settings" data-page-node-id="NeCAltvgVVUJdnclGTPY34"><span class="em" data-page-node-id="qnWvovcKhX8W92sHODe16p">⚙️</span>AI 设置</button>
+    <button class="nav-btn" data-tab="hot"><span class="em">🔥</span>爆款选题</button>
+    <button class="nav-btn" data-tab="topics"><span class="em">💡</span>选题库</button>
+    <button class="nav-btn" data-tab="write"><span class="em">✍️</span>写稿</button>
+    <button class="nav-btn" data-tab="data"><span class="em">📊</span>数据分析</button>
+    <button class="nav-btn more" data-tab="more"><span class="em">⋯</span>更多</button>
   </aside>
+  <div class="more-backdrop" id="more-backdrop"></div>
+  <div class="more-panel" id="more-panel">
+    <div class="more-grid">
+      <button class="nav-btn" data-tab="plan"><span class="em">📌</span>定位&amp;排期</button>
+      <button class="nav-btn" data-tab="kb"><span class="em">📚</span>知识库</button>
+      <button class="nav-btn" data-tab="title"><span class="em">🏷️</span>标题摘要</button>
+      <button class="nav-btn" data-tab="push"><span class="em">🚀</span>行动督促</button>
+      <button class="nav-btn" data-tab="review"><span class="em">🔍</span>稿件复盘</button>
+      <button class="nav-btn" data-tab="dissect"><span class="em">📖</span>范文拆解</button>
+      <button class="nav-btn" data-tab="strategy"><span class="em">🧭</span>运营策略</button>
+      <button class="nav-btn set" data-tab="settings"><span class="em">⚙️</span>AI 设置</button>
+    </div>
+  </div>
 
   <main class="main" data-page-node-id="NCN327Ssiax9Mx70KkiiHq">
     <div class="topbar" data-page-node-id="sf9gvnuOfwWI389M7uyFX8">
@@ -695,20 +715,43 @@
   }
 
   /* ---- nav ---- */
-  $$(".nav-btn").forEach(b=>b.addEventListener("click",()=>{
+  const MORE_TABS=new Set(["plan","kb","title","push","review","dissect","strategy","settings"]);
+  function updateNavActive(tab){
     $$(".nav-btn").forEach(x=>x.classList.remove("active"));
-    b.classList.add("active");
-    const tab=b.dataset.tab;
-      $$(".tab").forEach(s=>s.style.display = (s.id===tab)?"block":"none");
-      location.hash = tab;
-      if(tab==="workbench") renderWorkbench();
-    }));
+    const actualBtn=$(`.nav-btn[data-tab="${tab}"]`);
+    if(actualBtn) actualBtn.classList.add("active");
+    if(MORE_TABS.has(tab)){ const mb=$(".nav-btn.more"); if(mb) mb.classList.add("active"); }
+  }
+  function showTab(tab){
+    $$(".tab").forEach(s=>s.style.display = (s.id===tab)?"block":"none");
+    location.hash = tab;
+    if(tab==="workbench") renderWorkbench();
+  }
+  function closeMorePanel(){ $("#more-panel").classList.remove("open"); $("#more-backdrop").classList.remove("open"); }
+  function openMorePanel(){ $("#more-panel").classList.add("open"); $("#more-backdrop").classList.add("open"); }
+  function toggleMorePanel(){ const p=$("#more-panel"); if(p.classList.contains("open")) closeMorePanel(); else openMorePanel(); }
+
+  $$(".sidebar .nav-btn").forEach(b=>{
+    if(b.classList.contains("more")) return;
+    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); });
+  });
+  const moreBtn=$(".nav-btn.more");
+  if(moreBtn) moreBtn.addEventListener("click", toggleMorePanel);
+  $$("#more-panel .nav-btn").forEach(b=>{
+    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); });
+  });
+  $("#more-backdrop").addEventListener("click", closeMorePanel);
+
   const _h=location.hash?location.hash.slice(1):"";
-  const _btn=_h?$(`.nav-btn[data-tab="${_h}"]`):$(".nav-btn.active");
-  if(_btn) _btn.click();
+  const startTab=_h||"workbench";
+  updateNavActive(startTab);
+  showTab(startTab);
   function switchTab(tab){
     const btn=$(`.nav-btn[data-tab="${tab}"]`);
-    if(btn) btn.click();
+    if(!btn) return;
+    closeMorePanel();
+    updateNavActive(tab);
+    showTab(tab);
   }
 
   /* ---- 按任务选模型（可选覆盖） ---- */
