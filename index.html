@@ -249,6 +249,14 @@
   /* 一鱼多吃 */
   .reuse-report{margin-top:10px;font-size:13.5px;line-height:1.7;white-space:pre-wrap}
   .reuse-report h4{margin:10px 0 4px}
+  /* 公众号排版复制 */
+  .ly-preview{background:#fff;border:1px solid var(--line);border-radius:12px;padding:24px 22px;margin-top:12px;max-width:680px;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;overflow:auto}
+  .ly-preview h1,.ly-preview h2,.ly-preview h3,.ly-preview p,.ly-preview blockquote,.ly-preview ul,.ly-preview li{word-break:break-word}
+  .ly-field{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+  .ly-field>div{display:flex;flex-direction:column;gap:4px}
+  .ly-field label{font-size:12px;color:var(--muted)}
+  .ly-tip{font-size:12px;color:var(--muted);margin-top:6px}
+  .ly-ok{color:var(--ok);font-size:12.5px}
 </style>
 </head>
 <body data-page-node-id="uwcO4oHV1XxGg8pSWMKstM">
@@ -272,6 +280,7 @@
       <button class="nav-btn" data-tab="review"><span class="em">🔍</span>稿件复盘</button>
       <button class="nav-btn" data-tab="dissect"><span class="em">📖</span>范文拆解</button>
       <button class="nav-btn" data-tab="strategy"><span class="em">🧭</span>运营策略</button>
+      <button class="nav-btn" data-tab="layout"><span class="em">✨</span>排版复制</button>
       <button class="nav-btn set" data-tab="settings"><span class="em">⚙️</span>AI 设置</button>
     </div>
   </div>
@@ -457,8 +466,75 @@
         <div class="btn-row" data-page-node-id="wbReuseBtns">
           <button id="draft-reuse" data-page-node-id="wbReuseBtn">切分身</button>
           <button class="ghost" id="draft-reuse-copy" data-page-node-id="wbReuseCopy">复制全部</button>
+          <button class="soft" id="draft-to-layout" data-page-node-id="wbToLayout">去排版发布</button>
         </div>
         <div id="draft-reuse-result" style="display:none" data-page-node-id="wbReuseRes"></div>
+      </div>
+    </section>
+
+    <!-- 模块3.5 公众号排版复制 -->
+    <section id="layout" class="tab" style="display:none" data-page-node-id="lyNodeMain">
+      <h2 data-page-node-id="lyNodeH2">✨ 公众号排版 · 一键复制</h2>
+      <p class="sub" data-page-node-id="lyNodeSub">粘好文章（或载入写稿草稿），选样式，点「生成排版」，再点「复制」直接粘进公众号编辑器。所有样式已内联，公众号后台不会吞格式。</p>
+      <div class="card" data-page-node-id="lyCardEditor">
+        <div class="row" data-page-node-id="lyRow1">
+          <div style="flex:1;min-width:260px" data-page-node-id="lyCol1">
+            <label data-page-node-id="lyTtlLbl">文章标题（可选）</label>
+            <input id="ly-title" placeholder="不填则只排正文" data-page-node-id="lyTitle">
+            <label data-page-node-id="lyBodyLbl">正文 / 提纲（支持简易 Markdown）</label>
+            <textarea id="ly-body" style="min-height:220px" placeholder="直接粘贴你的文章。支持：# 一级标题、## 二级标题、### 三级标题、&gt; 引用、- 列表、**加粗**、--- 分隔线。每段空一行。"></textarea>
+            <div class="ly-tip" data-page-node-id="lyTip">小提示：公众号标题一般在后台单独填，这里留空也能排正文。</div>
+          </div>
+          <div style="flex:0 0 230px;min-width:200px" data-page-node-id="lyCol2">
+            <div class="ly-field" data-page-node-id="lyField">
+              <div><label data-page-node-id="lyTplLbl">样式模板</label>
+                <select id="ly-tpl" data-page-node-id="lyTpl">
+                  <option value="green">文艺绿（WorkBuddy 风）</option>
+                  <option value="clean">简约白</option>
+                  <option value="warm">卡片暖</option>
+                  <option value="mono">极简黑</option>
+                </select>
+              </div>
+              <div><label data-page-node-id="lySizeLbl">正文字号</label>
+                <select id="ly-size" data-page-node-id="lySize">
+                  <option value="15">15px</option>
+                  <option value="16" selected>16px</option>
+                  <option value="17">17px</option>
+                  <option value="18">18px</option>
+                </select>
+              </div>
+              <div><label data-page-node-id="lyLhLbl">行距</label>
+                <select id="ly-lh" data-page-node-id="lyLh">
+                  <option value="1.6">1.6</option>
+                  <option value="1.8" selected>1.8</option>
+                  <option value="2.0">2.0</option>
+                </select>
+              </div>
+              <div><label data-page-node-id="lyAccLbl">强调色</label>
+                <input type="color" id="ly-accent" value="#24B494" data-page-node-id="lyAcc" style="width:46px;height:34px;border:none;background:none;padding:0;cursor:pointer">
+              </div>
+            </div>
+            <div class="btn-row" data-page-node-id="lyLoadRow" style="margin-top:12px">
+              <button class="ghost sm" id="ly-load" data-page-node-id="lyLoad">载入写稿草稿</button>
+              <button class="ghost sm" id="ly-clear" data-page-node-id="lyClear">清空</button>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row" data-page-node-id="lyGenRow" style="margin-top:14px">
+          <button id="ly-gen" data-page-node-id="lyGen">生成排版</button>
+          <span class="ly-tip" data-page-node-id="lyGenTip">未配置 AI 也能用——这是纯排版工具。</span>
+        </div>
+      </div>
+      <div class="card" data-page-node-id="lyCardPrev">
+        <div class="btn-row" data-page-node-id="lyPrevRow" style="justify-content:space-between;align-items:center">
+          <h3 data-page-node-id="lyPrevH">预览（即公众号里的样子）</h3>
+          <div data-page-node-id="lyCopyBtns">
+            <button id="ly-copy" data-page-node-id="lyCopy">📋 复制（可直接粘公众号）</button>
+            <button class="ghost" id="ly-copy-src" data-page-node-id="lyCopySrc">复制源码</button>
+          </div>
+        </div>
+        <div id="ly-preview" class="ly-preview" data-page-node-id="lyPreview"><div class="empty">点「生成排版」先出个预览～</div></div>
+        <div id="ly-status" class="ly-tip" data-page-node-id="lyStatus"></div>
       </div>
     </section>
 
@@ -715,7 +791,7 @@
   }
 
   /* ---- nav ---- */
-  const MORE_TABS=new Set(["plan","kb","title","push","review","dissect","strategy","settings"]);
+  const MORE_TABS=new Set(["plan","kb","title","push","review","dissect","strategy","settings","layout"]);
   function updateNavActive(tab){
     $$(".nav-btn").forEach(x=>x.classList.remove("active"));
     const actualBtn=$(`.nav-btn[data-tab="${tab}"]`);
@@ -1176,6 +1252,108 @@
     const raw=$("#draft-reuse-result").dataset.raw||$("#draft-reuse-result").innerText||"";
     if(!raw.trim()){ toast("先切分身再复制"); return; }
     navigator.clipboard.writeText(raw).then(()=>toast("已复制全部分身")).catch(()=>toast("复制失败"));
+  };
+
+  /* ===== 模块3.5 公众号排版复制 ===== */
+  const LY_FONT='-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+  const LY_TPL={
+    green:{accent:"#24B494"},
+    clean:{accent:"#2e7d5b"},
+    warm:{accent:"#e8833a"},
+    mono:{accent:"#1a1a1a"}
+  };
+  function lyInline(s,accent){
+    s=esc(s);
+    s=s.replace(/\*\*(.+?)\*\*/g,'<strong style="font-weight:bold;color:'+accent+'">$1</strong>');
+    return s;
+  }
+  function lyMdToHtml(text,opt){
+    const {size,lh,accent}=opt;
+    const base='font-size:'+size+'px;color:#3d3d3d;line-height:'+lh+';letter-spacing:.5px;font-family:'+LY_FONT;
+    const lines=text.replace(/\r\n/g,'\n').split('\n');
+    let html='';let i=0;
+    while(i<lines.length){
+      const raw=lines[i].trim();
+      if(raw===''){i++;continue;}
+      if(raw==='---'||raw==='***'||raw==='___'){ html+='<hr style="border:none;border-top:1px solid #e8e8e8;margin:24px 0">'; i++;continue; }
+      if(raw.indexOf('# ')===0){ html+='<h1 style="font-size:'+(size+9)+'px;font-weight:bold;color:#1f1f1f;text-align:center;line-height:1.4;margin:10px 0 22px;padding-bottom:14px;border-bottom:2px solid '+accent+'">'+lyInline(raw.slice(2),accent)+'</h1>'; i++;continue; }
+      if(raw.indexOf('## ')===0){ html+='<h2 style="font-size:'+(size+4)+'px;font-weight:bold;color:'+accent+';line-height:1.5;margin:26px 0 12px;border-left:4px solid '+accent+';padding-left:10px">'+lyInline(raw.slice(3),accent)+'</h2>'; i++;continue; }
+      if(raw.indexOf('### ')===0){ html+='<h3 style="font-size:'+(size+2)+'px;font-weight:bold;color:#2a2a2a;margin:22px 0 10px">'+lyInline(raw.slice(4),accent)+'</h3>'; i++;continue; }
+      if(raw.indexOf('> ')===0){ html+='<blockquote style="margin:18px 0;padding:12px 16px;background:#f7f7f9;border-left:4px solid '+accent+';color:#666;font-size:'+(size-1)+'px;line-height:'+lh+'">'+lyInline(raw.slice(2),accent)+'</blockquote>'; i++;continue; }
+      if(raw.indexOf('- ')===0||raw.indexOf('* ')===0){
+        const items=[];
+        while(i<lines.length){ const t=lines[i].trim(); if(t.indexOf('- ')===0||t.indexOf('* ')===0){ items.push(lyInline(t.slice(2),accent)); i++; } else break; }
+        html+='<ul style="margin:16px 0;padding-left:22px;color:#3d3d3d;font-size:'+size+'px;line-height:'+lh+'">'+items.map(t=>'<li style="margin:8px 0">'+t+'</li>').join('')+'</ul>';
+        continue;
+      }
+      html+='<p style="margin:1.1em 0;'+base+'">'+lyInline(lines[i],accent)+'</p>';
+      i++;
+    }
+    return html;
+  }
+  function lyBuild(title,bodyHtml,opt){
+    const titleHtml=title?('<h1 style="font-size:'+(opt.size+10)+'px;font-weight:bold;color:#1f1f1f;text-align:center;line-height:1.4;margin:6px 0 22px;padding-bottom:14px;border-bottom:2px solid '+opt.accent+'">'+esc(title)+'</h1>'):'';
+    return '<section style="font-size:'+opt.size+'px;color:#3d3d3d;line-height:'+opt.lh+';letter-spacing:.5px;font-family:'+LY_FONT+';padding:4px 2px;max-width:100%">'+titleHtml+bodyHtml+'</section>';
+  }
+  function lyOpt(){
+    const tpl=LY_TPL[$("#ly-tpl").value]||LY_TPL.green;
+    return {size:parseInt($("#ly-size").value||"16",10),lh:parseFloat($("#ly-lh").value||"1.8"),accent:$("#ly-accent").value||tpl.accent};
+  }
+  async function lyCopyRich(html){
+    if(navigator.clipboard&&window.ClipboardItem){
+      try{
+        const item=new ClipboardItem({'text/html':new Blob([html],{type:'text/html'})});
+        await navigator.clipboard.write([item]);
+        return true;
+      }catch(e){}
+    }
+    try{
+      const div=document.createElement('div'); div.innerHTML=html;
+      div.style.cssText='position:fixed;left:-9999px;top:0';
+      document.body.appendChild(div);
+      const r=document.createRange(); r.selectNodeContents(div);
+      const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      const ok=document.execCommand('copy'); sel.removeAllRanges(); div.remove();
+      return ok;
+    }catch(e){ return false; }
+  }
+  $("#ly-gen").onclick=()=>{
+    const title=$("#ly-title").value.trim();
+    const body=$("#ly-body").value;
+    if(!body.trim()&&!title){ toast("先填正文或标题"); return; }
+    const opt=lyOpt();
+    const html=lyBuild(title,lyMdToHtml(body,opt),opt);
+    $("#ly-preview").innerHTML=html;
+    $("#ly-preview").dataset.html=html;
+    $("#ly-status").innerHTML='<span class="ly-ok">已生成预览，点右上「复制」粘进公众号即可。</span>';
+  };
+  $("#ly-copy").onclick=async()=>{
+    const html=$("#ly-preview").dataset.html||"";
+    if(!html){ toast("先生成排版"); return; }
+    const ok=await lyCopyRich(html);
+    if(ok){ toast("已复制富文本，去公众号后台 Ctrl+V 即可"); $("#ly-status").innerHTML='<span class="ly-ok">已复制！打开公众号后台编辑器，Ctrl/⌘+V 粘贴，格式会保留。</span>'; }
+    else toast("复制失败，请手动选中预览区 Ctrl+C");
+  };
+  $("#ly-copy-src").onclick=()=>{
+    const html=$("#ly-preview").dataset.html||"";
+    if(!html){ toast("先生成排版"); return; }
+    navigator.clipboard.writeText(html).then(()=>toast("已复制 HTML 源码")).catch(()=>toast("复制失败"));
+  };
+  $("#ly-load").onclick=()=>{
+    const d=store.get("drafts",[]);
+    if(!d.length){ toast("还没有草稿"); return; }
+    const dr=d[0];
+    $("#ly-title").value=dr.title||""; $("#ly-body").value=dr.body||"";
+    toast("已载入最新草稿，点「生成排版」");
+  };
+  $("#ly-clear").onclick=()=>{ $("#ly-title").value=""; $("#ly-body").value=""; $("#ly-preview").innerHTML='<div class="empty">点「生成排版」先出个预览～</div>'; if($("#ly-preview").dataset) $("#ly-preview").dataset.html=""; $("#ly-status").innerHTML=""; };
+  $("#draft-to-layout").onclick=()=>{
+    const title=$("#draft-title").value.trim();
+    const body=$("#draft-body").value;
+    if(!body.trim()&&!title){ toast("写稿页先填点内容"); return; }
+    $("#ly-title").value=title; $("#ly-body").value=body;
+    switchTab("layout");
+    toast("已把草稿送进排版，选好样式点「生成排版」");
   };
 
   function startDraftFromTopic(i){
