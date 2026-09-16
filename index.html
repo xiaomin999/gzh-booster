@@ -233,6 +233,10 @@
   /* 工作台总览 */
   .wb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
   .wb-card h3{margin-top:0}
+  .sop-list{margin:2px 0 4px}
+  .sop-item{font-size:12.5px;color:var(--text);padding:6px 0;border-bottom:1px dashed var(--line)}
+  .sop-item:last-child{border-bottom:none}
+  .sop-item b{color:var(--accent)}
   .wb-li{padding:6px 0;border-bottom:1px dashed var(--line);font-size:13.5px;line-height:1.5}
   .wb-li:last-child{border-bottom:none}
   .wb-li b{color:var(--accent)}
@@ -249,6 +253,18 @@
   /* 一鱼多吃 */
   .reuse-report{margin-top:10px;font-size:13.5px;line-height:1.7;white-space:pre-wrap}
   .reuse-report h4{margin:10px 0 4px}
+  /* 标题候选（推荐指数/字符数） */
+  .ttl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .ttl-idx{color:#e6a23c;font-size:13px;letter-spacing:1px;white-space:nowrap}
+  .ttl-type{font-size:11px;color:#fff;background:var(--accent);border-radius:6px;padding:1px 7px;white-space:nowrap}
+  .ttl-txt{flex:1;min-width:160px;font-size:14px;color:var(--text)}
+  .ttl-len{font-size:11px;color:var(--muted);white-space:nowrap}
+  .ttl-over{color:var(--warn);font-weight:600}
+  .ttl-warn{background:#fdf3f3}
+  .ttl-sec{font-weight:600;margin:12px 0 2px;color:var(--text);font-size:13px}
+  .ttl-line{font-size:13px;color:var(--text);padding:3px 0}
+  .ttl-note{font-size:11px;color:var(--warn);margin:-2px 0 6px 0}
+  .ttl-tip{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.6}
   /* 公众号排版复制 */
   .ly-preview{background:#fff;border:1px solid var(--line);border-radius:12px;padding:24px 22px;margin-top:12px;max-width:680px;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;overflow:auto}
   .ly-preview h1,.ly-preview h2,.ly-preview h3,.ly-preview p,.ly-preview blockquote,.ly-preview ul,.ly-preview li{word-break:break-word}
@@ -317,6 +333,17 @@
         <div class="card wb-card" data-page-node-id="wbNode4">
           <h3 data-page-node-id="wbNode4h">🧠 飞轮状态</h3>
           <div id="wb-fly" data-page-node-id="wbFly"></div>
+        </div>
+        <div class="card wb-card" data-page-node-id="wbSopNode">
+          <h3 data-page-node-id="wbSopH">📋 发布 SOP（5 步闭环）</h3>
+          <div class="sop-list">
+            <div class="sop-item"><b>① 选题</b> 栏目 + 人群 + 瓶颈，套四要素（地点 / 人物 / 行为 / 数字）</div>
+            <div class="sop-item"><b>② 标题</b> 至少 3 个候选，看推荐指数，≤64 字</div>
+            <div class="sop-item"><b>③ 结构</b> 钩子开头 → 分段 → 每 300 字记忆点 → 结尾互动</div>
+            <div class="sop-item"><b>④ 排版</b> 双版本（纯文本 + 内联 HTML），配图方案就位</div>
+            <div class="sop-item"><b>⑤ 时机</b> 卡 早 7-9 / 午 12-13 / 晚 20-22</div>
+          </div>
+          <div class="btn-row"><button class="ghost sm wb-jump" data-jump="hot">去爆款选题</button><button class="ghost sm wb-jump" data-jump="title">去标题</button><button class="ghost sm wb-jump" data-jump="layout">去排版</button></div>
         </div>
       </div>
     </section>
@@ -407,6 +434,8 @@
         <input id="hot-aud" placeholder="例如：25-35 岁职场女性 / 同样在自我成长里挣扎的人 / 刚开始理财的小白" data-page-node-id="ueFf3azPjJLJA0XCraap61">
         <label data-page-node-id="t52qZak2C5zJqNctmepKLa">你觉得自己阅读量不高的原因（选填）</label>
         <textarea id="hot-bottle" style="min-height:70px" placeholder="例如：标题太内敛没人点 / 写得太像日记只有老读者看 / 选题太小众缺乏共鸣点 / 发布时间不对。写越具体，选题越对症。"></textarea>
+        <label data-page-node-id="hotHotLbl">我观察到的热点（选填，七平台交叉验证的替代入口）</label>
+        <textarea id="hot-hot" style="min-height:60px" placeholder="把你在百度/微博/抖音/知乎/朋友圈看到的趋势、话题写下来，AI 会帮你和账号做交叉验证，筛出最适合你发的角度。没有就留空。"></textarea>
         <div class="btn-row" data-page-node-id="vO9yjgvMjZHvAtxM4CfEQk">
           <button id="hot-gen" data-page-node-id="DBPuJpYEgDbhTGDneCaqzt">生成爆款潜力选题</button>
           <button class="ghost" id="hot-clear" data-page-node-id="qeZWCKY5WvkLOUhUsl86bq">清空结果</button>
@@ -443,7 +472,7 @@
         <div class="btn-row" data-page-node-id="yIixcStKf29CVuwsvP44ex">
           <button id="draft-save" data-page-node-id="Z7VqFRRGQHAH1CDT5b8P3D">保存草稿</button>
           <button class="ghost" id="draft-gen-ai" data-page-node-id="PCeXBqTPt3t0CnFBcNRu8y">AI 生成初稿</button>
-          <button class="ghost" id="draft-img-prompt" data-page-node-id="hAqCVxVlpdR0hE9Tq2gziX">✨ 配图提示词</button>
+          <button class="ghost" id="draft-img-prompt" data-page-node-id="hAqCVxVlpdR0hE9Tq2gziX">🖼️ 配图方案</button>
           <button class="ghost" id="draft-prompt" data-page-node-id="ma4c1LolHmiVMoGkpH66Mu">生成写作 Prompt</button>
           <button class="soft" id="draft-list-btn" data-page-node-id="11CGlp20fx00GEVpMrQOUF">我的草稿</button>
         </div>
@@ -458,6 +487,7 @@
         <label class="self-check"><input type="checkbox" id="sc-2"> ② 有共鸣点吗？读到的人会不会觉得「这说的不就是我」</label>
         <label class="self-check"><input type="checkbox" id="sc-3"> ③ 结尾有互动钩子吗？有没有留一句邀请评论 / 抛个问题 / 金句回勾</label>
         <div id="sc-result" class="small" style="margin-top:8px"></div>
+        <div class="small" style="margin-top:8px;color:var(--muted)">💡 进阶：正文每 300 字放一个记忆点（金句 / 对比 / 数据卡），读者更易记住、更愿转发；涉及数据或引用，务必自己标来源，别让 AI 替你编。</div>
       </div>
 
       <div class="card" data-page-node-id="wbReuseNode">
@@ -513,6 +543,7 @@
               <div><label data-page-node-id="lyAccLbl">强调色</label>
                 <input type="color" id="ly-accent" value="#24B494" data-page-node-id="lyAcc" style="width:46px;height:34px;border:none;background:none;padding:0;cursor:pointer">
               </div>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:4px"><input type="checkbox" id="ly-justify"> 两端对齐</label>
             </div>
             <div class="btn-row" data-page-node-id="lyLoadRow" style="margin-top:12px">
               <button class="ghost sm" id="ly-load" data-page-node-id="lyLoad">载入写稿草稿</button>
@@ -530,6 +561,7 @@
           <h3 data-page-node-id="lyPrevH">预览（即公众号里的样子）</h3>
           <div data-page-node-id="lyCopyBtns">
             <button id="ly-copy" data-page-node-id="lyCopy">📋 复制（可直接粘公众号）</button>
+            <button class="ghost" id="ly-copy-text" data-page-node-id="lyCopyText">📄 复制纯文本版</button>
             <button class="ghost" id="ly-copy-src" data-page-node-id="lyCopySrc">复制源码</button>
           </div>
         </div>
@@ -596,6 +628,9 @@
         🌿 想摆烂也很正常。两个不放弃的方案：<br data-page-node-id="XezqKdaCRaS3yXR3Aknup5">
         ① <b data-page-node-id="42FxpFCbrUz5h3Fy6q0HkF">轻量化更新</b>——就写几百字随笔，发「片刻随感」也行；<br data-page-node-id="hsuRR1svEZY67DhEplhykG">
         ② <b data-page-node-id="kSsHEixXHxNktmUp6X2DKD">延期调整排期</b>——把这条挪到下周，账号不灭，只是歇会儿。
+      </div>
+      <div class="hint" data-page-node-id="wbTimingHint">
+        🕒 <b>发布时机窗口</b>（参考，不强制）：早 7-9 点（通勤）、午 12-13 点（午休）、晚 20-22 点（睡前刷手机高峰）。卡准再发，比硬凑日更更值钱。
       </div>
     </section>
 
@@ -1109,13 +1144,14 @@
     const col=$("#hot-col").value;
     const aud=$("#hot-aud").value.trim();
     const bottle=$("#hot-bottle").value.trim();
+    const hot=$("#hot-hot").value.trim();
     const n=parseInt($("#hot-count").value,10)||4;
     const btn=$("#hot-gen"); const orig=btn.textContent;
     if(AI.ok()){
       btn.textContent="生成中…"; btn.disabled=true;
       try{
-        const sys="你是公众号爆款选题策划专家，擅长把小众随笔号的内容潜力挖掘成高传播选题，但绝不鼓励标题党、不违背'纯粹自我记录随笔号'的人设。请基于用户给的栏目定位、目标人群（可能为空需你推断）、以及他对阅读量不高的判断，生成 N 个'爆款潜力'选题。每个选题返回 JSON 对象：{title, why, audience, angle, variants, hook}。title=吸引人但不夸张的短文标题；why=为什么这个选题容易爆（点出情绪/痛点/共鸣/悬念/反差/热点钩子中的哪几种，1-2 句）；audience=最对路的目标人群画像（身份/心境）；angle=一句内容角度说明可以怎么写；variants=2-3 个可选标题变体（字符串数组）；hook=能勾住人往下看的开头一句话。只返回 JSON 数组，不要其他文字。";
-        const user=`栏目定位：${col}\n目标人群：${aud||"（请根据栏目自行推断）"}\n我对阅读量不高的判断：${bottle||"（无，请按通用爆款逻辑把握）"}\n请生成 ${n} 个选题。`;
+        const sys="你是公众号爆款选题策划专家，擅长把小众随笔号的内容潜力挖掘成高传播选题，但绝不鼓励标题党、不违背'纯粹自我记录随笔号'的人设。请基于用户给的栏目定位、目标人群（可能为空需你推断）、他对阅读量不高的判断、以及他观察到的热点，生成 N 个'爆款潜力'选题。每个选题返回 JSON 对象：{title, why, audience, angle, variants, hook}。title=吸引人但不夸张的短文标题，尽量套用四要素公式：地点+人物+行为+数字，信息越具体越容易被点；why=为什么这个选题容易爆（点出情绪/痛点/共鸣/悬念/反差/热点钩子中的哪几种，1-2 句）；audience=最对路的目标人群画像（身份/心境）；angle=一句内容角度说明可以怎么写；variants=2-3 个可选标题变体（字符串数组）；hook=能勾住人往下看的开头一句话。只返回 JSON 数组，不要其他文字。";
+        const user=`栏目定位：${col}\n目标人群：${aud||"（请根据栏目自行推断）"}\n我对阅读量不高的判断：${bottle||"（无，请按通用爆款逻辑把握）"}\n我观察到的热点（做交叉验证用）：${hot||"（无）"}\n请生成 ${n} 个选题。`;
         const out=await AI.chat(sys, user, taskModel('hot'));
         const m=out.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
         if(Array.isArray(arr)&&arr.length){
@@ -1189,7 +1225,7 @@
     const btn=$("#draft-gen-ai"); const orig=btn.textContent;
     btn.textContent="生成中…"; btn.disabled=true;
     try{
-      let sys=`你是公众号随笔号写作助手。账号定位：纯粹自我记录随笔号，写给自己、随缘遇见同频读者；栏目：${col}；语气：${style}，真实松弛、允许碎碎念，拒绝硬造爆款、拒绝焦虑营销。请根据用户提供的标题和素材，写一篇完整的公众号推文初稿：钩子开头 + 分段正文（每段短、适配手机阅读）+ 结尾总结与一句互动引导。只返回正文，不要额外总结。`;
+      let sys=`你是公众号随笔号写作助手。账号定位：纯粹自我记录随笔号，写给自己、随缘遇见同频读者；栏目：${col}；语气：${style}，真实松弛、允许碎碎念，拒绝硬造爆款、拒绝焦虑营销。请根据用户提供的标题和素材，写一篇完整的公众号推文初稿：钩子开头 + 分段正文（每段短、适配手机阅读）+ 结尾总结与一句互动引导。写作要求：开头三行必须有钩子（抛问题 / 给场景 / 上数据）；中间每 300 字左右塞一个记忆点（金句、对比或数据卡），让读者易记住、易转发；结尾留互动引导。严禁编造数据或案例，涉及引用请让用户自行标注来源——账号安全比一篇爆款值钱。只返回正文，不要额外总结。`;
       const kbc=kbContext();
       if(kbc) sys+="\n\n【你沉淀的爆款因子与低阅读教训，写稿时尽量贴合，但保持随笔真实感】\n"+kbc;
       const out=await AI.chat(sys, `标题：${title||"（待定）"}\n素材/提纲：${body||"（请围绕标题自由发挥）"}`, taskModel('write'));
@@ -1204,12 +1240,12 @@
     const title=$("#draft-title").value.trim(); const body=$("#draft-body").value.trim();
     const box=$("#draft-img-result"); box.style.display="block";
     if(!title&&!body){ toast("标题或正文至少填一个"); return; }
-    if(!AI.ok()){ box.innerHTML='<div class="result">配置 AI 才能生成配图提示词。离线思路：根据标题想一个画面感强的封面——主体 + 氛围 + 配色 + 风格，例如「'+esc(title||"今日随笔")+'」的暖色手绘插画，旁边配一杯茶。</div>'; return; }
-    box.innerHTML='<div class="result">AI 构思配图中…</div>';
+    if(!AI.ok()){ box.innerHTML='<div class="result">配置 AI 才能生成配图方案。离线思路：封面用「'+esc(title||"今日随笔")+'」的暖色手绘插画（比例 2.35:1）；文中配 1-2 张图（16:9 或 1:1），放在论点或转折处，图注写清这张图想说的事。</div>'; return; }
+    box.innerHTML='<div class="result">AI 规划配图方案中…</div>';
     try{
-      const sys="你是公众号配图提示词助手。根据用户给的标题和正文，输出 1 条中文配图提示词（画面主体+氛围+配色+风格，适合做公众号封面/文中插图，温暖真实不浮夸），再附 1 句构图说明。纯文本。";
-      const out=await AI.chat(sys, "标题："+(title||"（待定）")+"\n正文片段："+(body||"（无）"));
-      box.innerHTML='<div class="result"><h4>✨ 配图提示词</h4>'+esc(out)+'</div>';
+      const sys="你是公众号配图策划助手。基于用户标题和正文，输出一份结构化配图方案，严格按下面格式（不要其他多余文字）：\n#### 封面图（比例 2.35:1）\n- 用途：公众号首图，手机订阅号列表里最显眼\n- 提示词：（画面主体+氛围+配色+风格，温暖真实不浮夸）\n- 构图：（一句话）\n#### 文中图 1（比例 16:9）\n- 插入位置：（放在第几段之后 / 哪个论点处）\n- 图注：（一句话说明这张图想传达什么）\n- 提示词：（…）\n#### 文中图 2（比例 1:1）\n- 插入位置：（…）\n- 图注：（…）\n- 提示词：（…）\n至少给封面 + 2 张文中图；保持随笔真实感，不浮夸。";
+      const out=await AI.chat(sys, "标题："+(title||"（待定）")+"\n正文片段："+(body||"（无）"), taskModel('write'));
+      box.innerHTML='<div class="result"><h4>🖼️ 配图方案</h4>'+renderReviewBody(md2html(out))+'</div>';
     }catch(e){ box.innerHTML='<div class="result">生成失败：'+e.message+'</div>'; }
   };
 
@@ -1269,7 +1305,7 @@
   }
   function lyMdToHtml(text,opt){
     const {size,lh,accent}=opt;
-    const base='font-size:'+size+'px;color:#3d3d3d;line-height:'+lh+';letter-spacing:.5px;font-family:'+LY_FONT;
+    const base='font-size:'+size+'px;color:#3d3d3d;line-height:'+lh+';letter-spacing:.5px;'+(opt.justify?'text-align:justify;':'')+'font-family:'+LY_FONT;
     const lines=text.replace(/\r\n/g,'\n').split('\n');
     let html='';let i=0;
     while(i<lines.length){
@@ -1279,11 +1315,11 @@
       if(raw.indexOf('# ')===0){ html+='<h1 style="font-size:'+(size+9)+'px;font-weight:bold;color:#1f1f1f;text-align:center;line-height:1.4;margin:10px 0 22px;padding-bottom:14px;border-bottom:2px solid '+accent+'">'+lyInline(raw.slice(2),accent)+'</h1>'; i++;continue; }
       if(raw.indexOf('## ')===0){ html+='<h2 style="font-size:'+(size+4)+'px;font-weight:bold;color:'+accent+';line-height:1.5;margin:26px 0 12px;border-left:4px solid '+accent+';padding-left:10px">'+lyInline(raw.slice(3),accent)+'</h2>'; i++;continue; }
       if(raw.indexOf('### ')===0){ html+='<h3 style="font-size:'+(size+2)+'px;font-weight:bold;color:#2a2a2a;margin:22px 0 10px">'+lyInline(raw.slice(4),accent)+'</h3>'; i++;continue; }
-      if(raw.indexOf('> ')===0){ html+='<blockquote style="margin:18px 0;padding:12px 16px;background:#f7f7f9;border-left:4px solid '+accent+';color:#666;font-size:'+(size-1)+'px;line-height:'+lh+'">'+lyInline(raw.slice(2),accent)+'</blockquote>'; i++;continue; }
+      if(raw.indexOf('> ')===0){ html+='<blockquote style="margin:18px 0;padding:12px 16px;background:#f7f7f9;border-left:4px solid '+accent+';color:#666;font-size:'+(size-1)+'px;line-height:'+lh+(opt.justify?';text-align:justify':'')+'">'+lyInline(raw.slice(2),accent)+'</blockquote>'; i++;continue; }
       if(raw.indexOf('- ')===0||raw.indexOf('* ')===0){
         const items=[];
         while(i<lines.length){ const t=lines[i].trim(); if(t.indexOf('- ')===0||t.indexOf('* ')===0){ items.push(lyInline(t.slice(2),accent)); i++; } else break; }
-        html+='<ul style="margin:16px 0;padding-left:22px;color:#3d3d3d;font-size:'+size+'px;line-height:'+lh+'">'+items.map(t=>'<li style="margin:8px 0">'+t+'</li>').join('')+'</ul>';
+        html+='<ul style="margin:16px 0;padding-left:22px;color:#3d3d3d;font-size:'+size+'px;line-height:'+lh+(opt.justify?';text-align:justify':'')+'">'+items.map(t=>'<li style="margin:8px 0">'+t+'</li>').join('')+'</ul>';
         continue;
       }
       html+='<p style="margin:1.1em 0;'+base+'">'+lyInline(lines[i],accent)+'</p>';
@@ -1297,7 +1333,16 @@
   }
   function lyOpt(){
     const tpl=LY_TPL[$("#ly-tpl").value]||LY_TPL.green;
-    return {size:parseInt($("#ly-size").value||"16",10),lh:parseFloat($("#ly-lh").value||"1.8"),accent:$("#ly-accent").value||tpl.accent};
+    return {size:parseInt($("#ly-size").value||"16",10),lh:parseFloat($("#ly-lh").value||"1.8"),accent:$("#ly-accent").value||tpl.accent,justify:$("#ly-justify").checked};
+  }
+  function lyPlain(body){
+    const lines=body.replace(/\r\n/g,'\n').split('\n').map(l=>{
+      let s=l.trim();
+      if(!s) return '';
+      s=s.replace(/^#+\s*/,'').replace(/^>\s*/,'').replace(/^[-*]\s*/,'').replace(/\*\*(.+?)\*\*/g,'$1').replace(/-{3,}/g,'');
+      return s;
+    });
+    return (lines.join('\n').replace(/\n{3,}/g,'\n\n')).trim();
   }
   async function lyCopyRich(html){
     if(navigator.clipboard&&window.ClipboardItem){
@@ -1339,6 +1384,13 @@
     if(!html){ toast("先生成排版"); return; }
     navigator.clipboard.writeText(html).then(()=>toast("已复制 HTML 源码")).catch(()=>toast("复制失败"));
   };
+  $("#ly-copy-text").onclick=async()=>{
+    const title=$("#ly-title").value.trim(); const body=$("#ly-body").value;
+    if(!body.trim()&&!title){ toast("先填正文或标题"); return; }
+    const txt=(title?title+"\n\n":"")+lyPlain(body);
+    try{ await navigator.clipboard.writeText(txt); toast("已复制纯文本版（零符号，粘贴即用）"); }
+    catch(e){ toast("复制失败，请手动选中预览区"); }
+  };
   $("#ly-load").onclick=()=>{
     const d=store.get("drafts",[]);
     if(!d.length){ toast("还没有草稿"); return; }
@@ -1369,6 +1421,32 @@
   }
 
   /* ===== 模块4 标题摘要 ===== */
+  function formatTitleResult(raw){
+    const lines=raw.split('\n');
+    let html='<h4>标题候选（带推荐指数 · 字符数）</h4>';
+    for(const line of lines){
+      const s=line.trim(); if(!s) continue;
+      const m=s.match(/^▸\s*\[指数(\d)\/5\|([^\]]+)\]\s*(.+)$/);
+      if(m){
+        const idx=+m[1], type=m[2], txt=m[3];
+        const len=[...txt].length;
+        const over=len>64;
+        const bad=/震惊|速看|马上删|删前必看|不转不是|惊天|炸了|万万没想到/.test(txt);
+        let stars=''; for(let i=0;i<5;i++) stars+= i<idx?'★':'☆';
+        html+='<div class="ttl-row'+(over||bad?' ttl-warn':'')+'">'
+          +'<span class="ttl-idx" title="推荐指数">'+stars+'</span>'
+          +'<span class="ttl-type">'+esc(type)+'</span>'
+          +'<span class="ttl-txt">'+esc(txt)+'</span>'
+          +'<span class="ttl-len'+(over?' ttl-over':'')+'">'+len+'字'+(over?' ⚠':'')+'</span>'
+          +'</div>'+(bad?'<div class="ttl-note">⚠ 含标题党措辞，平台可能压推荐、读者也烦</div>':'');
+        continue;
+      }
+      if((/[：:]$/.test(s)&&[...s].length<20) || /^(悬念|干货|共情|数字|反常识)/.test(s)){ html+='<div class="ttl-sec">'+esc(s)+'</div>'; continue; }
+      html+='<div class="ttl-line">'+esc(s)+'</div>';
+    }
+    html+='<div class="ttl-tip">推荐指数越高越该用；标题 ≤64 字手机端不折叠；避免「震惊 / 速看 / 马上删」类措辞。点任意标题可复制。</div>';
+    return html;
+  }
   $("#title-gen").onclick=async()=>{
     const theme=$("#title-theme").value.trim();
     if(!theme){ toast("先填主题"); return; }
@@ -1376,22 +1454,32 @@
     if(AI.ok()){
       box.innerHTML='<div class="result">AI 生成中…</div>';
       try{
-        const sys="你是公众号标题党（良性版）助手。请根据用户给的主题和正文，输出：10条标题（悬念好奇型4/干货价值型3/共情故事型3）、2条摘要、4条封面slogan。用清晰分段，纯文本。";
+        const sys="你是公众号标题（良性版）助手，绝不写标题党。请基于主题和正文，输出：\n① 8-10 条标题，每条严格用此格式：▸ [指数X/5|类型] 标题文字（X为推荐指数1-5，类型取 悬念/数字盘点/反常识/共情 之一；挑1条最该用的标5，其余按把握降序）；\n② 2 条摘要；\n③ 4 条封面 slogan。\n标题要求：具体有信息点、≤64 字、绝对避免「震惊/速看/马上删」等措辞。用清晰分段，纯文本。";
         const out=await AI.chat(sys, "主题："+theme+"\n正文片段："+($("#title-text").value.trim()||"（无）"), taskModel('title'));
-        box.innerHTML='<div class="result"><h4>AI 生成结果</h4>'+esc(out)+'</div>';
+        box.innerHTML='<div class="result">'+formatTitleResult(out)+'</div>';
         return;
       }catch(e){ box.innerHTML='<div class="result">AI 调用失败（'+e.message+'），改用离线模板：</div>'; }
     }
     // offline templates
     const t=theme;
     const titles=[
-      "悬念好奇型：","▸ 为什么聊「"+t+"」的人，最后都悄悄变了？","▸ 「"+t+"」这件事，我观察了好久才敢说","▸ 关于"+t+"，你可能一直理解反了","▸ 我花了很久才接受的"+t+"真相",
-      "干货价值型：","▸ "+t+"的5个实操方法（新手也能用）","▸ 一文讲清"+t+"，建议收藏","▸ 做"+t+"前，先搞懂这3件事","▸ "+t+"避坑指南：我踩过的雷",
-      "共情故事型：","▸ 那天我卡在"+t+"上，才懂了这件事","▸ 写给也在为"+t+"挣扎的你","▸ 承认吧，"+t+"真的很磨人","▸ 不慌，我和"+t+"和解了"
+      "悬念好奇型：",
+      "▸ [指数5/5|悬念] 为什么聊「"+t+"」的人，最后都悄悄变了？",
+      "▸ [指数4/5|悬念] 「"+t+"」这件事，我观察了好久才敢说",
+      "▸ [指数3/5|反常识] 关于"+t+"，你可能一直理解反了",
+      "▸ [指数3/5|共情] 我花了很久才接受的"+t+"真相",
+      "数字盘点型：",
+      "▸ [指数4/5|数字盘点] "+t+"的 5 个实操方法（新手也能用）",
+      "▸ [指数3/5|数字盘点] 做"+t+"前，先搞懂这 3 件事",
+      "▸ [指数4/5|数字盘点] "+t+"避坑指南：我踩过的 5 个雷",
+      "共情故事型：",
+      "▸ [指数4/5|共情] 那天我卡在"+t+"上，才懂了这件事",
+      "▸ [指数3/5|共情] 写给也在为"+t+"挣扎的你",
+      "▸ [指数3/5|共情] 不慌，我和"+t+"和解了"
     ].join("\n");
     const sum="摘要1：本文从个人体验出发，聊聊「"+t+"」的真实感受与可落地做法，不灌鸡汤。\n摘要2：关于「"+t+"」，我整理了几个踩过坑后的小经验，写给同样在摸索的你。";
     const slog="slogan：慢慢来，比较快 ｜ 写给也在摸索的你 ｜ 不慌，先动一笔 ｜ 真实比完美重要";
-    box.innerHTML='<div class="result"><h4>离线模板（配置 AI 可更贴合）</h4>'+esc(titles)+"\n\n"+esc(sum)+"\n\n"+esc(slog)+'</div>';
+    box.innerHTML='<div class="result">'+formatTitleResult(titles+"\n\n"+sum+"\n\n"+slog)+'</div>';
   };
 
   /* ===== 模块5 复盘 ===== */
