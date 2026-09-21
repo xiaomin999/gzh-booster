@@ -512,17 +512,29 @@
             <label data-page-node-id="lyTtlLbl">文章标题（可选）</label>
             <input id="ly-title" placeholder="不填则只排正文" data-page-node-id="lyTitle">
             <label data-page-node-id="lyBodyLbl">正文 / 提纲（支持简易 Markdown）</label>
-            <textarea id="ly-body" style="min-height:220px" placeholder="直接粘贴你的文章。支持：# 一级标题、## 二级标题、### 三级标题、&gt; 引用、- 列表、**加粗**、--- 分隔线。每段空一行。"></textarea>
-            <div class="ly-tip" data-page-node-id="lyTip">小提示：公众号标题一般在后台单独填，这里留空也能排正文。</div>
+            <textarea id="ly-body" style="min-height:220px" placeholder="直接粘贴你的文章。支持：# 一级标题、## 二级标题、### 三级标题、&gt; 引用、&gt;&gt; 金句（大号居中）、- 列表、**加粗**、==高亮==、--- 分隔线。每段空一行。"></textarea>
+            <div class="ly-tip" data-page-node-id="lyTip">小提示：先选「版式」和「配色」再生成。新增语法：<b>&gt;&gt; 金句</b>（大号居中强调）、<b>==高亮==</b>（行内底色）、<b>---</b>（带花饰分隔线）。公众号标题一般在后台单独填，这里留空也能排正文。</div>
           </div>
           <div style="flex:0 0 230px;min-width:200px" data-page-node-id="lyCol2">
             <div class="ly-field" data-page-node-id="lyField">
-              <div><label data-page-node-id="lyTplLbl">样式模板</label>
+              <div><label data-page-node-id="lyTplLbl">版式</label>
                 <select id="ly-tpl" data-page-node-id="lyTpl">
-                  <option value="green">文艺绿（WorkBuddy 风）</option>
-                  <option value="clean">简约白</option>
-                  <option value="warm">卡片暖</option>
-                  <option value="mono">极简黑</option>
+                  <option value="fresh">清新文（默认）</option>
+                  <option value="magazine">杂志风（首字下沉+编号）</option>
+                  <option value="card">卡片风（整篇卡片）</option>
+                  <option value="literary">文艺留白（居中分隔）</option>
+                  <option value="business">极简商务</option>
+                </select>
+              </div>
+              <div><label data-page-node-id="lyColorLbl">配色（小清新）</label>
+                <select id="ly-color" data-page-node-id="lyColor">
+                  <option value="mint">清新薄荷</option>
+                  <option value="sakura">淡樱粉</option>
+                  <option value="apricot">奶杏黄</option>
+                  <option value="blue">雾霾蓝</option>
+                  <option value="lilac">浅藕紫</option>
+                  <option value="matcha">抹茶绿</option>
+                  <option value="article">深蓝商务（文中范例）</option>
                 </select>
               </div>
               <div><label data-page-node-id="lySizeLbl">正文字号</label>
@@ -539,9 +551,6 @@
                   <option value="1.8" selected>1.8</option>
                   <option value="2.0">2.0</option>
                 </select>
-              </div>
-              <div><label data-page-node-id="lyAccLbl">强调色</label>
-                <input type="color" id="ly-accent" value="#24B494" data-page-node-id="lyAcc" style="width:46px;height:34px;border:none;background:none;padding:0;cursor:pointer">
               </div>
               <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:4px"><input type="checkbox" id="ly-justify"> 两端对齐</label>
             </div>
@@ -1292,62 +1301,106 @@
 
   /* ===== 模块3.5 公众号排版复制 ===== */
   const LY_FONT='-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
-  const LY_TPL={
-    green:{accent:"#24B494"},
-    clean:{accent:"#2e7d5b"},
-    warm:{accent:"#e8833a"},
-    mono:{accent:"#1a1a1a"}
+  const LY_COLORS={
+    mint:{label:"清新薄荷",primary:"#2f9e8f",accent:"#36b9a3",emphasis:"#e0795f",ink:"#3a4a47",soft:"#e8f6f3"},
+    sakura:{label:"淡樱粉",primary:"#d98aa6",accent:"#e7a6bd",emphasis:"#c0607a",ink:"#4a3f43",soft:"#fbeef3"},
+    apricot:{label:"奶杏黄",primary:"#d99a4e",accent:"#e9b15f",emphasis:"#cf7a4a",ink:"#4a4036",soft:"#fbf1e0"},
+    blue:{label:"雾霾蓝",primary:"#5b87a8",accent:"#79a7c4",emphasis:"#cf7a6a",ink:"#3a4250",soft:"#eaf1f7"},
+    lilac:{label:"浅藕紫",primary:"#9a7fb0",accent:"#b49ac8",emphasis:"#c0607a",ink:"#443b4a",soft:"#f1ecf7"},
+    matcha:{label:"抹茶绿",primary:"#7d8c4a",accent:"#9aab5e",emphasis:"#cf7a4a",ink:"#42483a",soft:"#f1f4e3"},
+    article:{label:"深蓝商务(文中范例)",primary:"#143a5e",accent:"#17a673",emphasis:"#c0392b",ink:"#2c3e50",soft:"#eaf6f1"}
   };
-  function lyInline(s,accent){
+  const LY_STYLES={
+    fresh:{label:"清新文",ornament:"❧",badge:false,card:false,dropcap:false,
+      h2:(t,c)=>'<p style="'+L(c.size+3,c.ink,c.lh)+';font-weight:bold;border-left:4px solid '+c.accent+';padding-left:12px;margin:28px 0 14px">'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:bold;margin:22px 0 10px">'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-left:4px solid '+c.accent+';border-radius:8px;padding:13px 16px;margin:18px 0">'+t+'</p>'},
+    magazine:{label:"杂志风",ornament:"❖",badge:true,card:false,dropcap:true,
+      h2:(t,c,n)=>'<p style="'+L(c.size+3,c.ink,c.lh)+';font-weight:bold;margin:30px 0 14px"><span style="'+L(c.size+1,"#fff",c.lh)+';background:'+c.accent+';border-radius:50%;display:inline-block;width:26px;height:26px;line-height:'+(c.size+1)+'px;text-align:center;margin-right:8px;font-weight:bold">'+n+'</span>'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:bold;padding-left:10px;border-left:3px solid '+c.accent+';margin:22px 0 10px">'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-left:5px solid '+c.accent+';border-radius:10px;padding:14px 18px;margin:18px 0">'+t+'</p>'},
+    card:{label:"卡片风",ornament:"✿",badge:false,card:true,dropcap:false,
+      h2:(t,c)=>'<p style="'+L(c.size+3,c.ink,c.lh)+';font-weight:bold;border-left:4px solid '+c.accent+';padding-left:12px;margin:24px 0 14px">'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:bold;margin:20px 0 10px">'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-radius:10px;padding:13px 16px;margin:16px 0">'+t+'</p>'},
+    literary:{label:"文艺留白",ornament:"✦",badge:false,card:false,dropcap:true,
+      h2:(t,c)=>'<p style="'+L(c.size+2,c.ink,c.lh)+';font-weight:bold;text-align:center;border-top:1px solid '+c.accent+';border-bottom:1px solid '+c.accent+';padding:10px 0;margin:32px 0 18px;letter-spacing:2px">'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.accent,c.lh)+';font-weight:bold;text-align:center;margin:24px 0 12px;letter-spacing:1px">'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size,c.accent,c.lh)+';font-style:italic;text-align:center;margin:20px 0;padding:6px 14px">'+t+'</p>'},
+    business:{label:"极简商务",ornament:"—",badge:false,card:false,dropcap:false,
+      h2:(t,c)=>'<p style="'+L(c.size+2,"#fff",c.lh)+';font-weight:bold;background:'+c.primary+';display:inline-block;padding:9px 14px;border-radius:4px;margin:28px 0 14px">'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:bold;margin:20px 0 10px">'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-left:3px solid '+c.accent+';padding:13px 16px;margin:18px 0">'+t+'</p>'}
+  };
+  function L(size,color,lh){ return 'font-size:'+size+'px;color:'+color+';line-height:'+lh+';font-family:'+LY_FONT; }
+  function lyInline(s,c){
     s=esc(s);
-    s=s.replace(/\*\*(.+?)\*\*/g,'<strong style="font-weight:bold;color:'+accent+'">$1</strong>');
+    s=s.replace(/\*\*(.+?)\*\*/g,'<strong style="font-weight:bold;'+L(c.size,c.emphasis,c.lh)+'">$1</strong>');
+    s=s.replace(/==(.+?)==/g,'<span style="background:'+c.soft+';color:'+c.primary+';font-weight:600;'+L(c.size,c.primary,c.lh)+';padding:1px 5px;border-radius:3px">$1</span>');
     return s;
   }
+  function lyTitle(t,c){ return '<p style="'+L(c.size+4,c.primary,c.lh)+';font-weight:bold;text-align:center;margin:6px 0 22px;padding-bottom:14px;border-bottom:2px solid '+c.accent+'">'+t+'</p>'; }
+  function lyPull(t,c){ return '<p style="text-align:center;'+L(c.size+6,c.accent,1.6)+';font-weight:bold;font-style:italic;margin:24px 0;padding:18px 4px;border-top:1px solid '+c.accent+';border-bottom:1px solid '+c.accent+'">「'+t+'」</p>'; }
+  function lyKey(items,c){
+    return items.map(t=>'<p style="'+L(c.size,c.ink,c.lh)+';background:'+c.soft+';border-left:3px solid '+c.accent+';border-radius:10px;padding:12px 14px;margin:10px 0">'+t+'</p>').join('');
+  }
   function lyMdToHtml(text,opt){
-    const {size,lh,accent}=opt;
-    const base='font-size:'+size+'px;color:#3d3d3d;line-height:'+lh+';letter-spacing:.5px;'+(opt.justify?'text-align:justify;':'')+'font-family:'+LY_FONT;
+    const {size,lh,primary,accent,emphasis,ink,soft,style,justify}=opt;
+    const S=LY_STYLES[style]||LY_STYLES.fresh;
+    const c={size,lh,primary,accent,emphasis,ink,soft,justify,style};
+    const base=L(size,ink,lh)+(justify?';text-align:justify':'')+';letter-spacing:.3px';
     const lines=text.replace(/\r\n/g,'\n').split('\n');
-    let html='';let i=0;
+    let html='';let i=0;let sec=0;let started=false;
     while(i<lines.length){
       const raw=lines[i].trim();
       if(raw===''){i++;continue;}
-      if(raw==='---'||raw==='***'||raw==='___'){ html+='<hr style="border:none;border-top:1px solid #e8e8e8;margin:24px 0">'; i++;continue; }
-      if(raw.indexOf('# ')===0){ html+='<h1 style="font-size:'+(size+9)+'px;font-weight:bold;color:#1f1f1f;text-align:center;line-height:1.4;margin:10px 0 22px;padding-bottom:14px;border-bottom:2px solid '+accent+'">'+lyInline(raw.slice(2),accent)+'</h1>'; i++;continue; }
-      if(raw.indexOf('## ')===0){ html+='<h2 style="font-size:'+(size+4)+'px;font-weight:bold;color:'+accent+';line-height:1.5;margin:26px 0 12px;border-left:4px solid '+accent+';padding-left:10px">'+lyInline(raw.slice(3),accent)+'</h2>'; i++;continue; }
-      if(raw.indexOf('### ')===0){ html+='<h3 style="font-size:'+(size+2)+'px;font-weight:bold;color:#2a2a2a;margin:22px 0 10px">'+lyInline(raw.slice(4),accent)+'</h3>'; i++;continue; }
-      if(raw.indexOf('> ')===0){ html+='<blockquote style="margin:18px 0;padding:12px 16px;background:#f7f7f9;border-left:4px solid '+accent+';color:#666;font-size:'+(size-1)+'px;line-height:'+lh+(opt.justify?';text-align:justify':'')+'">'+lyInline(raw.slice(2),accent)+'</blockquote>'; i++;continue; }
+      if(raw==='---'||raw==='***'||raw==='___'){ html+='<p style="text-align:center;margin:26px 0;'+L(14,accent,1)+';letter-spacing:6px">'+S.ornament+'&nbsp;&nbsp;&nbsp;</p>'; i++;started=true;continue; }
+      if(raw.indexOf('# ')===0){ html+=lyTitle(lyInline(raw.slice(2),c),c); i++;started=true;continue; }
+      if(raw.indexOf('## ')===0){ sec++; html+=S.h2(lyInline(raw.slice(3),c),c,String(sec).padStart(2,'0')); i++;started=true;continue; }
+      if(raw.indexOf('### ')===0){ html+=S.h3(lyInline(raw.slice(4),c),c); i++;started=true;continue; }
+      if(raw.indexOf('>> ')===0){ html+=lyPull(lyInline(raw.slice(3),c),c); i++;started=true;continue; }
+      if(raw.indexOf('> ')===0){ html+=S.quote(lyInline(raw.slice(2),c),c); i++;started=true;continue; }
       if(raw.indexOf('- ')===0||raw.indexOf('* ')===0){
         const items=[];
-        while(i<lines.length){ const t=lines[i].trim(); if(t.indexOf('- ')===0||t.indexOf('* ')===0){ items.push(lyInline(t.slice(2),accent)); i++; } else break; }
-        html+='<ul style="margin:16px 0;padding-left:22px;color:#3d3d3d;font-size:'+size+'px;line-height:'+lh+(opt.justify?';text-align:justify':'')+'">'+items.map(t=>'<li style="margin:8px 0">'+t+'</li>').join('')+'</ul>';
-        continue;
+        while(i<lines.length){ const t=lines[i].trim(); if(t.indexOf('- ')===0||t.indexOf('* ')===0){ items.push(lyInline(t.slice(2),c)); i++; } else break; }
+        html+=lyKey(items,c); started=true; continue;
       }
-      html+='<p style="margin:1.1em 0;'+base+'">'+lyInline(lines[i],accent)+'</p>';
-      i++;
+      let p=lyInline(lines[i],c);
+      if(S.dropcap&&!started){ p=p.replace(/^(.)/,'<span style="float:left;'+L((size*2.6).toFixed(0),accent,1)+';font-weight:bold;margin:2px 8px 0 0">$1</span>'); }
+      html+='<p style="margin:1.1em 0;'+base+'">'+p+'</p>';
+      started=true; i++;
     }
     return html;
   }
+  const LY_COPY_JS="(function(b){var s=b.parentNode;var c=s.cloneNode(true);var x=c.querySelector('[data-lycopy]');if(x)x.remove();var h=c.innerHTML;try{if(navigator.clipboard&&window.ClipboardItem){navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'})})]).then(function(){b.textContent='已复制 ✓';setTimeout(function(){b.textContent='一键复制'},1500);});}else{b.textContent='请手动复制';}}catch(e){b.textContent='请手动复制';}})(this)";
   function lyBuild(title,bodyHtml,opt){
-    const titleHtml=title?('<h1 style="font-size:'+(opt.size+10)+'px;font-weight:bold;color:#1f1f1f;text-align:center;line-height:1.4;margin:6px 0 22px;padding-bottom:14px;border-bottom:2px solid '+opt.accent+'">'+esc(title)+'</h1>'):'';
-    return '<section style="font-size:'+opt.size+'px;color:#3d3d3d;line-height:'+opt.lh+';letter-spacing:.5px;font-family:'+LY_FONT+';padding:4px 2px;max-width:100%">'+titleHtml+bodyHtml+'</section>';
+    const S=LY_STYLES[opt.style]||LY_STYLES.fresh;
+    const c={size:opt.size,lh:opt.lh,primary:opt.primary,accent:opt.accent,emphasis:opt.emphasis,ink:opt.ink,soft:opt.soft,style:opt.style};
+    const titleHtml=title?lyTitle(esc(title),c):'';
+    let inner=titleHtml+bodyHtml;
+    if(S.card){ inner='<div style="background:'+opt.soft+';border:1px solid #ececec;border-radius:14px;padding:22px 18px;box-shadow:0 2px 10px rgba(0,0,0,.04)">'+inner+'</div>'; }
+    const btn='<button data-lycopy="1" onclick="'+LY_COPY_JS.replace(/"/g,'&quot;')+'" style="position:fixed;right:14px;bottom:14px;z-index:99;background:'+opt.primary+';color:#fff;border:none;border-radius:24px;padding:10px 18px;font-size:14px;'+L(14,"#fff",1.4)+';cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.18)">一键复制</button>';
+    return '<section style="'+L(opt.size,opt.ink,opt.lh)+';max-width:680px;margin:0 auto;padding:4px 2px">'+inner+btn+'</section>';
   }
   function lyOpt(){
-    const tpl=LY_TPL[$("#ly-tpl").value]||LY_TPL.green;
-    return {size:parseInt($("#ly-size").value||"16",10),lh:parseFloat($("#ly-lh").value||"1.8"),accent:$("#ly-accent").value||tpl.accent,justify:$("#ly-justify").checked};
+    const style=$("#ly-tpl").value||"fresh";
+    const col=LY_COLORS[$("#ly-color").value]||LY_COLORS.mint;
+    return {size:parseInt($("#ly-size").value||"16",10),lh:parseFloat($("#ly-lh").value||"1.8"),primary:col.primary,accent:col.accent,emphasis:col.emphasis,ink:col.ink,soft:col.soft,style:style,justify:$("#ly-justify").checked};
   }
   function lyPlain(body){
     const lines=body.replace(/\r\n/g,'\n').split('\n').map(l=>{
       let s=l.trim();
       if(!s) return '';
-      s=s.replace(/^#+\s*/,'').replace(/^>\s*/,'').replace(/^[-*]\s*/,'').replace(/\*\*(.+?)\*\*/g,'$1').replace(/-{3,}/g,'');
+      s=s.replace(/^#+\s*/,'').replace(/^>>\s*/,'').replace(/^>\s*/,'').replace(/^[-*]\s*/,'').replace(/\*\*(.+?)\*\*/g,'$1').replace(/==(.+?)==/g,'$1').replace(/-{3,}/g,'');
       return s;
     });
     return (lines.join('\n').replace(/\n{3,}/g,'\n\n')).trim();
   }
   async function lyCopyRich(html){
+    const clean=html.replace(/<button[^>]*data-lycopy[^>]*>[\s\S]*?<\/button>/g,'');
     if(navigator.clipboard&&window.ClipboardItem){
       try{
-        const item=new ClipboardItem({'text/html':new Blob([html],{type:'text/html'})});
+        const item=new ClipboardItem({'text/html':new Blob([clean],{type:'text/html'})});
         await navigator.clipboard.write([item]);
         return true;
       }catch(e){}
