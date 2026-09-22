@@ -567,8 +567,9 @@
           </div>
         </div>
         <div class="btn-row" data-page-node-id="lyGenRow" style="margin-top:14px">
+          <button id="ly-smart" data-page-node-id="lySmart">✨ 智能排版（粘文本自动识别）</button>
           <button id="ly-gen" data-page-node-id="lyGen">生成排版</button>
-          <span class="ly-tip" data-page-node-id="lyGenTip">未配置 AI 也能用——这是纯排版工具。<b style="color:var(--muted)">引擎 v0922·秀米组件版</b></span>
+          <span class="ly-tip" data-page-node-id="lyGenTip">不用学语法：把文章整段粘进正文，点「智能排版」自动识别标题/小节/列表/问答/金句。<b style="color:var(--muted)">引擎 v0922·秀米组件版</b></span>
         </div>
       </div>
       <div class="card" data-page-node-id="lyCardPrev">
@@ -1306,7 +1307,7 @@
   };
 
   /* ===== 模块3.5 公众号排版复制 ===== */
-  const LY_FONT='-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+  const LY_FONT="-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif";
   const LY_COLORS={
     mint:{label:"清新薄荷",primary:"#2f9e8f",accent:"#36b9a3",emphasis:"#e0795f",ink:"#3a4a47",soft:"#e8f6f3"},
     sakura:{label:"淡樱粉",primary:"#d98aa6",accent:"#e7a6bd",emphasis:"#c0607a",ink:"#4a3f43",soft:"#fbeef3"},
@@ -1385,7 +1386,7 @@
       if(raw.indexOf('> ')===0){ html+=S.quote(lyInline(raw.slice(2),c),c); i++;started=true;continue; }
       if(/^(Q|A)[:：]/.test(raw)){
         let buf='';
-        while(i<lines.length){ const t=lines[i].trim(); const m=t.match(/^(Q|A)[:：]\s*(.*)$/); if(m){ if(m[1]==='Q'){ buf+='<p style="margin:14px 0 4px;'+L(c.size,c.ink,c.lh)+'"><span style="'+L(c.size,c.accent,c.lh)+';font-weight:bold;margin-right:6px">Q</span><strong style="font-weight:bold;'+L(c.size,c.ink,c.lh)+'">'+lyInline(m[2],c)+'</strong></p>'; } else { buf+='<p style="margin:0 0 12px;'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-radius:8px;padding:11px 14px">'+lyInline(m[2],c)+'</p>'; } i++; } else break; }
+        while(i<lines.length){ const t=lines[i].trim(); const m=t.match(/^(Q|A)[:：]\s*(.*)$/); if(m){ if(m[1]==='Q'){ buf+='<p style="margin:14px 0 4px;'+L(c.size,c.ink,c.lh)+'"><span style="'+L(c.size,c.accent,c.lh)+';font-weight:bold;margin-right:6px">Q</span><strong style="font-weight:bold;'+L(c.size,c.ink,c.lh)+'">'+lyInline(m[2],c)+'</strong></p>'; } else { buf+='<p style="margin:0 0 12px;'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-radius:8px;padding:11px 14px"><span style="'+L(c.size,c.accent,c.lh)+';font-weight:bold;margin-right:6px">A</span>'+lyInline(m[2],c)+'</p>'; } i++; } else break; }
         html+=buf; started=true; continue;
       }
       if(raw.indexOf('- ')===0||raw.indexOf('* ')===0){
@@ -1429,6 +1430,72 @@
     });
     return (lines.join('\n').replace(/\n{3,}/g,'\n\n')).trim();
   }
+  // 本地启发式：把纯文本自动识别成排版结构（无需手写语法）。按行识别，兼容「只有换行没有空行」的粘贴。
+  function lyHeuristic(raw, titleHint){
+    const lines=raw.replace(/\r\n/g,'\n').split('\n').map(s=>s.trim()).filter(Boolean);
+    const out=[];
+    let title=titleHint?('# '+titleHint):'';
+    let start=0;
+    if(!titleHint && lines.length){
+      const f=lines[0];
+      if(f.length<=24 && !/[。！？；：]/.test(f) && !/^[-•·*\d]/.test(f)){ title='# '+f; start=1; }
+    }
+    if(title) out.push(title);
+    let firstHeading=true;
+    const numHead=/^[（(]?[一二三四五六七八九十百\d]+[、.．）)]\s*/;
+    const chHead=/^第.{1,10}[章节目部分篇]\s*/;
+    const bullet=/^([-\d]+[.、)）]|[•·*]|\d+[.、])\s*/;
+    let i=start;
+    while(i<lines.length){
+      let L=lines[i];
+      if(/^(问|Q)\s*[：:]\s*/i.test(L)){ out.push('Q: '+L.replace(/^(问|Q)\s*[：:]\s*/i,'')); i++; continue; }
+      if(/^(答|A)\s*[：:]\s*/i.test(L)){ out.push('A: '+L.replace(/^(答|A)\s*[：:]\s*/i,'')); i++; continue; }
+      if(bullet.test(L)){
+        const items=[];
+        while(i<lines.length && bullet.test(lines[i])){ items.push(lines[i].replace(bullet,'')); i++; }
+        for(const it of items) out.push('- '+it);
+        continue;
+      }
+      if(numHead.test(L)||chHead.test(L)){ out.push((firstHeading?'##= ':'## ')+L); firstHeading=false; i++; continue; }
+      if(L.length<=22 && /[：:]$/.test(L) && !/[。！？]/.test(L)){ out.push((firstHeading?'##= ':'## ')+L); firstHeading=false; i++; continue; }
+      if(L.length<=22 && /[？?]$/.test(L) && !/[。！]/.test(L)){ out.push('##~ '+L); i++; continue; }
+      const qm=L.match(/[“"『「](.+?)[”"』」]/s);
+      if(qm && qm[1].length<=42){ out.push('>> '+qm[1]); i++; continue; }
+      if(/^(总结|提示|注|说明|小提醒|划重点|tip|注意)/i.test(L)){ out.push('> '+L); i++; continue; }
+      out.push(L.replace(/【([^】]{1,12})】/g,'[[$1]]'));
+      i++;
+    }
+    return out.join('\n');
+  }
+  // 智能排版：有 AI 交给 AI 识别结构，否则本地启发式；结果回填正文框并渲染
+  async function lySmart(){
+    const rawTitle=$("#ly-title").value.trim();
+    const raw=$("#ly-body").value;
+    if(!raw.trim()){ toast("先把文章粘贴到正文框"); return; }
+    const opt=lyOpt();
+    let md;
+    if(AI.ok()){
+      toast("AI 识别文章结构中…");
+      try{
+        const sys="你是公众号排版结构识别助手。用户会贴一段纯文本文章（没有任何排版标记）。你只做一件事：在合适位置加上轻量标记，让排版引擎能把它排成好看的公众号文章。\n可用标记（严格只用这些，不要加别的标记，不要输出代码块，不要写解释）：\n# 主标题（若用户已单独给标题则不要重复加这一行）\n## 小节标题\n##~ 疑问式小节标题（以问号结尾的短标题）\n##= 全文最重要的 1-2 个重点标题（整条色块）\n> 背景说明 / 备注 / 引用\n>> 金句（一句有冲击力的短句，独立成行，最多 2 句）\nQ: 问题\nA: 回答（与 Q 成对出现）\n- 列表项（每条一行）\n[[关键词]] 行内小标签（全文挑 2-4 个重点词加标签）\n规则：保留原文全部文字，只在行首或词外加标记；使用中文标点；不编造内容；输出只有被标记后的文本。";
+        let ai=await AI.chat(sys, raw);
+        ai=ai.replace(/^```[\s\S]*?\n/,'').replace(/```\s*$/,'').trim();
+        md=ai;
+      }catch(e){ toast("AI 识别失败，改用本地自动排版："+e.message); md=lyHeuristic(raw, rawTitle); }
+    } else {
+      md=lyHeuristic(raw, rawTitle);
+    }
+    const m=md.match(/^\s*#\s+(.+?)\s*$/m);
+    let inferred='';
+    if(m){ inferred=m[1].trim(); md=md.replace(/^\s*#\s+.+?(\n|$)/m,''); }
+    const title=rawTitle||inferred;
+    $("#ly-title").value=title;
+    $("#ly-body").value=md;
+    const html=lyBuild(title, lyMdToHtml(md, opt), opt);
+    $("#ly-preview").innerHTML=html;
+    $("#ly-preview").dataset.html=html;
+    $("#ly-status").innerHTML='<span class="ly-ok">智能排版完成'+(AI.ok()?'（AI 识别结构）':'（本地自动识别）')+'。已填回正文框，可手动微调后点「生成排版」重排。</span>';
+  }
   async function lyCopyRich(html){
     const clean=html.replace(/<button[^>]*data-lycopy[^>]*>[\s\S]*?<\/button>/g,'');
     if(navigator.clipboard&&window.ClipboardItem){
@@ -1458,6 +1525,7 @@
     $("#ly-preview").dataset.html=html;
     $("#ly-status").innerHTML='<span class="ly-ok">已生成预览，点右上「复制」粘进公众号即可。</span>';
   };
+  $("#ly-smart").onclick=()=>{ lySmart(); };
   $("#ly-copy").onclick=async()=>{
     const html=$("#ly-preview").dataset.html||"";
     if(!html){ toast("先生成排版"); return; }
