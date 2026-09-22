@@ -559,6 +559,7 @@
               <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:4px"><input type="checkbox" id="ly-justify"> 两端对齐</label>
             </div>
             <div class="btn-row" data-page-node-id="lyLoadRow" style="margin-top:12px">
+              <button class="ghost sm" id="ly-demo" data-page-node-id="lyDemo">✨ 填示例（看全部新组件）</button>
               <button class="ghost sm" id="ly-load" data-page-node-id="lyLoad">载入写稿草稿</button>
               <button class="ghost sm" id="ly-follow" data-page-node-id="lyFollow">➕ 加结尾引导</button>
               <button class="ghost sm" id="ly-clear" data-page-node-id="lyClear">清空</button>
@@ -567,7 +568,7 @@
         </div>
         <div class="btn-row" data-page-node-id="lyGenRow" style="margin-top:14px">
           <button id="ly-gen" data-page-node-id="lyGen">生成排版</button>
-          <span class="ly-tip" data-page-node-id="lyGenTip">未配置 AI 也能用——这是纯排版工具。</span>
+          <span class="ly-tip" data-page-node-id="lyGenTip">未配置 AI 也能用——这是纯排版工具。<b style="color:var(--muted)">引擎 v0922·秀米组件版</b></span>
         </div>
       </div>
       <div class="card" data-page-node-id="lyCardPrev">
@@ -1487,6 +1488,28 @@
   $("#ly-color").onchange=()=>{ const v=$("#ly-color").value; if(v&&v!=='custom'&&LY_COLORS[v]){ $("#ly-theme").value=LY_COLORS[v].primary; } };
   $("#ly-theme").oninput=()=>{ const v=$("#ly-theme").value; if(v&&/^#[0-9a-fA-F]{6}$/.test(v)){ const sel=$("#ly-color"); if(sel.querySelector('option[value="custom"]')) sel.value='custom'; } };
   $("#ly-follow").onclick=()=>{ const b=$("#ly-body"); b.value=(b.value.replace(/\s*$/,'')+"\n\n[[follow]]\n").replace(/^\n+/,''); toast("已加结尾引导，点「生成排版」看效果"); };
+  $("#ly-demo").onclick=()=>{
+    $("#ly-title").value="这样排版，公众号也能很精致";
+    $("#ly-body").value=[
+      "先选一个主题色，整篇的标题、卡片、分割线会自动统一色系。正文里可以用 **加粗**、==高亮== 和 [[小标签]] 做强调。",
+      "##~ 符号标题（✦ 标题 ✦）",
+      "左右带小符号、居中，适合做章节开头的仪式感。",
+      "##= 底色标题（整条色块）",
+      "一整条主题色底、白字，视觉最重，适合总起或重点小节。",
+      "##- 框线标题（描边框）",
+      "标题被一圈主题色细线包住，安静克制。",
+      "## 常规节标题",
+      "- 浅色卡片要点：适合罗列清单",
+      "- 并排放两列时可代替表格，公众号不踩坑",
+      "> 引用块：浅底加左色条，放背景说明或提醒。",
+      ">> 金句：大号居中，给读者一个记忆点。",
+      "Q: 这个功能要写代码吗？",
+      "A: 不用。填文章、选样式、点复制，三步搞定。",
+      "---✦",
+      "[[follow]]"
+    ].join("\n");
+    toast("已填入示例，直接点「生成排版」看效果");
+  };
   $("#draft-to-layout").onclick=()=>{
     const title=$("#draft-title").value.trim();
     const body=$("#draft-body").value;
