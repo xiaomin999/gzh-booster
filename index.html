@@ -519,27 +519,30 @@
             <div class="ly-field" data-page-node-id="lyField">
               <div><label data-page-node-id="lyTplLbl">版式</label>
                 <select id="ly-tpl" data-page-node-id="lyTpl">
-                  <option value="fresh">清新文（默认）</option>
-                  <option value="magazine">杂志风（首字下沉+编号）</option>
-                  <option value="card">卡片风（整篇卡片）</option>
-                  <option value="literary">文艺留白（居中分隔）</option>
-                  <option value="business">极简商务</option>
+                  <option value="editorial" selected>杂志编辑风（宋体·克制）</option>
+                  <option value="minimal">现代简约（大量留白）</option>
+                  <option value="morandi">治愈莫兰迪（低饱和卡片）</option>
+                  <option value="guofeng">国潮新中式（大地色）</option>
+                  <option value="tech">科技极简（几何编号）</option>
+                  <option value="retro">报纸复古（宋体双线）</option>
+                  <option value="poetic">大留白文艺（极简）</option>
                 </select>
               </div>
-              <div><label data-page-node-id="lyColorLbl">配色（小清新）</label>
+              <div><label data-page-node-id="lyColorLbl">配色（低饱和高级）</label>
                 <select id="ly-color" data-page-node-id="lyColor">
-                  <option value="mint">清新薄荷</option>
-                  <option value="sakura">淡樱粉</option>
-                  <option value="apricot">奶杏黄</option>
-                  <option value="blue">雾霾蓝</option>
-                  <option value="lilac">浅藕紫</option>
-                  <option value="matcha">抹茶绿</option>
-                  <option value="article">深蓝商务（文中范例）</option>
+                  <option value="ink">墨黑（极简高级）</option>
+                  <option value="clay" selected>陶土赤（温暖大地）</option>
+                  <option value="morandi">莫兰迪灰绿（治愈）</option>
+                  <option value="navy">藏青（商务冷静）</option>
+                  <option value="forest">松墨绿（沉静）</option>
+                  <option value="plum">灰藕（温柔）</option>
+                  <option value="ochre">赭黄燕麦（文艺）</option>
+                  <option value="slate">雾蓝灰（清冷）</option>
                   <option value="custom" style="display:none">自定义主题色</option>
                 </select>
               </div>
               <div><label data-page-node-id="lyThemeLbl">主题色（一键配色）</label>
-                <input type="color" id="ly-theme" value="#2f9e8f" data-page-node-id="lyTheme" style="width:46px;height:34px;border:none;background:none;padding:0;cursor:pointer">
+                <input type="color" id="ly-theme" value="#b07a5e" data-page-node-id="lyTheme" style="width:46px;height:34px;border:none;background:none;padding:0;cursor:pointer">
               </div>
               <div><label data-page-node-id="lySizeLbl">正文字号</label>
                 <select id="ly-size" data-page-node-id="lySize">
@@ -569,7 +572,7 @@
         <div class="btn-row" data-page-node-id="lyGenRow" style="margin-top:14px">
           <button id="ly-smart" data-page-node-id="lySmart">✨ 智能排版（粘文本自动识别）</button>
           <button id="ly-gen" data-page-node-id="lyGen">生成排版</button>
-          <span class="ly-tip" data-page-node-id="lyGenTip">不用学语法：把文章整段粘进正文，点「智能排版」自动识别标题/小节/列表/问答/金句。<b style="color:var(--muted)">引擎 v0922·秀米组件版</b></span>
+          <span class="ly-tip" data-page-node-id="lyGenTip">不用学语法：把文章整段粘进正文，点「智能排版」自动识别标题/小节/列表/问答/金句。<b style="color:var(--muted)">引擎 v0923·排版焕新版（7 种风格）</b></span>
         </div>
       </div>
       <div class="card" data-page-node-id="lyCardPrev">
@@ -1308,48 +1311,75 @@
 
   /* ===== 模块3.5 公众号排版复制 ===== */
   const LY_FONT="-apple-system,BlinkMacSystemFont,'Helvetica Neue','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif";
+  const LY_SERIF="'Songti SC','STSong','SimSun','Noto Serif SC',serif";
   const LY_COLORS={
-    mint:{label:"清新薄荷",primary:"#2f9e8f",accent:"#36b9a3",emphasis:"#e0795f",ink:"#3a4a47",soft:"#e8f6f3"},
-    sakura:{label:"淡樱粉",primary:"#d98aa6",accent:"#e7a6bd",emphasis:"#c0607a",ink:"#4a3f43",soft:"#fbeef3"},
-    apricot:{label:"奶杏黄",primary:"#d99a4e",accent:"#e9b15f",emphasis:"#cf7a4a",ink:"#4a4036",soft:"#fbf1e0"},
-    blue:{label:"雾霾蓝",primary:"#5b87a8",accent:"#79a7c4",emphasis:"#cf7a6a",ink:"#3a4250",soft:"#eaf1f7"},
-    lilac:{label:"浅藕紫",primary:"#9a7fb0",accent:"#b49ac8",emphasis:"#c0607a",ink:"#443b4a",soft:"#f1ecf7"},
-    matcha:{label:"抹茶绿",primary:"#7d8c4a",accent:"#9aab5e",emphasis:"#cf7a4a",ink:"#42483a",soft:"#f1f4e3"},
-    article:{label:"深蓝商务(文中范例)",primary:"#143a5e",accent:"#17a673",emphasis:"#c0392b",ink:"#2c3e50",soft:"#eaf6f1"}
+    ink:{label:"墨黑（极简高级）",primary:"#2e2a28",accent:"#9a8f80",emphasis:"#b5654a",ink:"#2b2724",soft:"#f4f1ec"},
+    clay:{label:"陶土赤（温暖大地）",primary:"#b07a5e",accent:"#c79b82",emphasis:"#8a5a3c",ink:"#46332a",soft:"#f6efe8"},
+    morandi:{label:"莫兰迪灰绿（治愈）",primary:"#7c8a7a",accent:"#9aa897",emphasis:"#b08968",ink:"#3f453f",soft:"#eef0ea"},
+    navy:{label:"藏青（商务冷静）",primary:"#34506b",accent:"#5b7c99",emphasis:"#c08552",ink:"#2b3a47",soft:"#eaf0f5"},
+    forest:{label:"松墨绿（沉静）",primary:"#3f5a4a",accent:"#6b8470",emphasis:"#b0894f",ink:"#2c3a31",soft:"#ebf1ec"},
+    plum:{label:"灰藕（温柔）",primary:"#8a6f86",accent:"#a98fa3",emphasis:"#b5654a",ink:"#3f3540",soft:"#f1ecf1"},
+    ochre:{label:"赭黄燕麦（文艺）",primary:"#b08a4e",accent:"#c8a86a",emphasis:"#8a5a3c",ink:"#433a2c",soft:"#f6f0e3"},
+    slate:{label:"雾蓝灰（清冷）",primary:"#5a6b7a",accent:"#8a99a6",emphasis:"#b5654a",ink:"#333b42",soft:"#eef1f4"}
   };
   const LY_STYLES={
-    fresh:{label:"清新文",ornament:"❧",badge:false,card:false,dropcap:false,
-      h2:(t,c)=>'<p style="'+L(c.size+3,c.ink,c.lh)+';font-weight:bold;border-left:4px solid '+c.accent+';padding-left:12px;margin:28px 0 14px">'+t+'</p>',
-      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:bold;margin:22px 0 10px">'+t+'</p>',
-      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-left:4px solid '+c.accent+';border-radius:8px;padding:13px 16px;margin:18px 0">'+t+'</p>'},
-    magazine:{label:"杂志风",ornament:"❖",badge:true,card:false,dropcap:true,
-      h2:(t,c,n)=>'<p style="'+L(c.size+3,c.ink,c.lh)+';font-weight:bold;margin:30px 0 14px"><span style="'+L(c.size+1,"#fff",c.lh)+';background:'+c.accent+';border-radius:50%;display:inline-block;width:26px;height:26px;line-height:'+(c.size+1)+'px;text-align:center;margin-right:8px;font-weight:bold">'+n+'</span>'+t+'</p>',
-      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:bold;padding-left:10px;border-left:3px solid '+c.accent+';margin:22px 0 10px">'+t+'</p>',
-      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-left:5px solid '+c.accent+';border-radius:10px;padding:14px 18px;margin:18px 0">'+t+'</p>'},
-    card:{label:"卡片风",ornament:"✿",badge:false,card:true,dropcap:false,
-      h2:(t,c)=>'<p style="'+L(c.size+3,c.ink,c.lh)+';font-weight:bold;border-left:4px solid '+c.accent+';padding-left:12px;margin:24px 0 14px">'+t+'</p>',
-      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:bold;margin:20px 0 10px">'+t+'</p>',
-      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-radius:10px;padding:13px 16px;margin:16px 0">'+t+'</p>'},
-    literary:{label:"文艺留白",ornament:"✦",badge:false,card:false,dropcap:true,
-      h2:(t,c)=>'<p style="'+L(c.size+2,c.ink,c.lh)+';font-weight:bold;text-align:center;border-top:1px solid '+c.accent+';border-bottom:1px solid '+c.accent+';padding:10px 0;margin:32px 0 18px;letter-spacing:2px">'+t+'</p>',
-      h3:(t,c)=>'<p style="'+L(c.size+1,c.accent,c.lh)+';font-weight:bold;text-align:center;margin:24px 0 12px;letter-spacing:1px">'+t+'</p>',
-      quote:(t,c)=>'<p style="'+L(c.size,c.accent,c.lh)+';font-style:italic;text-align:center;margin:20px 0;padding:6px 14px">'+t+'</p>'},
-    business:{label:"极简商务",ornament:"—",badge:false,card:false,dropcap:false,
-      h2:(t,c)=>'<p style="'+L(c.size+2,"#fff",c.lh)+';font-weight:bold;background:'+c.primary+';display:inline-block;padding:9px 14px;border-radius:4px;margin:28px 0 14px">'+t+'</p>',
-      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:bold;margin:20px 0 10px">'+t+'</p>',
-      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-left:3px solid '+c.accent+';padding:13px 16px;margin:18px 0">'+t+'</p>'}
+    editorial:{label:"杂志编辑风",ornament:"◆",badge:true,frame:"open",dropcap:true,
+      title:(t,c)=>'<p style="'+L(c.size+5,c.ink,c.lh,LY_SERIF)+';font-weight:bold;text-align:center;letter-spacing:1px;margin:4px 0 6px">'+t+'</p><p style="text-align:center;'+L(11,c.accent,1.6,LY_SERIF)+';letter-spacing:5px;margin:0 0 20px">❖ &nbsp; ❖ &nbsp; ❖</p>',
+      h2:(t,c)=>'<p style="text-align:center;margin:30px 0 16px"><span style="display:inline-block;'+L(c.size+3,c.ink,c.lh,LY_SERIF)+';font-weight:bold;letter-spacing:1px;padding-bottom:8px;border-bottom:1.5px solid '+c.accent+'">'+t+'</span></p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh,LY_SERIF)+';font-weight:bold;margin:20px 0 10px"><span style="color:'+c.accent+';margin-right:8px">❖</span>'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-left:3px solid '+c.accent+';padding:13px 16px;margin:18px 0">'+t+'</p>',
+      pull:(t,c)=>'<p style="text-align:center;'+L(c.size+4,c.ink,1.7,LY_SERIF)+';font-style:italic;margin:24px 0;padding:14px 0">'+t+'</p>',
+      divider:(c,orn)=>{const o=orn||'◆';const line='display:inline-block;width:60px;height:0;border-top:1px solid '+c.accent+';vertical-align:middle;margin:0 14px';return '<p style="text-align:center;margin:28px 0;'+L(13,c.accent,1)+'"><span style="'+line+'"></span><span style="'+L(12,c.accent,1,LY_SERIF)+';font-style:italic">'+o+'</span><span style="'+line+'"></span></p>';}},
+    minimal:{label:"现代简约",ornament:"·",badge:false,frame:"open",dropcap:false,
+      title:(t,c)=>'<p style="'+L(c.size+4,c.ink,c.lh)+';font-weight:600;text-align:center;margin:6px 0 22px;padding-bottom:12px;border-bottom:1px solid '+c.accent+'">'+t+'</p>',
+      h2:(t,c)=>'<p style="'+L(c.size+2,c.ink,c.lh)+';font-weight:bold;margin:28px 0 14px;padding-left:12px;border-left:3px solid '+c.accent+'">'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:600;margin:18px 0 10px">'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';border-left:2px solid '+c.accent+';padding:10px 14px;margin:16px 0">'+t+'</p>',
+      divider:(c,orn)=>'<p style="text-align:center;margin:24px 0;'+L(16,c.accent,1)+'">·&nbsp;&nbsp;·&nbsp;&nbsp;·</p>'},
+    morandi:{label:"治愈莫兰迪",ornament:"❀",badge:false,frame:"card",dropcap:false,
+      title:(t,c)=>'<p style="'+L(c.size+4,c.primary,c.lh)+';font-weight:bold;text-align:center;margin:4px 0 20px">'+t+'</p>',
+      h2:(t,c)=>'<p style="'+L(c.size+2,c.ink,c.lh)+';font-weight:bold;margin:22px 0 12px;padding:8px 12px;background:'+c.soft+';border-left:4px solid '+c.accent+';border-radius:8px">'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:600;margin:16px 0 9px"><span style="color:'+c.accent+';margin-right:7px">●</span>'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-radius:10px;padding:13px 16px;margin:16px 0">'+t+'</p>',
+      divider:(c,orn)=>{const o=orn||'❀';const line='display:inline-block;width:40px;height:0;border-top:1px solid '+c.accent+';vertical-align:middle;margin:0 12px';return '<p style="text-align:center;margin:24px 0;'+L(14,c.accent,1)+'"><span style="'+line+'"></span><span style="font-size:15px">'+o+'</span><span style="'+line+'"></span></p>';}},
+    guofeng:{label:"国潮新中式",ornament:"❖",badge:false,frame:"frame",dropcap:false,
+      title:(t,c)=>'<p style="'+L(c.size+4,c.ink,c.lh,LY_SERIF)+';font-weight:bold;text-align:center;letter-spacing:3px;margin:6px 0 8px">'+t+'</p><p style="text-align:center;'+L(12,c.accent,1.5)+';letter-spacing:6px;margin:0 0 18px">❖ &nbsp; ❖ &nbsp; ❖</p>',
+      h2:(t,c)=>'<p style="text-align:center;'+L(c.size+2,c.ink,c.lh,LY_SERIF)+';font-weight:bold;letter-spacing:2px;margin:26px 0 14px;padding:8px 0;border-top:1px solid '+c.accent+';border-bottom:1px solid '+c.accent+'">'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh,LY_SERIF)+';font-weight:bold;text-align:center;margin:18px 0 10px;color:'+c.primary+'">'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh,LY_SERIF)+';background:'+c.soft+';border-left:4px double '+c.accent+';padding:13px 16px;margin:18px 0">'+t+'</p>',
+      divider:(c,orn)=>{const o=orn||'❖';const line='display:inline-block;width:54px;height:0;border-top:2px solid '+c.accent+';vertical-align:middle;margin:0 12px';return '<p style="text-align:center;margin:26px 0;'+L(14,c.accent,1)+'"><span style="'+line+'"></span><span style="font-size:14px;letter-spacing:3px">'+o+'</span><span style="'+line+'"></span></p>';}},
+    tech:{label:"科技极简",ornament:"■",badge:true,frame:"open",dropcap:false,
+      title:(t,c)=>'<p style="text-align:center;margin:6px 0 20px"><span style="display:inline-block;width:34px;height:3px;background:'+c.accent+';vertical-align:middle;margin-right:12px"></span><span style="'+L(c.size+4,c.ink,c.lh)+';font-weight:bold;letter-spacing:1px">'+t+'</span><span style="display:inline-block;width:34px;height:3px;background:'+c.accent+';vertical-align:middle;margin-left:12px"></span></p>',
+      h2:(t,c,n)=>'<p style="'+L(c.size+2,c.ink,c.lh)+';font-weight:bold;margin:26px 0 14px"><span style="display:inline-block;background:'+c.accent+';color:#fff;'+L(12,"#fff",1.3)+';border-radius:3px;padding:2px 8px;margin-right:9px">'+n+'</span>'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh)+';font-weight:600;margin:16px 0 10px"><span style="color:'+c.accent+';margin-right:7px">▌</span>'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh)+';background:'+c.soft+';border-left:3px solid '+c.accent+';padding:12px 15px;margin:16px 0">'+t+'</p>',
+      divider:(c,orn)=>{const o=orn||'■';const line='display:inline-block;width:46px;height:0;border-top:1px solid '+c.accent+';vertical-align:middle;margin:0 12px';return '<p style="text-align:center;margin:24px 0;'+L(13,c.accent,1)+'"><span style="'+line+'"></span><span style="font-size:10px">'+o+'</span><span style="'+line+'"></span></p>';}},
+    retro:{label:"报纸复古",ornament:"❖",badge:false,frame:"frame",dropcap:true,
+      title:(t,c)=>'<p style="'+L(c.size+5,c.ink,c.lh,LY_SERIF)+';font-weight:bold;text-align:center;letter-spacing:2px;margin:4px 0 10px">'+t+'</p><div style="border-top:3px double '+c.ink+';margin:0 0 18px"></div>',
+      h2:(t,c)=>'<p style="text-align:center;margin:26px 0 14px"><span style="display:inline-block;border-top:2px solid '+c.ink+';border-bottom:2px solid '+c.ink+';'+L(c.size+2,c.ink,c.lh,LY_SERIF)+';font-weight:bold;letter-spacing:2px;padding:5px 4px">'+t+'</span></p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh,LY_SERIF)+';font-weight:bold;margin:18px 0 10px">'+t+'</p>',
+      quote:(t,c)=>'<p style="'+L(c.size-1,c.ink,c.lh,LY_SERIF)+';font-style:italic;margin:18px 8px;padding-left:12px;border-left:2px solid '+c.accent+'">'+t+'</p>',
+      pull:(t,c)=>'<p style="text-align:center;'+L(c.size+4,c.ink,1.7,LY_SERIF)+';font-style:italic;margin:24px 0;padding:14px 0;border-top:1px solid '+c.accent+';border-bottom:1px solid '+c.accent+'">「'+t+'」</p>',
+      divider:(c,orn)=>'<p style="text-align:center;margin:24px 0;'+L(13,c.accent,1)+';letter-spacing:6px">❖ &nbsp; ❖ &nbsp; ❖</p>'},
+    poetic:{label:"大留白文艺",ornament:"·",badge:false,frame:"open",dropcap:false,
+      title:(t,c)=>'<p style="'+L(c.size+6,c.ink,c.lh,LY_SERIF)+';font-weight:600;text-align:center;letter-spacing:3px;margin:10px 0 26px">'+t+'</p>',
+      h2:(t,c)=>'<p style="'+L(c.size+2,c.ink,c.lh,LY_SERIF)+';font-weight:600;text-align:center;letter-spacing:4px;margin:34px 0 18px;color:'+c.primary+'">'+t+'</p>',
+      h3:(t,c)=>'<p style="'+L(c.size+1,c.ink,c.lh,LY_SERIF)+';text-align:center;letter-spacing:2px;margin:22px 0 12px">'+t+'</p>',
+      quote:(t,c)=>'<p style="text-align:center;'+L(c.size,c.accent,1.9,LY_SERIF)+';font-style:italic;margin:24px 0;padding:0 16px">'+t+'</p>',
+      pull:(t,c)=>'<p style="text-align:center;'+L(c.size+4,c.primary,1.8,LY_SERIF)+';font-style:italic;margin:26px 0">'+t+'</p>',
+      divider:(c,orn)=>'<p style="text-align:center;margin:28px 0;'+L(14,c.accent,1)+';letter-spacing:8px">· &nbsp; · &nbsp; ·</p>'}
   };
   function lyMix(a,b,t){const pa=[parseInt(a.slice(1,3),16),parseInt(a.slice(3,5),16),parseInt(a.slice(5,7),16)];const pb=[parseInt(b.slice(1,3),16),parseInt(b.slice(3,5),16),parseInt(b.slice(5,7),16)];const c=pa.map((v,i)=>Math.round(v+(pb[i]-v)*t));return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join('');}
   function lyPalette(hex){hex=(hex||'#2f9e8f').trim();if(!/^#[0-9a-fA-F]{6}$/.test(hex))hex='#2f9e8f';return {primary:hex,accent:hex,emphasis:hex,ink:'#3a3f42',soft:lyMix(hex,'#ffffff',0.86)};}
   const LY_DIV={'✦':'✦','●':'●','🌿':'🌿','♡':'♡','·':'·','❀':'❀','✿':'✿','★':'★'};
-  function lyDivider(c,orn){const o=LY_DIV[orn]||orn||'❧';const line='display:inline-block;width:42px;height:0;border-top:1px solid '+c.accent+';vertical-align:middle;margin:0 12px';return '<p style="text-align:center;margin:26px 0;'+L(14,c.accent,1)+'"><span style="'+line+'"></span><span style="font-size:16px">'+o+'</span><span style="'+line+'"></span></p>';}
+  function lyDivider(c,orn,S){ if(S&&S.divider) return S.divider(c,orn); const o=orn||(S&&S.ornament)||'❧';const line='display:inline-block;width:42px;height:0;border-top:1px solid '+c.accent+';vertical-align:middle;margin:0 12px';return '<p style="text-align:center;margin:26px 0;'+L(14,c.accent,1)+'"><span style="'+line+'"></span><span style="font-size:16px">'+o+'</span><span style="'+line+'"></span></p>';}
   function lyDividerText(c,txt){return '<p style="text-align:center;margin:24px 0;'+L(13,c.accent,1)+'"><span style="margin:0 8px;opacity:.7">——</span>'+esc(txt)+'<span style="margin:0 8px;opacity:.7">——</span></p>';}
   function lyTitleSym(t,c){return '<p style="text-align:center;'+L(c.size+3,c.primary,c.lh)+';font-weight:bold;margin:30px 0 14px"><span style="color:'+c.accent+';margin-right:12px;font-weight:normal">✦</span>'+t+'<span style="color:'+c.accent+';margin-left:12px;font-weight:normal">✦</span></p>';}
   function lyTitleFill(t,c){return '<p style="background:'+c.accent+';color:#fff;font-weight:bold;'+L(c.size+2,'#fff',c.lh)+';border-radius:6px;padding:11px 16px;margin:26px 0 14px;text-align:center;letter-spacing:1px">'+t+'</p>';}
   function lyTitleBox(t,c){return '<p style="border:1.5px solid '+c.accent+';color:'+c.primary+';font-weight:bold;'+L(c.size+2,c.primary,c.lh)+';border-radius:8px;padding:9px 14px;margin:26px 0 14px;text-align:center;letter-spacing:1px">'+t+'</p>';}
   function lyTag(s,c){return '<span style="background:'+c.soft+';color:'+c.primary+';font-weight:600;'+L(c.size-1,c.primary,c.lh)+';border-radius:20px;padding:1px 9px;margin:0 3px;white-space:nowrap">'+s+'</span>';}
-  function lyFollow(c){return '<p style="text-align:center;'+L(c.size+1,c.primary,c.lh)+';font-weight:bold;margin:34px 0 8px">关注【你的公众号名】</p><p style="text-align:center;'+L(c.size-1,c.ink,c.lh)+';margin:6px 0">看完点个「赞」和「在看」，下期不见不散 👋</p><p style="text-align:center;margin:14px 0"><span style="display:inline-block;border:1px dashed '+c.accent+';border-radius:8px;'+L(12,c.accent,1.4)+';padding:18px 44px">此处替换为你的公众号二维码</span></p>';}
-  function L(size,color,lh){ return 'font-size:'+size+'px;color:'+color+';line-height:'+lh+';font-family:'+LY_FONT; }
+  function lyFollow(c,S){ if(S&&S.follow) return S.follow(c); return '<p style="text-align:center;'+L(c.size+1,c.primary,c.lh)+';font-weight:bold;margin:34px 0 8px">关注【你的公众号名】</p><p style="text-align:center;'+L(c.size-1,c.ink,c.lh)+';margin:6px 0">看完点个「赞」和「在看」，下期不见不散 👋</p><p style="text-align:center;margin:14px 0"><span style="display:inline-block;border:1px dashed '+c.accent+';border-radius:8px;'+L(12,c.accent,1.4)+';padding:18px 44px">此处替换为你的公众号二维码</span></p>';}
+  function L(size,color,lh,font){ return 'font-size:'+size+'px;color:'+color+';line-height:'+lh+';font-family:'+(font||LY_FONT); }
   function lyInline(s,c){
     s=esc(s);
     s=s.replace(/\[\[(.+?)\]\]/g,function(m,t){return lyTag(t,c);});
@@ -1357,14 +1387,14 @@
     s=s.replace(/==(.+?)==/g,'<span style="background:'+c.soft+';color:'+c.primary+';font-weight:600;'+L(c.size,c.primary,c.lh)+';padding:1px 5px;border-radius:3px">$1</span>');
     return s;
   }
-  function lyTitle(t,c){ return '<p style="'+L(c.size+4,c.primary,c.lh)+';font-weight:bold;text-align:center;margin:6px 0 22px;padding-bottom:14px;border-bottom:2px solid '+c.accent+'">'+t+'</p>'; }
-  function lyPull(t,c){ return '<p style="text-align:center;'+L(c.size+6,c.accent,1.6)+';font-weight:bold;font-style:italic;margin:24px 0;padding:18px 4px;border-top:1px solid '+c.accent+';border-bottom:1px solid '+c.accent+'">「'+t+'」</p>'; }
+  function lyTitle(t,c,S){ if(S&&S.title) return S.title(t,c); return '<p style="'+L(c.size+4,c.primary,c.lh)+';font-weight:bold;text-align:center;margin:6px 0 22px;padding-bottom:14px;border-bottom:2px solid '+c.accent+'">'+t+'</p>'; }
+  function lyPull(t,c,S){ if(S&&S.pull) return S.pull(t,c); return '<p style="text-align:center;'+L(c.size+6,c.accent,1.6)+';font-weight:bold;font-style:italic;margin:24px 0;padding:18px 4px;border-top:1px solid '+c.accent+';border-bottom:1px solid '+c.accent+'">「'+t+'」</p>'; }
   function lyKey(items,c){
     return items.map(t=>'<p style="'+L(c.size,c.ink,c.lh)+';background:'+c.soft+';border-left:3px solid '+c.accent+';border-radius:10px;padding:12px 14px;margin:10px 0">'+t+'</p>').join('');
   }
   function lyMdToHtml(text,opt){
     const {size,lh,primary,accent,emphasis,ink,soft,style,justify}=opt;
-    const S=LY_STYLES[style]||LY_STYLES.fresh;
+    const S=LY_STYLES[style]||LY_STYLES.editorial;
     const c={size,lh,primary,accent,emphasis,ink,soft,justify,style};
     const base=L(size,ink,lh)+(justify?';text-align:justify':'')+';letter-spacing:.3px';
     const lines=text.replace(/\r\n/g,'\n').split('\n');
@@ -1372,17 +1402,17 @@
     while(i<lines.length){
       const raw=lines[i].trim();
       if(raw===''){i++;continue;}
-      if(raw==='---'||raw==='***'||raw==='___'){ html+=lyDivider(c,S.ornament); i++;started=true;continue; }
-      if(/^---[^\s]$/.test(raw)){ html+=lyDivider(c,raw.slice(3)); i++;started=true;continue; }
+      if(raw==='---'||raw==='***'||raw==='___'){ html+=lyDivider(c,S.ornament,S); i++;started=true;continue; }
+      if(/^---[^\s]$/.test(raw)){ html+=lyDivider(c,raw.slice(3),S); i++;started=true;continue; }
       if(/^---\s+\S/.test(raw)){ html+=lyDividerText(c,raw.slice(4).trim()); i++;started=true;continue; }
-      if(raw==='[[follow]]'){ html+=lyFollow(c); i++;started=true;continue; }
-      if(raw.indexOf('# ')===0){ html+=lyTitle(lyInline(raw.slice(2),c),c); i++;started=true;continue; }
+      if(raw==='[[follow]]'){ html+=lyFollow(c,S); i++;started=true;continue; }
+      if(raw.indexOf('# ')===0){ html+=lyTitle(lyInline(raw.slice(2),c),c,S); i++;started=true;continue; }
       if(raw.indexOf('##~ ')===0){ html+=lyTitleSym(lyInline(raw.slice(4),c),c); i++;started=true;continue; }
       if(raw.indexOf('##= ')===0){ html+=lyTitleFill(lyInline(raw.slice(4),c),c); i++;started=true;continue; }
       if(raw.indexOf('##- ')===0){ html+=lyTitleBox(lyInline(raw.slice(4),c),c); i++;started=true;continue; }
       if(raw.indexOf('## ')===0){ sec++; html+=S.h2(lyInline(raw.slice(3),c),c,String(sec).padStart(2,'0')); i++;started=true;continue; }
       if(raw.indexOf('### ')===0){ html+=S.h3(lyInline(raw.slice(4),c),c); i++;started=true;continue; }
-      if(raw.indexOf('>> ')===0){ html+=lyPull(lyInline(raw.slice(3),c),c); i++;started=true;continue; }
+      if(raw.indexOf('>> ')===0){ html+=lyPull(lyInline(raw.slice(3),c),c,S); i++;started=true;continue; }
       if(raw.indexOf('> ')===0){ html+=S.quote(lyInline(raw.slice(2),c),c); i++;started=true;continue; }
       if(/^(Q|A)[:：]/.test(raw)){
         let buf='';
@@ -1395,7 +1425,7 @@
         html+=lyKey(items,c); started=true; continue;
       }
       let p=lyInline(lines[i],c);
-      if(S.dropcap&&!started){ p=p.replace(/^(.)/,'<span style="float:left;'+L((size*2.6).toFixed(0),accent,1)+';font-weight:bold;margin:2px 8px 0 0">$1</span>'); }
+      if(S.dropcap&&!started){ const df=(style==='editorial'||style==='retro'||style==='guofeng'||style==='poetic')?LY_SERIF:LY_FONT; p=p.replace(/^(.)/,'<span style="float:left;'+L((size*2.6).toFixed(0),accent,1,df)+';font-weight:bold;margin:2px 8px 0 0">$1</span>'); }
       html+='<p style="margin:1.1em 0;'+base+'">'+p+'</p>';
       started=true; i++;
     }
@@ -1403,18 +1433,20 @@
   }
   const LY_COPY_JS="(function(b){var s=b.parentNode;var c=s.cloneNode(true);var x=c.querySelector('[data-lycopy]');if(x)x.remove();var h=c.innerHTML;try{if(navigator.clipboard&&window.ClipboardItem){navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([h],{type:'text/html'})})]).then(function(){b.textContent='已复制 ✓';setTimeout(function(){b.textContent='一键复制'},1500);});}else{b.textContent='请手动复制';}}catch(e){b.textContent='请手动复制';}})(this)";
   function lyBuild(title,bodyHtml,opt){
-    const S=LY_STYLES[opt.style]||LY_STYLES.fresh;
+    const S=LY_STYLES[opt.style]||LY_STYLES.editorial;
     const c={size:opt.size,lh:opt.lh,primary:opt.primary,accent:opt.accent,emphasis:opt.emphasis,ink:opt.ink,soft:opt.soft,style:opt.style};
-    const titleHtml=title?lyTitle(esc(title),c):'';
+    const titleHtml=title?lyTitle(esc(title),c,S):'';
     let inner=titleHtml+bodyHtml;
-    if(S.card){ inner='<div style="background:'+opt.soft+';border:1px solid #ececec;border-radius:14px;padding:22px 18px;box-shadow:0 2px 10px rgba(0,0,0,.04)">'+inner+'</div>'; }
+    if(S.frame==='card'){ inner='<div style="background:'+opt.soft+';border:1px solid #ececec;border-radius:14px;padding:22px 18px;box-shadow:0 2px 10px rgba(0,0,0,.04)">'+inner+'</div>'; }
+    else if(S.frame==='frame'){ inner='<div style="border:1px solid '+opt.accent+';border-radius:4px;padding:24px 20px;background:#fff">'+inner+'</div>'; }
     const btn='<button data-lycopy="1" onclick="'+LY_COPY_JS.replace(/"/g,'&quot;')+'" style="position:fixed;right:14px;bottom:14px;z-index:99;background:'+opt.primary+';color:#fff;border:none;border-radius:24px;padding:10px 18px;font-size:14px;'+L(14,"#fff",1.4)+';cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.18)">一键复制</button>';
     return '<section style="'+L(opt.size,opt.ink,opt.lh)+';max-width:680px;margin:0 auto;padding:4px 2px">'+inner+btn+'</section>';
   }
   function lyOpt(){
-    const style=$("#ly-tpl").value||"fresh";
+    const style=$("#ly-tpl").value||"editorial";
+    const cv=$("#ly-color").value;
     const theme=$("#ly-theme").value.trim();
-    const col=theme?lyPalette(theme):(LY_COLORS[$("#ly-color").value]||LY_COLORS.mint);
+    const col=(cv&&cv!=='custom'&&LY_COLORS[cv])?LY_COLORS[cv]:(theme?lyPalette(theme):LY_COLORS.clay);
     return {size:parseInt($("#ly-size").value||"16",10),lh:parseFloat($("#ly-lh").value||"1.8"),primary:col.primary,accent:col.accent,emphasis:col.emphasis,ink:col.ink,soft:col.soft,style:style,justify:$("#ly-justify").checked};
   }
   function lyPlain(body){
