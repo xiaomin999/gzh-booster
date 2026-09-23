@@ -1,6 +1,6 @@
 // 公众号助推助手 Service Worker
 // 策略：导航请求（HTML）走网络优先，保证每次都能拿到最新版本；静态资源走缓存优先，离线可用且更快。
-const CACHE = "gzh-app-v4";
+const CACHE = "gzh-app-v5";
 const ASSETS = ["./", "index.html", "manifest.json", "icon-192.png", "icon-512.png", "icon.svg"];
 
 self.addEventListener("install", (e) => {

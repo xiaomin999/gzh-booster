@@ -114,6 +114,19 @@
   .hot-card .hc-v{color:var(--ink);flex:1}
   .hot-card .hc-ops{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
   .hot-card .hc-ops button{padding:4px 10px;font-size:11px}
+  .sc-item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+  .sc-item .sc-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .sc-item .sc-name{font-weight:600;font-size:14px}
+  .sc-item .sc-badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .sc-total{font-weight:700;font-size:12.5px;border-radius:8px;padding:2px 8px;background:#eef2ff;color:#3b5bdb}
+  .sc-total.low{background:#fdecec;color:#c92a2a}
+  .sc-win{font-size:11.5px;color:#2b8a3e;font-weight:600}
+  .sc-drop{font-size:11.5px;color:#c92a2a;font-weight:600}
+  .sc-crown{font-size:12px;color:#e8590c;font-weight:700;margin-right:4px}
+  .sc-dims{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;margin-top:8px}
+  .sc-dims label{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--muted)}
+  .sc-dims select{width:100%;padding:2px 4px;font-size:12px}
+  .hc-gene{display:inline-block;background:#fff4e0;color:#b0701c;border-radius:20px;padding:0 8px;font-size:11px;font-weight:600;margin-left:6px;vertical-align:1px}
   .small{color:var(--muted);font-size:11.5px}
   .str-item{border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:10px}
   .str-item .t-title{cursor:pointer;user-select:none}
@@ -434,13 +447,28 @@
         <input id="hot-aud" placeholder="例如：25-35 岁职场女性 / 同样在自我成长里挣扎的人 / 刚开始理财的小白" data-page-node-id="ueFf3azPjJLJA0XCraap61">
         <label data-page-node-id="t52qZak2C5zJqNctmepKLa">你觉得自己阅读量不高的原因（选填）</label>
         <textarea id="hot-bottle" style="min-height:70px" placeholder="例如：标题太内敛没人点 / 写得太像日记只有老读者看 / 选题太小众缺乏共鸣点 / 发布时间不对。写越具体，选题越对症。"></textarea>
-        <label data-page-node-id="hotHotLbl">我观察到的热点（选填，七平台交叉验证的替代入口）</label>
+        <label data-page-node-id="hotHotLbl">我观察到的热点（选填；粘一段新闻/热点，AI 会按 情绪/信息差/身份/行动 四个基因炼成选题）</label>
         <textarea id="hot-hot" style="min-height:60px" placeholder="把你在百度/微博/抖音/知乎/朋友圈看到的趋势、话题写下来，AI 会帮你和账号做交叉验证，筛出最适合你发的角度。没有就留空。"></textarea>
         <div class="btn-row" data-page-node-id="vO9yjgvMjZHvAtxM4CfEQk">
           <button id="hot-gen" data-page-node-id="DBPuJpYEgDbhTGDneCaqzt">生成爆款潜力选题</button>
           <button class="ghost" id="hot-clear" data-page-node-id="qeZWCKY5WvkLOUhUsl86bq">清空结果</button>
         </div>
         <div class="small" id="hot-tip" data-page-node-id="u97Jfw3uiFIIiGdZZzRmjx">未配置 AI 时，会给出一组通用爆款角度模板（仍需你结合栏目落地）。配置 AI 后点「生成」即可产出贴合你账号的选题。</div>
+      </div>
+      <div class="card" data-page-node-id="scoreCardNode">
+        <h3 data-page-node-id="scoreH">⚖️ 8 维评分卡（过滤函数）</h3>
+        <p class="sub" data-page-node-id="scoreSub">别凭感觉挑。情绪 / 传播 / 独家 / 身份 / 时效 / 传播锚点 / 可视化 / 低门槛，每项 1-5 分，总分低于 30 直接丢掉。分最高的那个，才值得动笔。</p>
+        <div class="btn-row" data-page-node-id="scoreBtns">
+          <button id="score-import-hot" class="ghost">⬆️ 带入上面生成的选题</button>
+          <button id="score-import-topics" class="ghost">📚 从选题库带入</button>
+          <button id="score-ai" class="soft">🤖 AI 批量评分</button>
+          <button id="score-clear" class="ghost sm">清空</button>
+        </div>
+        <label data-page-node-id="scoreInLbl">手动添加候选（每行一个）</label>
+        <textarea id="score-input" style="min-height:56px" placeholder="把想比较的选题一行一个贴进来；也可留空只用上面两个带入按钮"></textarea>
+        <div class="btn-row"><button id="score-add" class="ghost sm">加入评分</button></div>
+        <div id="score-list" style="margin-top:12px"></div>
+        <div id="score-empty" class="empty" style="display:none">还没有候选。生成爆款选题后点「带入」，或手动粘贴。</div>
       </div>
       <div class="card" data-page-node-id="1E4c4ifb68VvYSMTyBtLJj">
         <h3 data-page-node-id="3pfIp93WwjpdH69Z4tCjEl">爆款潜力选题 <span class="small" data-page-node-id="sjIK7392aeJjtFIEMn9aK1">（生成后可一键加入选题库 / 生成初稿）</span></h3>
@@ -472,6 +500,7 @@
         <div class="btn-row" data-page-node-id="yIixcStKf29CVuwsvP44ex">
           <button id="draft-save" data-page-node-id="Z7VqFRRGQHAH1CDT5b8P3D">保存草稿</button>
           <button class="ghost" id="draft-gen-ai" data-page-node-id="PCeXBqTPt3t0CnFBcNRu8y">AI 生成初稿</button>
+          <button class="ghost" id="draft-humanize" data-page-node-id="wbHumanBtn">🧼 去 AI 味</button>
           <button class="ghost" id="draft-img-prompt" data-page-node-id="hAqCVxVlpdR0hE9Tq2gziX">🖼️ 配图方案</button>
           <button class="ghost" id="draft-prompt" data-page-node-id="ma4c1LolHmiVMoGkpH66Mu">生成写作 Prompt</button>
           <button class="soft" id="draft-list-btn" data-page-node-id="11CGlp20fx00GEVpMrQOUF">我的草稿</button>
@@ -655,11 +684,13 @@
 
     <!-- 模块7 拆解 -->
     <section id="dissect" class="tab" style="display:none" data-page-node-id="vNNWI4rLGMI5JVOV4qe1ws">
-      <h2 data-page-node-id="DaTAxEXzJReC43GH8jjGzt">📖 范文拆解</h2>
-      <p class="sub" data-page-node-id="4qiFYnHFC1YD757BcWI100">贴一篇别人的文章，结构化拆给你看；只借鉴不抄袭。</p>
+      <h2 data-page-node-id="DaTAxEXzJReC43GH8jjGzt">📖 对标拆解（六步）</h2>
+      <p class="sub" data-page-node-id="4qiFYnHFC1YD757BcWI100">对标不是抄，是先把地图看清楚再上路。贴范文（+可选评论区），按六步拆：标题公式 → 结构骨架 → 内容角度 → 评论区 → 选题金矿 → 定口子「别人没写透、我能写」。</p>
       <div class="card" data-page-node-id="RAVGza5klPSZaITZ1qt52s">
         <label data-page-node-id="SDw6bUTwDJPIxXxxaWxd1D">粘贴范文</label>
         <textarea id="dissect-text" style="min-height:160px" placeholder="把想拆的文章贴进来"></textarea>
+        <label data-page-node-id="dissectCmtLbl">评论区 / 读者反馈（选填；读者真正在问什么、吵什么，就是下一篇的选题金矿）</label>
+        <textarea id="dissect-comments" style="min-height:70px" placeholder="把这篇文下的热评、疑问、争议贴进来；没有就留空"></textarea>
         <div class="btn-row" data-page-node-id="xYUlj0PYTXUEzCl7B1Bcxc">
           <button id="dissect-gen" data-page-node-id="R1cnv0GgfAHRsafPEMiXe6">生成拆解框架</button>
           <span class="small" data-page-node-id="jtFbnYN0PCD5YUoXzNwMyW">离线给框架引导；配 AI 可直接填内容。</span>
@@ -1153,7 +1184,7 @@
         if(AI.ok()) generateAIDraft(); else toast("已载入选题，配置 AI 后可一键生成初稿");
       };
       div.querySelector("[data-copy]").onclick=()=>{
-        const txt=`标题：${t.title}\n为什么能爆：${t.why||""}\n对路人群：${t.audience||""}\n写作角度：${t.angle||""}\n标题变体：${Array.isArray(t.variants)?t.variants.join(" / "):""}\n开头钩子：${t.hook||""}`;
+        const txt=`标题：${t.title}\n爆款基因：${t.gene||""}\n为什么能爆：${t.why||""}\n对路人群：${t.audience||""}\n写作角度：${t.angle||""}\n标题变体：${Array.isArray(t.variants)?t.variants.join(" / "):""}\n开头钩子：${t.hook||""}`;
         navigator.clipboard.writeText(txt).then(()=>toast("已复制")).catch(()=>toast("复制失败"));
       };
       box.appendChild(div);
@@ -1169,7 +1200,7 @@
     if(AI.ok()){
       btn.textContent="生成中…"; btn.disabled=true;
       try{
-        const sys="你是公众号爆款选题策划专家，擅长把小众随笔号的内容潜力挖掘成高传播选题，但绝不鼓励标题党、不违背'纯粹自我记录随笔号'的人设。请基于用户给的栏目定位、目标人群（可能为空需你推断）、他对阅读量不高的判断、以及他观察到的热点，生成 N 个'爆款潜力'选题。每个选题返回 JSON 对象：{title, why, audience, angle, variants, hook}。title=吸引人但不夸张的短文标题，尽量套用四要素公式：地点+人物+行为+数字，信息越具体越容易被点；why=为什么这个选题容易爆（点出情绪/痛点/共鸣/悬念/反差/热点钩子中的哪几种，1-2 句）；audience=最对路的目标人群画像（身份/心境）；angle=一句内容角度说明可以怎么写；variants=2-3 个可选标题变体（字符串数组）；hook=能勾住人往下看的开头一句话。只返回 JSON 数组，不要其他文字。";
+        const sys="你是公众号爆款选题策划专家，擅长把小众随笔号的内容潜力挖掘成高传播选题，但绝不鼓励标题党、不违背'纯粹自我记录随笔号'的人设。请基于用户给的栏目定位、目标人群（可能为空需你推断）、他对阅读量不高的判断、以及他观察到的热点，生成 N 个'爆款潜力'选题。如果用户给了热点素材，优先按四个爆款基因去炼它：情绪（戳中共鸣/痛点/爽感）、信息差（别人不知道或理解反了）、身份（'这说的就是我这类人'）、行动（看完能立刻照做），一个选题主打一个基因。每个选题返回 JSON 对象：{title, gene, why, audience, angle, variants, hook}。title=吸引人但不夸张的短文标题，尽量套用四要素公式：地点+人物+行为+数字，信息越具体越容易被点；gene=本选题主打的爆款基因，只能是'情绪'、'信息差'、'身份'、'行动'之一；why=为什么这个选题容易爆（点出情绪/痛点/共鸣/悬念/反差/热点钩子中的哪几种，1-2 句）；audience=最对路的目标人群画像（身份/心境）；angle=一句内容角度说明可以怎么写；variants=2-3 个可选标题变体（字符串数组）；hook=能勾住人往下看的开头一句话。只返回 JSON 数组，不要其他文字。";
         const user=`栏目定位：${col}\n目标人群：${aud||"（请根据栏目自行推断）"}\n我对阅读量不高的判断：${bottle||"（无，请按通用爆款逻辑把握）"}\n我观察到的热点（做交叉验证用）：${hot||"（无）"}\n请生成 ${n} 个选题。`;
         const out=await AI.chat(sys, user, taskModel('hot'));
         const m=out.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
@@ -1183,10 +1214,10 @@
       finally{ btn.textContent=orig; btn.disabled=false; }
     }else{
       const tmpl=[
-        {title:"写给也在为「"+(col||"生活")+"」挣扎的你", why:"强共情——把'我'换成'我们'，让同处境的人觉得'这说的不就是我吗'。", audience:"和你在同一处境里的普通人", angle:"用一段自己的真实卡点开场，再给一点点微小的出口。", variants:["写给也在为这件事挣扎的你","承认吧，这件事真的很磨人","不慌，我和它和解了"], hook:"昨天我又卡在同一个地方，然后突然想通了一件事。"},
-        {title:"我做「"+(col||"这件事")+"」踩过的 5 个坑", why:"干货+避坑天然高收藏，'踩坑'带真实感和可信度。", audience:"想上手但怕走弯路的新手", angle:"列 5 个自己真实踩过的雷，每条给一句怎么避。", variants:["我做XX踩过的5个坑","一文讲清XX，建议收藏","XX避坑指南：我替你试错了"], hook:"如果重来一次，这 5 个坑我一个都不想再踩。"},
-        {title:"关于「"+(col||"这件事")+"」，你可能一直理解反了", why:"认知颠覆引发好奇，点开率高。", audience:"有基础认知、愿意被刷新的人", angle:"先抛一个常见误解，再用自己的体验把它翻过来。", variants:["你可能一直理解反了","聊XX前，先搞懂这3件事","这件事，我观察好久才敢说"], hook:"我以为我早就懂了，直到上个月栽了个跟头。"},
-        {title:"一个月里，我和「"+(col||"这件事")+"」的关系变了", why:"时间线+变化感制造追看欲，也容易被转发'给同样在变的人'。", audience:"处在变化期、想看见参照的人", angle:"用几个时间节点串起心态/做法的变化。", variants:["一个月，我和它的关系变了","慢慢来，比较快","不慌，先动一笔"], hook:"30 天前我绝对想不到，今天会这么平静地写它。"}
+        {title:"写给也在为「"+(col||"生活")+"」挣扎的你", gene:"身份", why:"强共情——把'我'换成'我们'，让同处境的人觉得'这说的不就是我吗'。", audience:"和你在同一处境里的普通人", angle:"用一段自己的真实卡点开场，再给一点点微小的出口。", variants:["写给也在为这件事挣扎的你","承认吧，这件事真的很磨人","不慌，我和它和解了"], hook:"昨天我又卡在同一个地方，然后突然想通了一件事。"},
+        {title:"我做「"+(col||"这件事")+"」踩过的 5 个坑", gene:"行动", why:"干货+避坑天然高收藏，'踩坑'带真实感和可信度。", audience:"想上手但怕走弯路的新手", angle:"列 5 个自己真实踩过的雷，每条给一句怎么避。", variants:["我做XX踩过的5个坑","一文讲清XX，建议收藏","XX避坑指南：我替你试错了"], hook:"如果重来一次，这 5 个坑我一个都不想再踩。"},
+        {title:"关于「"+(col||"这件事")+"」，你可能一直理解反了", gene:"信息差", why:"认知颠覆引发好奇，点开率高。", audience:"有基础认知、愿意被刷新的人", angle:"先抛一个常见误解，再用自己的体验把它翻过来。", variants:["你可能一直理解反了","聊XX前，先搞懂这3件事","这件事，我观察好久才敢说"], hook:"我以为我早就懂了，直到上个月栽了个跟头。"},
+        {title:"一个月里，我和「"+(col||"这件事")+"」的关系变了", gene:"情绪", why:"时间线+变化感制造追看欲，也容易被转发'给同样在变的人'。", audience:"处在变化期、想看见参照的人", angle:"用几个时间节点串起心态/做法的变化。", variants:["一个月，我和它的关系变了","慢慢来，比较快","不慌，先动一笔"], hook:"30 天前我绝对想不到，今天会这么平静地写它。"}
       ];
       const cut=tmpl.slice(0,Math.min(n,tmpl.length));
       store.set("hotlist", cut);
@@ -1196,6 +1227,69 @@
   };
   $("#hot-clear").onclick=()=>{ if(confirm("清空已生成的爆款选题？")){ store.set("hotlist",[]); renderHot(); } };
   renderHot();
+
+  /* ===== 模块2.6 8维评分卡（过滤函数） ===== */
+  const SCORE_DIMS=[["emotion","情绪共鸣"],["spread","传播性"],["unique","独家性"],["identity","身份契合"],["timely","时效性"],["anchor","传播锚点"],["visual","可视化"],["easy","低门槛"]];
+  const SCORE_KEYS=SCORE_DIMS.map(d=>d[0]);
+  function defS(){ const s={}; SCORE_KEYS.forEach(k=>s[k]=3); return s; }
+  function scoreTotal(s){ return SCORE_KEYS.reduce((a,k)=>a+(+(s&&s[k])||0),0); }
+  function renderScores(){
+    const data=store.get("scorelist",[]);
+    const box=$("#score-list"); const empty=$("#score-empty");
+    box.innerHTML="";
+    if(!data.length){ empty.style.display="block"; return; }
+    empty.style.display="none";
+    const order=data.map((d,i)=>({i,total:scoreTotal(d.s)})).sort((a,b)=>b.total-a.total);
+    const best=order[0].total>=30?order[0].i:-1;
+    order.forEach(({i,total})=>{
+      const it=data[i]; if(!it) return;
+      const low=total<30;
+      const div=document.createElement("div"); div.className="sc-item";
+      div.innerHTML=`<div class="sc-head">
+        <div class="sc-name">${i===best?'<span class="sc-crown">🏆 推荐</span>':""}${esc(it.title)}</div>
+        <div class="sc-badges"><span class="sc-total${low?" low":""}">${total}/40</span>
+        ${low?'<span class="sc-drop">低于30 · 建议丢掉</span>':'<span class="sc-win">入围</span>'}
+        <button class="ghost sm" data-sdel="${i}">删</button></div></div>
+      <div class="sc-dims">${SCORE_DIMS.map(([k,label])=>`<label>${label}<select data-sdim="${k}" data-sidx="${i}">${[1,2,3,4,5].map(v=>`<option value="${v}"${(+(it.s&&it.s[k])||3)===v?" selected":""}>${v}</option>`).join("")}</select></label>`).join("")}</div>`;
+      div.querySelectorAll("[data-sdim]").forEach(sel=>{
+        sel.onchange=()=>{ const d=store.get("scorelist",[]); if(!d[i]) return; d[i].s[sel.dataset.sdim]=+sel.value; store.set("scorelist",d); renderScores(); };
+      });
+      div.querySelector("[data-sdel]").onclick=()=>{ const d=store.get("scorelist",[]); d.splice(i,1); store.set("scorelist",d); renderScores(); };
+      box.appendChild(div);
+    });
+  }
+  function importScoreTitles(list,tag){
+    const d=store.get("scorelist",[]);
+    const have=new Set(d.map(x=>x.title));
+    let n=0;
+    list.forEach(t=>{ const title=String(t||"").trim().slice(0,60); if(title&&!have.has(title)){ d.push({title,s:defS()}); have.add(title); n++; } });
+    store.set("scorelist",d); renderScores();
+    toast(n?("已带入 "+n+" 个候选"+tag):"没有新候选可带入");
+  }
+  $("#score-import-hot").onclick=()=>{ const hot=store.get("hotlist",[]); if(!hot.length){ toast("先生成爆款选题"); return; } importScoreTitles(hot.map(t=>t.title),"（来自爆款选题）"); };
+  $("#score-import-topics").onclick=()=>{ const tp=store.get("topics",[]); if(!tp.length){ toast("选题库是空的"); return; } importScoreTitles(tp.map(t=>t.title),"（来自选题库）"); };
+  $("#score-add").onclick=()=>{ const lines=$("#score-input").value.split(/\n+/).map(s=>s.trim()).filter(Boolean); if(!lines.length){ toast("先粘贴候选选题"); return; } importScoreTitles(lines,""); $("#score-input").value=""; };
+  $("#score-clear").onclick=()=>{ if(confirm("清空评分卡？")){ store.set("scorelist",[]); renderScores(); } };
+  $("#score-ai").onclick=async()=>{
+    if(!AI.ok()){ toast("先配置 AI 才能批量评分"); switchTab("settings"); return; }
+    const d=store.get("scorelist",[]);
+    if(!d.length){ toast("先加入候选"); return; }
+    const btn=$("#score-ai"); const orig=btn.textContent; btn.textContent="评分中…"; btn.disabled=true;
+    try{
+      const sys="你是公众号选题评审。对每个候选选题按 8 维打分，每维 1-5 的整数：情绪共鸣(能不能戳中情绪)、传播性(读者愿不愿意转)、独家性(角度是否少有人写)、身份契合(目标读者是否觉得'这说的就是我')、时效性(有没有时效窗口)、传播锚点(有没有可引用的金句/数字/标签)、可视化(能不能配出直观的图或场景)、低门槛(写作门槛越低分越高)。只返回 JSON 数组：[{\"t\":\"原标题\",\"s\":[8个整数，顺序为 情绪,传播,独家,身份,时效,锚点,可视化,门槛]}]，不要其他文字。";
+      const out=await AI.chat(sys, d.map(x=>x.title).join("\n"), taskModel('hot'));
+      const m=out.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
+      let hit=0;
+      (Array.isArray(arr)?arr:[]).forEach(o=>{
+        const it=d.find(x=>x.title===o.t||(o.t&&x.title.indexOf(o.t)>=0));
+        if(it&&Array.isArray(o.s)){ SCORE_KEYS.forEach((k,j)=>{ it.s[k]=Math.min(5,Math.max(1,parseInt(o.s[j],10)||3)); }); hit++; }
+      });
+      store.set("scorelist",d); renderScores();
+      toast(hit?("AI 已评 "+hit+" 个"):"AI 没返回有效评分");
+    }catch(e){ toast("AI 评分失败："+e.message); }
+    finally{ btn.textContent=orig; btn.disabled=false; }
+  };
+  renderScores();
 
   /* ===== 模块3 写稿 ===== */
   function renderDrafts(){
@@ -1307,6 +1401,19 @@
     const raw=$("#draft-reuse-result").dataset.raw||$("#draft-reuse-result").innerText||"";
     if(!raw.trim()){ toast("先切分身再复制"); return; }
     navigator.clipboard.writeText(raw).then(()=>toast("已复制全部分身")).catch(()=>toast("复制失败"));
+  };
+  $("#draft-humanize").onclick=async()=>{
+    const body=$("#draft-body").value.trim();
+    if(!body){ toast("先有正文再去 AI 味"); return; }
+    if(!AI.ok()){ toast("先配置 AI 才能去 AI 味"); switchTab("settings"); return; }
+    const btn=$("#draft-humanize"); const orig=btn.textContent; btn.textContent="去味中…"; btn.disabled=true;
+    try{
+      const sys="你是 humanizer（去 AI 味）编辑。把用户给的公众号正文改得更像真人写的：删掉 AI 腔（首先/其次/综上所述/值得注意的是/总而言之、工整排比、空洞总结、每段一样长）；句子长短要参差；允许口语和不完美的表达；保留原文的具体细节和真实情绪，不新增事实、不改变原意；篇幅与原文相近。直接输出改后的全文，不要任何解释。";
+      const out=await AI.chat(sys, body, taskModel('write'));
+      $("#draft-body").value=out.trim();
+      toast("已去 AI 味，记得通读一遍再保存");
+    }catch(e){ toast("去味失败："+e.message); }
+    finally{ btn.textContent=orig; btn.disabled=false; }
   };
 
   /* ===== 模块3.5 公众号排版复制 ===== */
@@ -1652,7 +1759,7 @@
           +'</div>'+(bad?'<div class="ttl-note">⚠ 含标题党措辞，平台可能压推荐、读者也烦</div>':'');
         continue;
       }
-      if((/[：:]$/.test(s)&&[...s].length<20) || /^(悬念|干货|共情|数字|反常识)/.test(s)){ html+='<div class="ttl-sec">'+esc(s)+'</div>'; continue; }
+      if((/[：:]$/.test(s)&&[...s].length<20) || /^(悬念|干货|共情|数字|反常识|疑问|反差|身份)/.test(s) || /^(推荐最优|稳妥版|传播版)/.test(s)){ html+='<div class="ttl-sec">'+esc(s)+'</div>'; continue; }
       html+='<div class="ttl-line">'+esc(s)+'</div>';
     }
     html+='<div class="ttl-tip">推荐指数越高越该用；标题 ≤64 字手机端不折叠；避免「震惊 / 速看 / 马上删」类措辞。点任意标题可复制。</div>';
@@ -1665,28 +1772,30 @@
     if(AI.ok()){
       box.innerHTML='<div class="result">AI 生成中…</div>';
       try{
-        const sys="你是公众号标题（良性版）助手，绝不写标题党。请基于主题和正文，输出：\n① 8-10 条标题，每条严格用此格式：▸ [指数X/5|类型] 标题文字（X为推荐指数1-5，类型取 悬念/数字盘点/反常识/共情 之一；挑1条最该用的标5，其余按把握降序）；\n② 2 条摘要；\n③ 4 条封面 slogan。\n标题要求：具体有信息点、≤64 字、绝对避免「震惊/速看/马上删」等措辞。用清晰分段，纯文本。";
+        const sys="你是公众号标题（良性版）助手，绝不写标题党。请基于主题和正文输出：\n① 8 条标题候选，必须覆盖四种公式、每种各 2 条：疑问式、反差式、身份式、数字式。每条严格用格式：▸ [指数X/5|公式] 标题文字（公式取 疑问/反差/身份/数字；挑 1 条最该用的标 5，其余按把握降序）；\n② 推荐最优：从 8 条里挑 1 条，一句话说明为什么；\n③ 1 个稳妥版标题（更克制安全）和 1 个更猛的传播版标题（仍不标题党）；\n④ 2 条摘要；⑤ 4 条封面 slogan。\n标题 ≤64 字、具体有信息点、避免「震惊/速看/马上删」。纯文本分段输出。";
         const out=await AI.chat(sys, "主题："+theme+"\n正文片段："+($("#title-text").value.trim()||"（无）"), taskModel('title'));
         box.innerHTML='<div class="result">'+formatTitleResult(out)+'</div>';
         return;
       }catch(e){ box.innerHTML='<div class="result">AI 调用失败（'+e.message+'），改用离线模板：</div>'; }
     }
-    // offline templates
+    // offline templates：4 公式 × 2 + 推荐/稳妥/传播
     const t=theme;
     const titles=[
-      "悬念好奇型：",
-      "▸ [指数5/5|悬念] 为什么聊「"+t+"」的人，最后都悄悄变了？",
-      "▸ [指数4/5|悬念] 「"+t+"」这件事，我观察了好久才敢说",
-      "▸ [指数3/5|反常识] 关于"+t+"，你可能一直理解反了",
-      "▸ [指数3/5|共情] 我花了很久才接受的"+t+"真相",
-      "数字盘点型：",
-      "▸ [指数4/5|数字盘点] "+t+"的 5 个实操方法（新手也能用）",
-      "▸ [指数3/5|数字盘点] 做"+t+"前，先搞懂这 3 件事",
-      "▸ [指数4/5|数字盘点] "+t+"避坑指南：我踩过的 5 个雷",
-      "共情故事型：",
-      "▸ [指数4/5|共情] 那天我卡在"+t+"上，才懂了这件事",
-      "▸ [指数3/5|共情] 写给也在为"+t+"挣扎的你",
-      "▸ [指数3/5|共情] 不慌，我和"+t+"和解了"
+      "疑问式：",
+      "▸ [指数5/5|疑问] 为什么聊「"+t+"」的人，最后都悄悄变了？",
+      "▸ [指数3/5|疑问] "+t+"这件事，是不是只有我卡了这么久？",
+      "反差式：",
+      "▸ [指数4/5|反差] 关于"+t+"，你可能一直理解反了",
+      "▸ [指数3/5|反差] 我越努力做"+t+"，越发现方向错了",
+      "身份式：",
+      "▸ [指数4/5|身份] 写给也在为"+t+"挣扎的你",
+      "▸ [指数3/5|身份] 30 岁才搞懂"+t+"，我亏了吗？",
+      "数字式：",
+      "▸ [指数4/5|数字] "+t+"的 5 个实操方法（新手也能用）",
+      "▸ [指数3/5|数字] 做"+t+"前，先搞懂这 3 件事",
+      "推荐最优：第一条「为什么聊"+t+"的人，最后都悄悄变了」——疑问+结果前置，点开率最稳。",
+      "稳妥版：慢慢来：我和「"+t+"」和解的过程",
+      "传播版：聊了这么多年"+t+"，这篇终于说透了"
     ].join("\n");
     const sum="摘要1：本文从个人体验出发，聊聊「"+t+"」的真实感受与可落地做法，不灌鸡汤。\n摘要2：关于「"+t+"」，我整理了几个踩过坑后的小经验，写给同样在摸索的你。";
     const slog="slogan：慢慢来，比较快 ｜ 写给也在摸索的你 ｜ 不慌，先动一笔 ｜ 真实比完美重要";
@@ -1789,21 +1898,22 @@
   $("#stuck-note").value=store.get("stuck","")||"";
   $("#stuck-note").addEventListener("blur",()=>store.set("stuck",$("#stuck-note").value));
 
-  /* ===== 模块7 拆解 ===== */
+  /* ===== 模块7 拆解（六步对标） ===== */
   $("#dissect-gen").onclick=async()=>{
     const text=$("#dissect-text").value.trim();
     if(!text){ toast("先贴范文"); return; }
+    const comments=$("#dissect-comments").value.trim();
     const box=$("#dissect-result"); box.style.display="block";
     if(AI.ok()){
-      box.innerHTML='<div class="result">AI 拆解中…</div>';
+      box.innerHTML='<div class="result">AI 六步拆解中…</div>';
       try{
-        const sys="你是写作拆解助手。请拆解用户提供的文章：1)文章结构 2)开篇钩子 3)段落逻辑 4)结尾套路 5)标题思路 6)可借鉴点（强调只借鉴不抄袭）。";
-        const out=await AI.chat(sys, text, taskModel('dissect'));
+        const sys="你是公众号对标拆解助手。按固定六步拆解用户提供的文章，纯文本输出，用【】小标题分隔，每步给具体内容而不是空话：\n【一 拆标题】这篇标题用了什么公式（疑问/反差/身份/数字/悬念…），公式名+一句为什么有效；再按同款公式给 3 个变体标题。\n【二 拆结构】开头钩子是什么、全文分几块、小标题怎么分布、论证方式（故事/清单/观点）、结尾怎么引导互动。\n【三 拆角度】这个赛道哪些方向已经写烂了（列 2-3 个）、哪些角度还是空白没人写（列 2-3 个）。\n【四 拆评论区】结合文章内容和用户贴的评论区，读者真正在问什么、吵什么、缺什么（列 3-5 条；没贴评论区就按内容推测读者最可能的反应）。\n【五 选题金矿】从第四步提炼 2-3 个值得写的下一篇选题，各配一句理由。\n【六 定口子】综合前五步，给出 1-3 个「别人没写透、我能写」的切入点，说明为什么轮得到我写。只借鉴不抄袭。";
+        const out=await AI.chat(sys, text+(comments?("\n\n【评论区】\n"+comments):""), taskModel('dissect'));
         box.innerHTML='<div class="result">'+esc(out)+'</div>';
         return;
       }catch(e){ box.innerHTML='<div class="result">AI 失败（'+e.message+'），改用框架：</div>'; }
     }
-    const f=`【文章结构】\n（这篇分了几块？每块讲什么？）\n\n【开篇钩子】\n（第一句怎么抓住人的？）\n\n【段落逻辑】\n（每段之间怎么衔接？）\n\n【结尾套路】\n（怎么收尾、有没有引导互动？）\n\n【标题思路】\n（标题用了哪类：悬念/干货/共情？）\n\n【可借鉴点】\n（哪一处我能用在自己随笔里？只借鉴不抄袭）`;
+    const f=`【一 拆标题】\n（标题用了什么公式：疑问/反差/身份/数字/悬念？为什么有效？照这个公式写 3 个自己的变体）\n\n【二 拆结构】\n（开头钩子是什么？分几块？小标题怎么分布？结尾怎么引导互动？）\n\n【三 拆角度】\n（这个赛道哪些方向已经写烂了？哪些角度还没人写？）\n\n【四 拆评论区】\n（读者在问什么、吵什么、缺什么？没评论区就想想读者看完最想吐槽/追问什么）\n\n【五 选题金矿】\n（从评论区的疑问和争议里，提炼 2-3 篇下一篇可写的选题）\n\n【六 定口子】\n（别人没写透、我能写的是什么？为什么轮得到我写？只借鉴不抄袭）`;
     box.innerHTML='<div class="result">'+esc(f)+'</div>';
   };
 
