@@ -275,6 +275,14 @@
   .ttl-over{color:var(--warn);font-weight:600}
   .ttl-warn{background:#fdf3f3}
   .ttl-sec{font-weight:600;margin:12px 0 2px;color:var(--text);font-size:13px}
+  /* 全部功能入口网格 */
+  .feat-head{margin-top:26px;margin-bottom:2px}
+  .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:8px}
+  .feat-card{border:1px solid var(--line);border-radius:12px;padding:12px 13px;background:#fff;cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:2px}
+  .feat-card:hover{border-color:var(--accent);box-shadow:0 3px 10px rgba(20,20,40,.08);transform:translateY(-1px)}
+  .feat-card .fi{font-size:21px;line-height:1}
+  .feat-card .ft{font-weight:600;font-size:13px;margin-top:4px}
+  .feat-card .fd{color:var(--muted);font-size:11px;line-height:1.45}
   .ttl-line{font-size:13px;color:var(--text);padding:3px 0}
   .ttl-note{font-size:11px;color:var(--warn);margin:-2px 0 6px 0}
   .ttl-tip{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.6}
@@ -358,6 +366,23 @@
           </div>
           <div class="btn-row"><button class="ghost sm wb-jump" data-jump="hot">去爆款选题</button><button class="ghost sm wb-jump" data-jump="title">去标题</button><button class="ghost sm wb-jump" data-jump="layout">去排版</button></div>
         </div>
+      </div>
+      <h3 class="feat-head">🗂️ 全部功能（点卡片直达，不用翻侧边栏）</h3>
+      <p class="sub">从选题到复盘一条线，所有模块都在这儿。</p>
+      <div class="feat-grid">
+        <div class="feat-card wb-jump" data-jump="plan"><div class="fi">📌</div><div class="ft">定位 &amp; 排期</div><div class="fd">栏目定位与发布节奏</div></div>
+        <div class="feat-card wb-jump" data-jump="topics"><div class="fi">💡</div><div class="ft">选题库</div><div class="fd">碎片转选题、每组 4 个</div></div>
+        <div class="feat-card wb-jump" data-jump="hot"><div class="fi">🔥</div><div class="ft">爆款选题</div><div class="fd">四基因炼选题 + 8 维评分卡</div></div>
+        <div class="feat-card wb-jump" data-jump="write"><div class="fi">✍️</div><div class="ft">写稿</div><div class="fd">初稿 + 去 AI 味</div></div>
+        <div class="feat-card wb-jump" data-jump="title"><div class="fi">🏷️</div><div class="ft">标题 / 摘要</div><div class="fd">8 候选 + 稳妥/传播版</div></div>
+        <div class="feat-card wb-jump" data-jump="dissect"><div class="fi">📖</div><div class="ft">范文拆解</div><div class="fd">六步对标找口子</div></div>
+        <div class="feat-card wb-jump" data-jump="layout"><div class="fi">✨</div><div class="ft">排版复制</div><div class="fd">7 风格智能排版</div></div>
+        <div class="feat-card wb-jump" data-jump="review"><div class="fi">🔍</div><div class="ft">稿件复盘</div><div class="fd">四维打分与建议</div></div>
+        <div class="feat-card wb-jump" data-jump="push"><div class="fi">🚀</div><div class="ft">行动督促</div><div class="fd">每周微小行动</div></div>
+        <div class="feat-card wb-jump" data-jump="kb"><div class="fi">📚</div><div class="ft">知识库</div><div class="fd">爆款因子沉淀</div></div>
+        <div class="feat-card wb-jump" data-jump="data"><div class="fi">📊</div><div class="ft">数据分析</div><div class="fd">多图分析与回流</div></div>
+        <div class="feat-card wb-jump" data-jump="strategy"><div class="fi">🧭</div><div class="ft">运营策略</div><div class="fd">策略 / 踩坑 / 灵感</div></div>
+        <div class="feat-card wb-jump" data-jump="settings"><div class="fi">⚙️</div><div class="ft">AI 设置</div><div class="fd">接口与模型配置</div></div>
       </div>
     </section>
 
