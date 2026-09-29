@@ -283,6 +283,14 @@
   .feat-card .fi{font-size:21px;line-height:1}
   .feat-card .ft{font-weight:600;font-size:13px;margin-top:4px}
   .feat-card .fd{color:var(--muted);font-size:11px;line-height:1.45}
+  .t-meta2{color:var(--accent);font-size:11px;margin-top:2px}
+  .v-item{display:flex;gap:8px;align-items:flex-start;padding:8px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff}
+  .v-check{flex:0 0 auto;margin-top:3px}
+  .v-body{flex:1 1 auto;min-width:0}
+  .v-text{font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+  .v-meta{color:var(--muted);font-size:11px;margin-top:3px}
+  .v-used{color:#2e8b57;font-weight:600}
+  .muted{color:var(--muted)}
   .ttl-line{font-size:13px;color:var(--text);padding:3px 0}
   .ttl-note{font-size:11px;color:var(--warn);margin:-2px 0 6px 0}
   .ttl-tip{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.6}
@@ -316,6 +324,7 @@
       <button class="nav-btn" data-tab="push"><span class="em">🚀</span>行动督促</button>
       <button class="nav-btn" data-tab="review"><span class="em">🔍</span>稿件复盘</button>
       <button class="nav-btn" data-tab="dissect"><span class="em">📖</span>范文拆解</button>
+      <button class="nav-btn" data-tab="voice"><span class="em">🗣️</span>用户原声</button>
       <button class="nav-btn" data-tab="strategy"><span class="em">🧭</span>运营策略</button>
       <button class="nav-btn" data-tab="layout"><span class="em">✨</span>排版复制</button>
       <button class="nav-btn set" data-tab="settings"><span class="em">⚙️</span>AI 设置</button>
@@ -376,6 +385,7 @@
         <div class="feat-card wb-jump" data-jump="write"><div class="fi">✍️</div><div class="ft">写稿</div><div class="fd">初稿 + 去 AI 味</div></div>
         <div class="feat-card wb-jump" data-jump="title"><div class="fi">🏷️</div><div class="ft">标题 / 摘要</div><div class="fd">8 候选 + 稳妥/传播版</div></div>
         <div class="feat-card wb-jump" data-jump="dissect"><div class="fi">📖</div><div class="ft">范文拆解</div><div class="fd">六步对标找口子</div></div>
+        <div class="feat-card wb-jump" data-jump="voice"><div class="fi">🗣️</div><div class="ft">用户原声</div><div class="fd">收原声·提炼选题</div></div>
         <div class="feat-card wb-jump" data-jump="layout"><div class="fi">✨</div><div class="ft">排版复制</div><div class="fd">7 风格智能排版</div></div>
         <div class="feat-card wb-jump" data-jump="review"><div class="fi">🔍</div><div class="ft">稿件复盘</div><div class="fd">四维打分与建议</div></div>
         <div class="feat-card wb-jump" data-jump="push"><div class="fi">🚀</div><div class="ft">行动督促</div><div class="fd">每周微小行动</div></div>
@@ -526,12 +536,14 @@
           <button id="draft-save" data-page-node-id="Z7VqFRRGQHAH1CDT5b8P3D">保存草稿</button>
           <button class="ghost" id="draft-gen-ai" data-page-node-id="PCeXBqTPt3t0CnFBcNRu8y">AI 生成初稿</button>
           <button class="ghost" id="draft-humanize" data-page-node-id="wbHumanBtn">🧼 去 AI 味</button>
+          <button class="ghost" id="draft-altruism">🤝 利他自检</button>
           <button class="ghost" id="draft-img-prompt" data-page-node-id="hAqCVxVlpdR0hE9Tq2gziX">🖼️ 配图方案</button>
           <button class="ghost" id="draft-prompt" data-page-node-id="ma4c1LolHmiVMoGkpH66Mu">生成写作 Prompt</button>
           <button class="soft" id="draft-list-btn" data-page-node-id="11CGlp20fx00GEVpMrQOUF">我的草稿</button>
         </div>
         <div id="draft-list" style="margin-top:12px;display:none" data-page-node-id="3GqZVWsVDD6tp7by0SA0GY"></div>
         <div id="draft-img-result" style="display:none" data-page-node-id="E36NppGH0evXdditfk5noM"></div>
+        <div id="draft-altruism-result" style="display:none;margin-top:8px" class="small"></div>
       </div>
 
       <div class="card" data-page-node-id="wbScNode">
@@ -825,7 +837,48 @@
     </section>
 
     <!-- 设置 -->
-    <section id="settings" class="tab" style="display:none" data-page-node-id="Wj5ZXqRzm65xTyBgVWNw7R">
+    <section id="voice" class="tab" style="display:none" data-page-node-id="vNcM0dX">
+    <div class="card">
+      <h3>🗣️ 用户原声收集箱</h3>
+      <p class="sub">把读者原话、评论区、私信、群聊、知乎/小红书高赞提问、搜一搜下拉词，原样丢进来。原声是利他选题的金矿——读者原话比你自己想的更精准。</p>
+      <div class="btn-row">
+        <select id="voice-source">
+          <option value="评论区">评论区</option>
+          <option value="私信">私信</option>
+          <option value="群聊">群聊</option>
+          <option value="知乎">知乎</option>
+          <option value="小红书">小红书</option>
+          <option value="搜一搜">搜一搜</option>
+          <option value="自问">自问（我常被问/想不通的）</option>
+          <option value="其他">其他</option>
+        </select>
+        <input id="voice-tags" placeholder="标签（可选，如 标题/职业）" style="flex:1;min-width:120px">
+      </div>
+      <textarea id="voice-text" style="min-height:90px;margin-top:8px" placeholder="粘贴一条原声，例如：你见过的优秀的女生是怎样的？"></textarea>
+      <div class="btn-row" style="margin-top:8px">
+        <button id="voice-add">＋ 收一条原声</button>
+        <button class="ghost" id="voice-clear">清空</button>
+      </div>
+      <div id="voice-list" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card">
+      <h3>🧪 原声 → 选题（提炼）</h3>
+      <p class="sub">勾选若干原声，一键提炼成可发选题，自动带入「选题库」并标记来源。配了 AI 会按利他视角产出标题/角度/解决点；没配则走离线模板，待你补标题。</p>
+      <div class="btn-row">
+        <button id="voice-extract">提炼选中的原声 → 选题</button>
+        <button class="ghost" id="voice-extract-all">全部提炼</button>
+      </div>
+      <div id="voice-extract-result" class="small" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <h3>📊 原声沉淀看板</h3>
+      <div id="voice-board" class="small"></div>
+    </div>
+  </section>
+
+  <section id="settings" class="tab" style="display:none" data-page-node-id="Wj5ZXqRzm65xTyBgVWNw7R">
       <h2 data-page-node-id="taJ6JrbaZBzHpz8FOmpyrZ">⚙️ AI 设置（可选）</h2>
       <p class="sub" data-page-node-id="88hg8fBGNPrwhNvenvr6kc">填了你自己的 OpenAI 兼容接口，标题/写稿/复盘/拆解会用 AI 生成；不填也能用模板与手动模式。</p>
       <div class="card" data-page-node-id="tvln0hY71VlEGD5JhwuKy1">
@@ -901,7 +954,7 @@
   }
 
   /* ---- nav ---- */
-  const MORE_TABS=new Set(["plan","kb","title","push","review","dissect","strategy","settings","layout"]);
+  const MORE_TABS=new Set(["plan","kb","title","push","review","dissect","strategy","settings","layout","voice"]);
   function updateNavActive(tab){
     $$(".nav-btn").forEach(x=>x.classList.remove("active"));
     const actualBtn=$(`.nav-btn[data-tab="${tab}"]`);
@@ -912,6 +965,7 @@
     $$(".tab").forEach(s=>s.style.display = (s.id===tab)?"block":"none");
     location.hash = tab;
     if(tab==="workbench") renderWorkbench();
+    if(tab==="voice") renderVoices();
   }
   function closeMorePanel(){ $("#more-panel").classList.remove("open"); $("#more-backdrop").classList.remove("open"); }
   function openMorePanel(){ $("#more-panel").classList.add("open"); $("#more-backdrop").classList.add("open"); }
@@ -1123,15 +1177,17 @@
         <button class="soft sm" data-draft="${i}">生成初稿</button>
         <button class="ghost sm" data-del="${i}">删</button></div></div>
         <div class="t-angle">${esc(t.angle||"（无角度）")}</div>
+        ${t.source?`<div class="t-meta2">🗣️ 源自原声${t.tVoice?("：「"+esc(t.tVoice)+"」"):""}</div>`:""}
+        ${t.solve?`<div class="t-meta2">🎯 解决点：${esc(t.solve)}</div>`:""}
         <div class="t-meta">${esc(t.date)} · ${t.status||"待写"}</div>`;
       div.querySelector("[data-del]").onclick=()=>{ const d=store.get("topics",[]); d.splice(i, 1); store.set("topics",d); renderTopics(); };
       div.querySelector("[data-draft]").onclick=()=>startDraftFromTopic(i);
       box.appendChild(div);
     });
   }
-  function addTopic(title, angle, group){
+  function addTopic(title, angle, group, extra){
     const d=store.get("topics",[]);
-    d.unshift({title, angle, group, status:"待写", date:new Date().toISOString().slice(0,10)});
+    d.unshift(Object.assign({title, angle, group, status:"待写", date:new Date().toISOString().slice(0,10)}, extra||{}));
     store.set("topics",d); renderTopics();
   }
   $("#frag-to-topic").onclick=async()=>{
@@ -1158,15 +1214,15 @@
   $("#topic-export").onclick=()=>{
     const data=store.get("topics",[]);
     if(!data.length){ toast("选题库为空"); return; }
-    let csv="组别,标题,写作角度,状态,创建日期\n";
-    data.forEach(t=>{ csv+=`"${csvEsc(GROUPS[t.group])}","${csvEsc(t.title)}","${csvEsc(t.angle||"")}","${csvEsc(t.status||"待写")}","${t.date}"\n`; });
+    let csv="组别,标题,写作角度,状态,创建日期,来源,解决点\n";
+    data.forEach(t=>{ csv+=`"${csvEsc(GROUPS[t.group])}","${csvEsc(t.title)}","${csvEsc(t.angle||"")}","${csvEsc(t.status||"待写")}","${t.date}","${csvEsc(t.source||"")}","${csvEsc(t.solve||"")}"\n`; });
     download("选题库.csv", csv);
   };
   $("#topic-copy").onclick=()=>{
     const data=store.get("topics",[]);
     if(!data.length){ toast("选题库为空"); return; }
-    let t="组别\t标题\t写作角度\t状态\n";
-    data.forEach(x=>{ t+=`${GROUPS[x.group]}\t${x.title}\t${x.angle||""}\t${x.status||"待写"}\n`; });
+    let t="组别\t标题\t写作角度\t状态\t来源\t解决点\n";
+    data.forEach(x=>{ t+=`${GROUPS[x.group]}\t${x.title}\t${x.angle||""}\t${x.status||"待写"}\t${x.source||""}\t${x.solve||""}\n`; });
     navigator.clipboard.writeText(t).then(()=>toast("已复制，可直接粘进 Excel")).catch(()=>toast("复制失败"));
   };
   function csvEsc(s){ return String(s).replace(/"/g,'""'); }
@@ -1254,7 +1310,7 @@
   renderHot();
 
   /* ===== 模块2.6 8维评分卡（过滤函数） ===== */
-  const SCORE_DIMS=[["emotion","情绪共鸣"],["spread","传播性"],["unique","独家性"],["identity","身份契合"],["timely","时效性"],["anchor","传播锚点"],["visual","可视化"],["easy","低门槛"]];
+  const SCORE_DIMS=[["emotion","情绪共鸣"],["spread","传播性"],["unique","独家性"],["identity","身份契合"],["timely","时效性"],["anchor","传播锚点"],["visual","可视化"],["easy","低门槛"],["solve","解决度"]];
   const SCORE_KEYS=SCORE_DIMS.map(d=>d[0]);
   function defS(){ const s={}; SCORE_KEYS.forEach(k=>s[k]=3); return s; }
   function scoreTotal(s){ return SCORE_KEYS.reduce((a,k)=>a+(+(s&&s[k])||0),0); }
@@ -1265,15 +1321,15 @@
     if(!data.length){ empty.style.display="block"; return; }
     empty.style.display="none";
     const order=data.map((d,i)=>({i,total:scoreTotal(d.s)})).sort((a,b)=>b.total-a.total);
-    const best=order[0].total>=30?order[0].i:-1;
+    const best=order[0].total>=34?order[0].i:-1;
     order.forEach(({i,total})=>{
       const it=data[i]; if(!it) return;
-      const low=total<30;
+      const low=total<34;
       const div=document.createElement("div"); div.className="sc-item";
       div.innerHTML=`<div class="sc-head">
         <div class="sc-name">${i===best?'<span class="sc-crown">🏆 推荐</span>':""}${esc(it.title)}</div>
-        <div class="sc-badges"><span class="sc-total${low?" low":""}">${total}/40</span>
-        ${low?'<span class="sc-drop">低于30 · 建议丢掉</span>':'<span class="sc-win">入围</span>'}
+        <div class="sc-badges"><span class="sc-total${low?" low":""}">${total}/45</span>
+        ${low?'<span class="sc-drop">低于34 · 建议丢掉</span>':'<span class="sc-win">入围</span>'}
         <button class="ghost sm" data-sdel="${i}">删</button></div></div>
       <div class="sc-dims">${SCORE_DIMS.map(([k,label])=>`<label>${label}<select data-sdim="${k}" data-sidx="${i}">${[1,2,3,4,5].map(v=>`<option value="${v}"${(+(it.s&&it.s[k])||3)===v?" selected":""}>${v}</option>`).join("")}</select></label>`).join("")}</div>`;
       div.querySelectorAll("[data-sdim]").forEach(sel=>{
@@ -1301,7 +1357,7 @@
     if(!d.length){ toast("先加入候选"); return; }
     const btn=$("#score-ai"); const orig=btn.textContent; btn.textContent="评分中…"; btn.disabled=true;
     try{
-      const sys="你是公众号选题评审。对每个候选选题按 8 维打分，每维 1-5 的整数：情绪共鸣(能不能戳中情绪)、传播性(读者愿不愿意转)、独家性(角度是否少有人写)、身份契合(目标读者是否觉得'这说的就是我')、时效性(有没有时效窗口)、传播锚点(有没有可引用的金句/数字/标签)、可视化(能不能配出直观的图或场景)、低门槛(写作门槛越低分越高)。只返回 JSON 数组：[{\"t\":\"原标题\",\"s\":[8个整数，顺序为 情绪,传播,独家,身份,时效,锚点,可视化,门槛]}]，不要其他文字。";
+      const sys="你是公众号选题评审。对每个候选选题按 9 维打分，每维 1-5 的整数：情绪共鸣(能不能戳中情绪)、传播性(读者愿不愿意转)、独家性(角度是否少有人写)、身份契合(目标读者是否觉得'这说的就是我')、时效性(有没有时效窗口)、传播锚点(有没有可引用的金句/数字/标签)、可视化(能不能配出直观的图或场景)、低门槛(写作门槛越低分越高)、解决度(读者读完能否立刻做一步)。只返回 JSON 数组：[{\"t\":\"原标题\",\"s\":[9个整数，顺序为 情绪,传播,独家,身份,时效,锚点,可视化,门槛,解决度]}]，不要其他文字。";
       const out=await AI.chat(sys, d.map(x=>x.title).join("\n"), taskModel('hot'));
       const m=out.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
       let hit=0;
@@ -1315,6 +1371,85 @@
     finally{ btn.textContent=orig; btn.disabled=false; }
   };
   renderScores();
+
+  /* ===== 用户原声（利他选题上游） ===== */
+  function renderVoices(){
+    const vs=store.get("voices",[]);
+    const list=$("#voice-list");
+    if(list){
+      if(!vs.length){ list.innerHTML='<div class="empty">还没有原声，先收几条（评论区/私信/知乎高赞提问都算）</div>'; }
+      else{
+        list.innerHTML=vs.map((v,i)=>`<div class="v-item">
+          <label class="v-check"><input type="checkbox" data-vidx="${i}" ${v.used?"disabled":""}></label>
+          <div class="v-body">
+            <div class="v-text">${esc(v.text)}</div>
+            <div class="v-meta">🏷️ ${esc(v.source||"其他")}${v.tags?(" · "+esc(v.tags)):""} · ${esc(v.ts||"")}${v.used?' · <span class="v-used">已转选题</span>':''}</div>
+          </div>
+          <button class="ghost sm" data-vdel="${i}">删</button>
+        </div>`).join("");
+        list.querySelectorAll("[data-vdel]").forEach(b=>b.onclick=()=>{ const d=store.get("voices",[]); d.splice(+b.dataset.vdel,1); store.set("voices",d); renderVoices(); });
+      }
+    }
+    const board=$("#voice-board");
+    if(board){
+      if(!vs.length){ board.innerHTML='<span class="muted">收满 5 条后这里会显示来源分布。</span>'; }
+      else{
+        const cnt={}; vs.forEach(v=>{ const k=v.source||"其他"; cnt[k]=(cnt[k]||0)+1; });
+        const total=vs.length; const max=Math.max(1,...Object.values(cnt));
+        board.innerHTML='共 '+total+' 条原声<br>'+Object.keys(cnt).map(k=>`<div style="margin:4px 0"><span style="display:inline-block;min-width:64px">${esc(k)}</span><span style="display:inline-block;height:10px;background:var(--accent);border-radius:5px;width:${Math.round(cnt[k]/max*120)}px"></span> ${cnt[k]}</div>`).join("");
+      }
+    }
+  }
+  $("#voice-add").onclick=()=>{
+    const text=$("#voice-text").value.trim();
+    if(!text){ toast("先粘贴一条原声"); return; }
+    const d=store.get("voices",[]);
+    d.unshift({text, source:$("#voice-source").value, tags:$("#voice-tags").value.trim(), ts:new Date().toISOString().slice(0,10), used:false});
+    store.set("voices",d); $("#voice-text").value=""; $("#voice-tags").value=""; renderVoices(); toast("已收一条原声");
+  };
+  $("#voice-clear").onclick=()=>{ if(confirm("清空全部原声？")){ store.set("voices",[]); renderVoices(); } };
+  function selectedVoices(){ const idx=[]; $$("#voice-list [data-vidx]:checked").forEach(c=>idx.push(+c.dataset.vidx)); return idx; }
+  $("#voice-extract-all").onclick=()=>{ const vs=store.get("voices",[]); if(!vs.length){ toast("没有原声"); return; } doExtract(vs.map((_,i)=>i)); };
+  $("#voice-extract").onclick=()=>{
+    const idx=selectedVoices();
+    if(!idx.length){ toast("先勾选要提炼的原声"); return; }
+    doExtract(idx);
+  };
+  async function doExtract(idxs){
+    const vs=store.get("voices",[]);
+    const sel=idxs.map(i=>vs[i]).filter(Boolean);
+    if(!sel.length){ toast("没有可提炼的原声"); return; }
+    const box=$("#voice-extract-result"); box.innerHTML="提炼中…";
+    const btn=$("#voice-extract"); const orig=btn.textContent; btn.disabled=true; btn.textContent="提炼中…";
+    try{
+      if(AI.ok()){
+        const sys="你是公众号随笔号利他选题助手。用户给若干条「读者原声」（真实提问/吐槽/困惑）。请为每条原声提炼成可写的公众号选题。返回 JSON 数组，每个元素：{\"voice\":\"原声原文\",\"title\":\"利他标题（点名谁+什么困惑+得到什么）\",\"angle\":\"一句写作角度\",\"gene\":\"情绪/信息差/身份/行动 中最贴合的1个\",\"solve\":\"读者读完能立刻做的一步（解决点）\"}。只返回 JSON。";
+        const out=await AI.chat(sys, sel.map(v=>"【"+v.source+"】"+v.text).join("\n"), taskModel('hot'));
+        const m=out.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
+        let n=0;
+        (Array.isArray(arr)?arr:[]).forEach(o=>{
+          const vtext=o.voice||"";
+          addTopic(o.title||vtext.slice(0,20), (o.angle||"")+"（源：「"+(vtext||"原声")+"」）", "w", {source:o.gene||"", solve:o.solve||"", tVoice:vtext});
+          const di=vs.findIndex(v=>v.text===vtext);
+          if(di>=0) vs[di].used=true;
+          n++;
+        });
+        store.set("voices",vs);
+        box.innerHTML="✅ 已用 AI 提炼 "+n+" 条，带入「选题库」（带 🗣️来源 与 🎯解决点）。去选题库看看。";
+      }else{
+        let n=0;
+        sel.forEach(v=>{
+          addTopic("（待定）从原声出发："+v.text.slice(0,16), "源自原声：「"+v.text+"」——先想清楚它在帮读者解决什么具体困惑，再定标题。", "w", {source:"原声", solve:"", tVoice:v.text});
+          v.used=true; n++;
+        });
+        store.set("voices",vs);
+        box.innerHTML="✅ 离线模板已带入 "+n+" 条到选题库（待你补标题/角度/解决点）。配 AI 可一键产出更精准的标题。";
+      }
+      renderVoices();
+    }catch(e){ box.innerHTML='<span style="color:var(--red)">提炼失败：'+e.message+'</span>'; }
+    finally{ btn.textContent=orig; btn.disabled=false; }
+  }
+  renderVoices();
 
   /* ===== 模块3 写稿 ===== */
   function renderDrafts(){
@@ -1439,6 +1574,29 @@
       toast("已去 AI 味，记得通读一遍再保存");
     }catch(e){ toast("去味失败："+e.message); }
     finally{ btn.textContent=orig; btn.disabled=false; }
+  };
+
+  $("#draft-altruism").onclick=()=>{
+    const body=$("#draft-body").value.trim();
+    if(!body){ toast("先有正文再自检"); return; }
+    const box=$("#draft-altruism-result"); box.style.display="block";
+    const paras=body.split(/\n+/).filter(Boolean);
+    const checks=[
+      ["立靶：正文有面向「你/读者」的对话感（让人觉得在说我）", /(你|您|读者|咱们|我们)/.test(body)],
+      ["可拿走：给出读者能立刻做的一步（可以/试试/步骤）", /(可以|试试|一步|步骤|先|再|记得|建议|不妨)/.test(body)],
+      ["互动钩子：结尾抛问题 / 邀评论（留互动入口）", /(问|？|\?|留言|评论|说说|你怎么|你呢)/.test(paras[paras.length-1]||"")],
+      ["具体场景：有真实细节 / 故事 / 引语，而非空泛说理", /("|“|「|『|比如|记得有一次|那次|有天)/.test(body)]
+    ];
+    let html="<b>🤝 利他自检</b><br>"+checks.map(c=>`<div>${c[1]?"✅":"⚠️"} ${c[0]}</div>`).join("");
+    if(AI.ok()){
+      (async()=>{ try{
+        const sys="你是公众号利他度评审。针对用户给的正文，从读者视角只给 3 条最该改的利他短板（没立靶/不可拿走/无互动/太抽象），每条一句话。不要客套，不要重复已通过的项。";
+        const out=await AI.chat(sys, body, taskModel('write'));
+        html+='<div style="margin-top:6px;border-top:1px dashed var(--line);padding-top:6px"><b>🤖 AI 视角</b><br>'+out.replace(/\n/g,"<br>")+"</div>";
+        box.innerHTML=html;
+      }catch(e){ /* 保留离线结果 */ } })();
+    }
+    box.innerHTML=html;
   };
 
   /* ===== 模块3.5 公众号排版复制 ===== */
