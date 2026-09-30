@@ -302,6 +302,25 @@
   .ly-field label{font-size:12px;color:var(--muted)}
   .ly-tip{font-size:12px;color:var(--muted);margin-top:6px}
   .ly-ok{color:var(--ok);font-size:12.5px}
+  /* 读者画像 × 话题金矿 指南卡 */
+  .gm-card{border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px;background:linear-gradient(180deg,var(--accent-soft) 0%,#fff 90%);box-shadow:var(--shadow)}
+  .gm-badge{display:inline-block;font-size:11px;color:var(--accent);background:#fff;border:1px solid var(--line);border-radius:20px;padding:2px 10px;margin-bottom:8px}
+  .gm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:12px 0}
+  .gm-pillar{border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff}
+  .gm-pillar.hot{border-left:4px solid var(--red)}
+  .gm-pillar.warm{border-left:4px solid var(--amber)}
+  .gm-h{font-weight:600;font-size:13.5px;margin-bottom:5px}
+  .gm-b{font-size:12.5px;color:var(--muted);line-height:1.6}
+  .gm-tag{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+  .gm-tag.hot{background:#fdeef0;color:var(--red)}
+  .gm-tag.warm{background:#fdf3e2;color:var(--amber)}
+  .gm-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .gm-box{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+  .gm-box h4{margin:0 0 8px;font-size:13px}
+  .gm-ul{margin:0;padding-left:18px;font-size:12.5px;color:var(--ink);line-height:1.75}
+  .gm-ul li{margin-bottom:3px}
+  .gm-foot{margin-top:12px;font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+  @media(max-width:560px){.gm-cols{grid-template-columns:1fr}}
 </style>
 </head>
 <body data-page-node-id="uwcO4oHV1XxGg8pSWMKstM">
@@ -740,6 +759,56 @@
     <section id="strategy" class="tab" style="display:none" data-page-node-id="th6VSvB2TH3mnU2NaO74Io">
       <h2 data-page-node-id="hHvUlySs0AIE78k0QvEbMY">🧭 运营策略 &amp; 优化要点</h2>
       <p class="sub" data-page-node-id="9iRbHTelZHJFGkQwpMGHCf">随手记公众号运营策略、优化要点、踩坑与灵感。手机电脑填同一同步码会自动共用。可配 AI 把一条要点展开成可执行清单。</p>
+
+      <!-- 读者画像 × 话题金矿 指南卡 -->
+      <div class="gm-card">
+        <span class="gm-badge">📌 常驻指南 · 来自你后台读者画像</span>
+        <h3 style="margin:0 0 4px">👵 读者画像 × 话题金矿</h3>
+        <p class="sub" style="margin:0 0 4px">你的推送人群以 <b>36-60 岁女性</b> 为主（女 88%、36-45 占 40.6%、46-60 占 31.8%；地域集中在江苏 / 广东 / 上海 / 浙江）。她们要的不是"干货大词"，而是 <b>"跟我有关、能拿走、不焦虑"</b>。下面 5 个支柱按匹配度排好，直接当选题清单用。</p>
+        <div class="gm-grid">
+          <div class="gm-pillar hot">
+            <div class="gm-h">🌿 身体与健康 <span class="gm-tag hot">强匹配</span></div>
+            <div class="gm-b">更年期 / 睡眠 / 血压血脂 / 关节膝盖 / 养生食谱 / 体检报告怎么看</div>
+          </div>
+          <div class="gm-pillar hot">
+            <div class="gm-h">💗 中年女性自我 <span class="gm-tag hot">强匹配</span></div>
+            <div class="gm-b">情绪价值 / 被看见 / 夫妻关系 / 第二人生 / "我还是我"的觉醒</div>
+          </div>
+          <div class="gm-pillar warm">
+            <div class="gm-h">👧 孩子与家庭 <span class="gm-tag warm">改包装</span></div>
+            <div class="gm-b">子女婚恋 / 隔代养育 / 婆媳相处 / 空巢 / 手足亲情（少说教，多共情）</div>
+          </div>
+          <div class="gm-pillar warm">
+            <div class="gm-h">💰 钱与安全感 <span class="gm-tag warm">改包装</span></div>
+            <div class="gm-b">养老规划 / 稳健理财 / 防诈骗 / 退休金医保 / 给儿女减负</div>
+          </div>
+          <div class="gm-pillar warm">
+            <div class="gm-h">📱 实用工具技能 <span class="gm-tag warm">改包装</span></div>
+            <div class="gm-b">手机用法 / 短视频剪辑 / AI 工具入门 / 防骗实操（手把手步骤体）</div>
+          </div>
+        </div>
+        <div class="gm-cols">
+          <div class="gm-box">
+            <h4>📖 她们的阅读习惯</h4>
+            <ul class="gm-ul">
+              <li>标题要 <b>"与我有关 + 有结果 + 不焦虑"</b></li>
+              <li>长文配清单体 / 分点，手机一屏好读</li>
+              <li>朋友圈、视频号转发多 → 题要"可分享给闺蜜 / 女儿"</li>
+              <li>真实故事 + 一点专业背书，信任感更强</li>
+            </ul>
+          </div>
+          <div class="gm-box">
+            <h4>🚫 三个避坑</h4>
+            <ul class="gm-ul">
+              <li>别贩卖焦虑（"再不 XX 就晚了"式恐吓）</li>
+              <li>别只给理论不给步骤（要"今天就能做"）</li>
+              <li>别硬凹年轻人梗 / 说教口气</li>
+              <li>别把"健康"写成"治病"，守住科普边界</li>
+            </ul>
+          </div>
+        </div>
+        <div class="gm-foot">💡 用法：打开「🗣️ 用户原声」模块，把读者真实提问贴进去 → 提炼选题时优先往这 5 个支柱靠，命中"强匹配"优先写。</div>
+      </div>
       <div class="card" data-page-node-id="sUJna0v95rvp52KpaN6wsG">
         <h3 data-page-node-id="SV32TlUX8mki0RG6xcg9Mh">添加一条</h3>
         <div class="row" data-page-node-id="yYTITlFw2VKRx4jQqDkXwb">
