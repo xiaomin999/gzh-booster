@@ -335,12 +335,23 @@
   .tk-t{flex:1 1 auto;font-size:13px}
   .tk-a{font-size:11.5px;color:var(--muted);flex:1 1 auto}
   .tk-item .ghost{margin-left:auto;flex:0 0 auto}
+  .mt-chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+  .mt-chip{padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;cursor:pointer;color:var(--ink);transition:.15s}
+  .mt-chip:hover{border-color:var(--accent)}
+  .mt-chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .mt-row{margin:4px 0 8px}
+  .mt-line{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .inp{flex:1 1 260px;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px;background:#fff;color:var(--ink)}
+  .mt-summary{margin-top:10px;padding:10px 12px;border:1px dashed var(--line);border-radius:10px;background:#fafbff}
+  .mt-sum{font-size:13px;margin:2px 0}
+  .tk-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:8px;background:#eef1f6;color:var(--muted)}
+  .tk-badge.on{background:var(--accent);color:#fff}
 </style>
 </head>
 <body data-page-node-id="uwcO4oHV1XxGg8pSWMKstM">
 <div class="wrap" data-page-node-id="8aorz0PUjEfCO6FAudA8VG">
   <aside class="sidebar" data-page-node-id="GetzZrzozsJZhjZeO2YrML">
-    <div class="brand" data-page-node-id="HCsktZAFnxQM5XYpvBB7TM">📚 公众号助推助手<small data-page-node-id="JY0EFHS3SBUmqzPzlG7pZk">随笔号 · 不催更 · 松弛写</small></div>
+    <div class="brand" data-page-node-id="HCsktZAFnxQM5XYpvBB7TM">📚 公众号助推助手<small data-page-node-id="JY0EFHS3SBUmqzPzlG7pZk">涨粉变现 · 聚焦赛道 · 稳定更新</small></div>
     <button class="nav-btn active" data-tab="workbench"><span class="em">🧩</span>工作台</button>
     <button class="nav-btn" data-tab="hot"><span class="em">🔥</span>爆款选题</button>
     <button class="nav-btn" data-tab="topics"><span class="em">💡</span>选题库</button>
@@ -367,9 +378,9 @@
 
   <main class="main" data-page-node-id="NCN327Ssiax9Mx70KkiiHq">
     <div class="topbar" data-page-node-id="sf9gvnuOfwWI389M7uyFX8">
-      <div data-page-node-id="RQcoVmCokllvrbtgl8aUe8"><b data-page-node-id="W4HIRD8O2BXB3cIX9EhqrV">固定设定</b>｜纯粹自我记录随笔号 · 写给自己 · 随缘遇见同频读者 · 不为涨粉变现</div>
+      <div data-page-node-id="RQcoVmCokllvrbtgl8aUe8"><b data-page-node-id="W4HIRD8O2BXB3cIX9EhqrV">固定设定</b>｜涨粉变现导向号 · 服务 26-35 岁女性 · 用真实经验与观点建立信任</div>
       <div class="tags" id="top-tags" data-page-node-id="oTyGENKHr1GiEcp3bL7kQ1">
-        <span class="top-tag-fixed" data-page-node-id="SeR8M4ua1qpAdzzVkymq9J">灵感驱动 · 允许断更 · 不设 KPI</span>
+        <span class="top-tag-fixed" data-page-node-id="SeR8M4ua1qpAdzzVkymq9J">聚焦 2-3 赛道 · 稳定更新 · 数据驱动</span>
       </div>
     </div>
 
@@ -968,6 +979,18 @@
       <h2 data-page-node-id="gXXtrack02">🛤️ 公众号赛道库 &amp; 每日选题</h2>
       <p class="sub" data-page-node-id="gXXtrack03">来自西部阿敏的赛道清单（三农 / 生活日常 / 宠物 / 旅游 / 美食 / 育儿 / 影视娱乐 / 历史 / 职场 / 干货类）。点开即看每个赛道的「今日选题」——<b>每天首次打开会自动刷新</b>，不配 AI 也有离线题库随机抽，配了 AI 就用 AI 现写。</p>
 
+      <div class="card" data-page-node-id="gXXmd01" id="maintrack-card">
+        <h3 data-page-node-id="gXXmd02">🎯 我的主攻方向（让涨粉有聚焦）</h3>
+        <p class="sub" data-page-node-id="gXXmd03">先标 <b>2-3 个赛道</b>作为主攻，每日选题会优先聚焦它们（生成更多且排在前面），账号定位也更清晰。再写一句你的「定位一句话」，常驻于此。</p>
+        <div class="mt-chips" id="mt-chips"></div>
+        <div class="mt-row"><span class="small" id="mt-hint"></span></div>
+        <div class="mt-line">
+          <input id="mt-position" class="inp" type="text" placeholder="一句话定位，如：帮 26-35 岁女生在职场与理财上少走弯路" />
+          <button id="mt-save-pos" class="ghost sm">保存定位</button>
+        </div>
+        <div class="mt-summary" id="mt-summary"></div>
+      </div>
+
       <div class="card" data-page-node-id="gXXtrack04">
         <h3 data-page-node-id="gXXtrack05">📌 新手选赛道 · 这篇文章的要点</h3>
         <ul class="gm-ul">
@@ -1201,7 +1224,7 @@
   function renderTopTags(){
     const wrap=$("#top-tags"); if(!wrap) return;
     const cols=getColumns();
-    wrap.innerHTML=cols.map(c=>`<span>${esc(fullName(c))}</span>`).join('')+'<span class="top-tag-fixed">灵感驱动 · 允许断更 · 不设 KPI</span>';
+    wrap.innerHTML=cols.map(c=>`<span>${esc(fullName(c))}</span>`).join('')+'<span class="top-tag-fixed">聚焦 2-3 赛道 · 稳定更新 · 数据驱动</span>';
   }
   function fillColumnSelects(){
     const cols=getColumns();
@@ -1591,6 +1614,7 @@
     {id:"ganhuo", em:"📚", name:"干货类", desc:"时间管理、理财、成长、书单、兼职副业",
       pool:["一年读完50本书的方法","记账三个月攒下第一笔","早起打卡21天变化","副业从0到月入过千","时间块管理法","极简生活清单","免费学Python资源","存钱挑战365天","普通人理财第一步","书单分享：这5本值得读","摆脱精神内耗","下班后两小时怎么用"]}
   ];
+  const MAIN_KEY="mainTracks", POS_KEY="positionLine";
 
   function todayStr(){ const d=new Date(); const p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
   function shuffleArr(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
@@ -1610,24 +1634,24 @@
 
   function renderTracks(){
     const box=$("#track-list"); if(!box) return;
-    const s=store.get("tracks",{});
-    box.innerHTML = TRACKS.map(t=>{
-      const e=s[t.id]; const topics=(e&&e.topics)||[];
+    const s=store.get("tracks",{}); const main=getMainTracks();
+    box.innerHTML = TRACKS.slice().sort((a,b)=>{ const ia=main.indexOf(a.id), ib=main.indexOf(b.id); return (ia===-1?99:ia)-(ib===-1?99:ib); }).map(t=>{
+      const e=s[t.id]; const topics=(e&&e.topics)||[]; const isMain=main.includes(t.id);
       const items = topics.length
         ? topics.map((x,i)=>`<div class="tk-item"><span class="tk-t">${esc(x.t)}</span>${x.a?`<span class="tk-a">${esc(x.a)}</span>`:""}<button class="ghost sm" data-tk-add="${t.id}" data-i="${i}">＋入库</button></div>`).join("")
         : '<div class="empty">暂无选题，点「换一批」生成</div>';
       return `<div class="card tk-card">
         <div class="tk-head"><span class="tk-em">${t.em}</span>
-          <div class="tk-tt"><div class="tk-name">${esc(t.name)}</div><div class="tk-desc">${esc(t.desc)}</div></div>
+          <div class="tk-tt"><div class="tk-name">${esc(t.name)}<span class="tk-badge${isMain?' on':''}">${isMain?'★ 主攻':'观察'}</span></div><div class="tk-desc">${esc(t.desc)}</div></div>
           <button class="ghost sm" data-tk-refresh="${t.id}">🎲 换一批</button></div>
-        <div class="tk-sub">今日选题 · 更新于 ${e?e.day:todayStr()}</div>
+        <div class="tk-sub">今日选题 · ${isMain?'主攻聚焦 · ':''}更新于 ${e?e.day:todayStr()}</div>
         <div class="tk-items">${items}</div>
       </div>`;
     }).join("");
     box.querySelectorAll("[data-tk-refresh]").forEach(b=>b.onclick=async()=>{
       b.disabled=true; const old=b.textContent; b.textContent="生成中…";
       const t=TRACKS.find(x=>x.id===b.dataset.tkRefresh);
-      const topics=await genTrackTopics(t,4); saveTrackTopics(t.id, topics); renderTracks(); toast("已刷新「"+t.name+"」");
+      const topics=await genTrackTopics(t,tcount(t)); saveTrackTopics(t.id, topics); renderTracks(); toast("已刷新「"+t.name+"」");
     });
     box.querySelectorAll("[data-tk-add]").forEach(b=>b.onclick=()=>{
       const t=TRACKS.find(x=>x.id===b.dataset.tkAdd); const e=store.get("tracks",{})[t.id]; const x=e&&e.topics[+b.dataset.i];
@@ -1637,20 +1661,52 @@
 
   async function refreshAllTracks(){
     const st=$("#track-status"); if(st) st.textContent="生成中…";
-    for(const t of TRACKS){ const topics=await genTrackTopics(t,4); saveTrackTopics(t.id, topics); }
+    for(const t of TRACKS){ const topics=await genTrackTopics(t,tcount(t)); saveTrackTopics(t.id, topics); }
     renderTracks(); if(st) st.textContent="已生成「"+TRACKS.length+" 个赛道」今日选题"; toast("全部赛道已刷新");
   }
   const _trAll=$("#track-refresh-all"); if(_trAll) _trAll.onclick=refreshAllTracks;
 
   function ensureDailyTracks(){
     const today=todayStr(); const s=store.get("tracks",{}); let changed=false;
-    TRACKS.forEach(t=>{ if(!s[t.id] || s[t.id].day!==today){ s[t.id]={day:today, topics:genOfflineTopics(t,4)}; changed=true; } });
+    TRACKS.forEach(t=>{ if(!s[t.id] || s[t.id].day!==today){ s[t.id]={day:today, topics:genOfflineTopics(t,tcount(t))}; changed=true; } });
     if(changed) store.set("tracks", s);
     if(AI.ok()){
-      TRACKS.forEach(t=>{ genTrackTopics(t,4).then(topics=>{ const cur=store.get("tracks",{}); if(cur[t.id]&&cur[t.id].day===today){ cur[t.id].topics=topics; store.set("tracks",cur); renderTracks(); } }); });
+      TRACKS.forEach(t=>{ genTrackTopics(t,tcount(t)).then(topics=>{ const cur=store.get("tracks",{}); if(cur[t.id]&&cur[t.id].day===today){ cur[t.id].topics=topics; store.set("tracks",cur); renderTracks(); } }); });
     }
   }
   ensureDailyTracks();
+  renderMainTracks(); refreshMainSummary();
+
+  /* ===== 我的主攻方向（涨粉聚焦） ===== */
+  function getMainTracks(){ return store.get(MAIN_KEY,[]); }
+  function setMainTracks(arr){ store.set(MAIN_KEY, arr); renderMainTracks(); renderTracks(); refreshMainSummary(); }
+  function tcount(t){ return getMainTracks().includes(t.id)?5:4; }
+  function renderMainTracks(){
+    const box=$("#mt-chips"); if(!box) return;
+    const main=getMainTracks();
+    box.innerHTML=TRACKS.map(t=>{
+      const on=main.includes(t.id);
+      return `<button class="mt-chip${on?' on':''}" data-mt="${t.id}">${t.em} ${esc(t.name)}${on?' ✓':''}</button>`;
+    }).join('');
+    const hint=$("#mt-hint"); if(hint) hint.textContent = main.length? ('已选 '+main.length+' 个 · 建议 2-3 个'):'还没选，先点 2-3 个赛道';
+    box.querySelectorAll("[data-mt]").forEach(b=>b.onclick=()=>{
+      let m=getMainTracks(); const id=b.dataset.mt;
+      if(m.includes(id)){ m=m.filter(x=>x!==id); }
+      else { if(m.length>=3){ toast("最多选 3 个主攻赛道"); return; } m.push(id); }
+      setMainTracks(m);
+    });
+    const pos=$("#mt-position"); if(pos && !pos.value) pos.value=store.get(POS_KEY,"")||"";
+  }
+  function refreshMainSummary(){
+    const box=$("#mt-summary"); if(!box) return;
+    const main=getMainTracks(); const pos=store.get(POS_KEY,"")||"";
+    if(!main.length && !pos){ box.innerHTML='<span class="small">选好主攻赛道 + 写好定位一句话，账号就有了清晰人设，涨粉才有的放矢。</span>'; return; }
+    const names=main.map(id=>{ const t=TRACKS.find(x=>x.id===id); return t?t.em+" "+t.name:""; }).filter(Boolean);
+    box.innerHTML='<div class="mt-sum"><b>主攻方向：</b>'+(names.length?names.join(' · '):'<span class="small">未选</span>')+'</div>'
+      + (pos?('<div class="mt-sum"><b>定位一句话：</b>'+esc(pos)+'</div>'):'')
+      + '<div class="mt-sum small">每日选题已优先聚焦以上赛道，打开本页即可看到「今日选题」。</div>';
+  }
+  const _mtPos=$("#mt-save-pos"); if(_mtPos) _mtPos.onclick=()=>{ const v=$("#mt-position").value.trim(); store.set(POS_KEY,v); refreshMainSummary(); toast(v?"定位已保存":"已清空定位"); };
 
   /* ===== 模块3 写稿 ===== */
   function renderDrafts(){
@@ -2361,7 +2417,7 @@
     if(!AI.ok()){ toast("先配置 AI 才能展开"); switchTab("settings"); return; }
     const btn=$("#str-ai"); const orig=btn.textContent; btn.textContent="展开中…"; btn.disabled=true;
     try{
-      const sys="你是公众号运营策略助手。用户是随笔号，定位：纯粹自我记录随笔号，不为涨粉变现。请把用户的一条策略/优化要点，展开成 3-6 条可执行的优化清单，每条具体、可落地、口语化，不要空话套话。";
+      const sys="你是公众号运营策略助手。用户是涨粉变现导向的公众号主理人，目标人群 26-35 岁女性，定位：用真实经验与观点建立信任、稳定涨粉并探索变现。请把用户的一条策略/优化要点，展开成 3-6 条可执行的优化清单，每条具体、可落地、口语化，并尽量指向涨粉/互动/变现，不要空话套话。";
       const out=await AI.chat(sys, `要点：${title}\n${content}`, taskModel('strategy'));
       $("#str-content").value=(content?content+"\n\n":"")+"【AI 展开】\n"+out;
       $("#str-status").innerHTML='<span class="ok">AI 已展开到内容框，确认无误再点「保存」</span>';
