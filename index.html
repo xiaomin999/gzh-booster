@@ -2898,6 +2898,8 @@
   function md2html(s){
     // 轻量 markdown 解析：标题、粗体、列表、分隔线、引用
     let html=esc(s).replace(/\r/g,"");
+    // AI 有时会输出 <br> 标签，esc 后会变成文字，还原为真正换行
+    html=html.replace(/&lt;\s*br\s*\/?\s*&gt;/gi,"\n");
     // 引用
     html=html.replace(/^>(.+)$/gm,'<blockquote>$1</blockquote>');
     // 分隔线
