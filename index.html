@@ -321,6 +321,20 @@
   .gm-ul li{margin-bottom:3px}
   .gm-foot{margin-top:12px;font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
   @media(max-width:560px){.gm-cols{grid-template-columns:1fr}}
+  /* 赛道库 */
+  .tk-card{margin-bottom:14px}
+  .tk-head{display:flex;align-items:flex-start;gap:10px}
+  .tk-em{font-size:22px;line-height:1.2;flex:0 0 auto}
+  .tk-tt{flex:1 1 auto;min-width:0}
+  .tk-name{font-weight:600;font-size:14px}
+  .tk-desc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+  .tk-head .ghost{margin-left:auto;flex:0 0 auto}
+  .tk-sub{font-size:11.5px;color:var(--muted);margin:8px 0 6px}
+  .tk-items{display:flex;flex-direction:column;gap:6px}
+  .tk-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .tk-t{flex:1 1 auto;font-size:13px}
+  .tk-a{font-size:11.5px;color:var(--muted);flex:1 1 auto}
+  .tk-item .ghost{margin-left:auto;flex:0 0 auto}
 </style>
 </head>
 <body data-page-node-id="uwcO4oHV1XxGg8pSWMKstM">
@@ -345,6 +359,7 @@
       <button class="nav-btn" data-tab="dissect"><span class="em">📖</span>范文拆解</button>
       <button class="nav-btn" data-tab="voice"><span class="em">🗣️</span>用户原声</button>
       <button class="nav-btn" data-tab="strategy"><span class="em">🧭</span>运营策略</button>
+      <button class="nav-btn" data-tab="track"><span class="em">🛤️</span>赛道库</button>
       <button class="nav-btn" data-tab="layout"><span class="em">✨</span>排版复制</button>
       <button class="nav-btn set" data-tab="settings"><span class="em">⚙️</span>AI 设置</button>
     </div>
@@ -411,6 +426,7 @@
         <div class="feat-card wb-jump" data-jump="kb"><div class="fi">📚</div><div class="ft">知识库</div><div class="fd">爆款因子沉淀</div></div>
         <div class="feat-card wb-jump" data-jump="data"><div class="fi">📊</div><div class="ft">数据分析</div><div class="fd">多图分析与回流</div></div>
         <div class="feat-card wb-jump" data-jump="strategy"><div class="fi">🧭</div><div class="ft">运营策略</div><div class="fd">策略 / 踩坑 / 灵感</div></div>
+        <div class="feat-card wb-jump" data-jump="track"><div class="fi">🛤️</div><div class="ft">赛道库</div><div class="fd">10 赛道·每日 AI 选题</div></div>
         <div class="feat-card wb-jump" data-jump="settings"><div class="fi">⚙️</div><div class="ft">AI 设置</div><div class="fd">接口与模型配置</div></div>
       </div>
     </section>
@@ -762,52 +778,52 @@
 
       <!-- 读者画像 × 话题金矿 指南卡 -->
       <div class="gm-card">
-        <span class="gm-badge">📌 常驻指南 · 来自你后台读者画像</span>
-        <h3 style="margin:0 0 4px">👵 读者画像 × 话题金矿</h3>
-        <p class="sub" style="margin:0 0 4px">你的推送人群以 <b>36-60 岁女性</b> 为主（女 88%、36-45 占 40.6%、46-60 占 31.8%；地域集中在江苏 / 广东 / 上海 / 浙江）。她们要的不是"干货大词"，而是 <b>"跟我有关、能拿走、不焦虑"</b>。下面 5 个支柱按匹配度排好，直接当选题清单用。</p>
+        <span class="gm-badge">📌 常驻指南 · 2026-10 按最新后台画像更新</span>
+        <h3 style="margin:0 0 4px">👩‍💼 读者画像 × 话题金矿</h3>
+        <p class="sub" style="margin:0 0 4px"><b>26-35 岁占 55.0%，成绝对主力</b>（女 85.5%、36-45 占 25.7%、18-25 占 9.4%）。选题主战场已转移到"上升期女性"——她们在搞钱、攒钱、谈感情、修炼自己。四大强匹配支柱 + 一条兼顾线，直接当选题清单用。</p>
         <div class="gm-grid">
           <div class="gm-pillar hot">
-            <div class="gm-h">🌿 身体与健康 <span class="gm-tag hot">强匹配</span></div>
-            <div class="gm-b">更年期 / 睡眠 / 血压血脂 / 关节膝盖 / 养生食谱 / 体检报告怎么看</div>
+            <div class="gm-h">💼 搞钱与职场 <span class="gm-tag hot">强匹配</span></div>
+            <div class="gm-b">副业变现 / AI 提效工具 / 跳槽转行 / 职场技能 / 个人品牌</div>
           </div>
           <div class="gm-pillar hot">
-            <div class="gm-h">💗 中年女性自我 <span class="gm-tag hot">强匹配</span></div>
-            <div class="gm-b">情绪价值 / 被看见 / 夫妻关系 / 第二人生 / "我还是我"的觉醒</div>
+            <div class="gm-h">💰 攒钱与理财 <span class="gm-tag hot">强匹配</span></div>
+            <div class="gm-b">记账存钱 / 基金定投 / 理性消费 / 降级不降质 / 省钱攻略</div>
+          </div>
+          <div class="gm-pillar hot">
+            <div class="gm-h">💗 情感与关系 <span class="gm-tag hot">强匹配</span></div>
+            <div class="gm-b">婚恋选择 / 亲密关系沟通 / 原生家庭 / 相亲与婚姻现实题</div>
+          </div>
+          <div class="gm-pillar hot">
+            <div class="gm-h">🧘 自我状态 <span class="gm-tag hot">强匹配</span></div>
+            <div class="gm-b">情绪内耗自救 / 自律成长 / 熬夜与体检 / 身材焦虑 / 精简生活</div>
           </div>
           <div class="gm-pillar warm">
-            <div class="gm-h">👧 孩子与家庭 <span class="gm-tag warm">改包装</span></div>
-            <div class="gm-b">子女婚恋 / 隔代养育 / 婆媳相处 / 空巢 / 手足亲情（少说教，多共情）</div>
-          </div>
-          <div class="gm-pillar warm">
-            <div class="gm-h">💰 钱与安全感 <span class="gm-tag warm">改包装</span></div>
-            <div class="gm-b">养老规划 / 稳健理财 / 防诈骗 / 退休金医保 / 给儿女减负</div>
-          </div>
-          <div class="gm-pillar warm">
-            <div class="gm-h">📱 实用工具技能 <span class="gm-tag warm">改包装</span></div>
-            <div class="gm-b">手机用法 / 短视频剪辑 / AI 工具入门 / 防骗实操（手把手步骤体）</div>
+            <div class="gm-h">🍼 育儿与家庭 <span class="gm-tag warm">兼顾线</span></div>
+            <div class="gm-b">职场妈妈平衡 / 婆媳 / 隔代育儿——36-45 老读者仍爱看，别全砍</div>
           </div>
         </div>
         <div class="gm-cols">
           <div class="gm-box">
             <h4>📖 她们的阅读习惯</h4>
             <ul class="gm-ul">
-              <li>标题要 <b>"与我有关 + 有结果 + 不焦虑"</b></li>
-              <li>长文配清单体 / 分点，手机一屏好读</li>
-              <li>朋友圈、视频号转发多 → 题要"可分享给闺蜜 / 女儿"</li>
-              <li>真实故事 + 一点专业背书，信任感更强</li>
+              <li>标题要 <b>"数字+利益点 / 身份代入"</b>（"30 岁的我""普通女生"）</li>
+              <li>清单体 / 步骤体，信息密度高，<b>"收藏=学会"</b></li>
+              <li>转发是社交货币：有用、有态度、<b>替她说话</b></li>
+              <li>真实经历 + 一点专业背书，最吃这套</li>
             </ul>
           </div>
           <div class="gm-box">
-            <h4>🚫 三个避坑</h4>
+            <h4>🚫 四个避坑</h4>
             <ul class="gm-ul">
-              <li>别贩卖焦虑（"再不 XX 就晚了"式恐吓）</li>
-              <li>别只给理论不给步骤（要"今天就能做"）</li>
-              <li>别硬凹年轻人梗 / 说教口气</li>
-              <li>别把"健康"写成"治病"，守住科普边界</li>
+              <li>别纯鸡汤，要"今天就能做"</li>
+              <li>别端着说教，也别硬凹 00 后梗</li>
+              <li>别丢掉 36-45 老读者：健康/家庭留每周 1-2 篇支线</li>
+              <li>理财不荐股、健康不诊病，守住边界</li>
             </ul>
           </div>
         </div>
-        <div class="gm-foot">💡 用法：打开「🗣️ 用户原声」模块，把读者真实提问贴进去 → 提炼选题时优先往这 5 个支柱靠，命中"强匹配"优先写。</div>
+        <div class="gm-foot">💡 用法：打开「🗣️ 用户原声」把读者真实提问贴进去 → 提炼选题优先命中四大强匹配支柱；兼顾线每周 1-2 篇稳住老读者。</div>
       </div>
       <div class="card" data-page-node-id="sUJna0v95rvp52KpaN6wsG">
         <h3 data-page-node-id="SV32TlUX8mki0RG6xcg9Mh">添加一条</h3>
@@ -947,6 +963,37 @@
     </div>
   </section>
 
+    <!-- 模块 赛道库 -->
+    <section id="track" class="tab" style="display:none" data-page-node-id="gXXtrack01">
+      <h2 data-page-node-id="gXXtrack02">🛤️ 公众号赛道库 &amp; 每日选题</h2>
+      <p class="sub" data-page-node-id="gXXtrack03">来自西部阿敏的赛道清单（三农 / 生活日常 / 宠物 / 旅游 / 美食 / 育儿 / 影视娱乐 / 历史 / 职场 / 干货类）。点开即看每个赛道的「今日选题」——<b>每天首次打开会自动刷新</b>，不配 AI 也有离线题库随机抽，配了 AI 就用 AI 现写。</p>
+
+      <div class="card" data-page-node-id="gXXtrack04">
+        <h3 data-page-node-id="gXXtrack05">📌 新手选赛道 · 这篇文章的要点</h3>
+        <ul class="gm-ul">
+          <li><b>选 2-3 个测试</b>，别贪多，先做起来再调，比准备好了再做更完美。</li>
+          <li><b>从自身出发</b>：会什么、懂什么、喜欢什么，就先做哪个，更容易坚持。</li>
+          <li>极细分也能爆——有人只写「白头发」、只写「古建筑」也篇篇爆，找准自己的切口。</li>
+        </ul>
+        <p class="sub" style="margin:10px 0 6px"><b>新手六坑（务必避开）</b></p>
+        <ul class="gm-ul">
+          <li>时政类、擦边类、恐怖/迷信类、不健康类、消极类——<b>一律不碰</b>。</li>
+          <li>账号违规别慌，看情况调整即可，不是世界末日。</li>
+          <li>没完全跑通变现流程、收入不稳前，<b>千万别离职全职</b>，先兼职做。</li>
+          <li>想挣快钱的请靠边——前期收入极不稳定，静下心打磨写作才有结果。</li>
+          <li>学会拆解、总结、复盘、调整，边做边改比等完美更重要。</li>
+        </ul>
+      </div>
+
+      <div class="card" data-page-node-id="gXXtrack06">
+        <div class="btn-row">
+          <button id="track-refresh-all">🎲 全部换一批（重新生成今日选题）</button>
+          <span class="small" id="track-status"></span>
+        </div>
+        <div id="track-list" style="margin-top:10px"></div>
+      </div>
+    </section>
+
   <section id="settings" class="tab" style="display:none" data-page-node-id="Wj5ZXqRzm65xTyBgVWNw7R">
       <h2 data-page-node-id="taJ6JrbaZBzHpz8FOmpyrZ">⚙️ AI 设置（可选）</h2>
       <p class="sub" data-page-node-id="88hg8fBGNPrwhNvenvr6kc">填了你自己的 OpenAI 兼容接口，标题/写稿/复盘/拆解会用 AI 生成；不填也能用模板与手动模式。</p>
@@ -1023,7 +1070,7 @@
   }
 
   /* ---- nav ---- */
-  const MORE_TABS=new Set(["plan","kb","title","push","review","dissect","strategy","settings","layout","voice"]);
+  const MORE_TABS=new Set(["plan","kb","title","push","review","dissect","strategy","settings","layout","voice","track"]);
   function updateNavActive(tab){
     $$(".nav-btn").forEach(x=>x.classList.remove("active"));
     const actualBtn=$(`.nav-btn[data-tab="${tab}"]`);
@@ -1035,6 +1082,7 @@
     location.hash = tab;
     if(tab==="workbench") renderWorkbench();
     if(tab==="voice") renderVoices();
+    if(tab==="track") renderTracks();
   }
   function closeMorePanel(){ $("#more-panel").classList.remove("open"); $("#more-backdrop").classList.remove("open"); }
   function openMorePanel(){ $("#more-panel").classList.add("open"); $("#more-backdrop").classList.add("open"); }
@@ -1519,6 +1567,90 @@
     finally{ btn.textContent=orig; btn.disabled=false; }
   }
   renderVoices();
+
+  /* ===== 模块 赛道库（每日选题） ===== */
+  const TRACKS=[
+    {id:"sannong", em:"🌾", name:"三农", desc:"和农村相关：奇怪植物、野果、乡村特色美食、乡愁等",
+      pool:["老家后山那棵没人认识的野果树，结的果酸掉牙","外婆做的霉豆腐，城里买不到的味道","回村第一顿饭，妈妈杀鸡炖的汤","农村自建房前后对比，花了8万块","被城里人当杂草的野菜，其实是宝贝","赶集日实录：5块钱能买一大兜","黄豆自己发豆芽，三天就能吃","灶台烟火气：一口铁锅用二十年","村里老井的水，比矿泉水甜","秋收晒谷场，满地金黄","竹编簸箕藤椅，老手艺快没了","抓泥鳅鳝鱼，小时候的夏天","腊肉熏制全过程，挂在房梁上","池塘里摸河蚌，炖汤鲜掉眉毛","田埂上的野花，叫不出名字但好看"]},
+    {id:"daily", em:"🌞", name:"生活日常", desc:"搞笑、奇葩、气人的，和生活相关的话题都能写",
+      pool:["相亲时对方说了句啥，我当场想走","地铁上遇到的离谱事","和爸妈聊天的代沟名场面","超市排队被插队，我忍了","租房遇到的奇葩房东","加班到半夜的citywalk","小区里养狗的邻里战争","一个普通周末的真实流水账","手机相册里最尴尬的截图","和闺蜜吐槽的年度合集","外卖备注写错后的社死","家里的神兽又拆家了"]},
+    {id:"pet", em:"🐾", name:"宠物", desc:"猫狗鸡鸭其他宠物，自己喜欢的、身边人养的都能分享",
+      pool:["我家猫主子今天又拆家了","捡到一只流浪猫的第七天","狗子第一次见到雪的反应","宠物绝育前后对比","自制猫饭，比买的放心","宠物医院的社死账单","狗狗的迷惑行为大赏","养鹦鹉是什么体验","阳台养了一缸鱼的治愈","宠物相亲（给猫找对象）","猫砂盆选购踩坑","半夜猫叫，邻居来敲门"]},
+    {id:"travel", em:"🧳", name:"旅游", desc:"外出旅游和拍照，一手素材直接拍直接发，现在很火",
+      pool:["周末周边游，2小时直达的小众地","一个人旅行的快乐清单","小众古镇，没那么多游客","机票蹲守攻略，省一半钱","海边日出，5点起床值了","city walk路线分享","穷游三天两夜花了多少","亲子游避坑指南","拍照机位大公开","民宿踩雷vs宝藏","自驾318 Day1实录","旅行vlog怎么拍不糊"]},
+    {id:"food", em:"🍜", name:"美食", desc:"自己做或爱吃的，一张图一个标题就能发",
+      pool:["10分钟快手早餐","冰箱清空料理挑战","外婆的拿手菜复刻","减脂餐也能好吃","一人食的仪式感","空气炸锅翻车实录","街边小吃探店","自制奶茶比奶茶店好喝","红烧肉的秘诀","夏日解暑糖水","便当带去公司被抢光","不会失败的蛋糕"]},
+    {id:"parent", em:"👶", name:"育儿", desc:"家里有孩子的日常分享，不用天天搬专家话",
+      pool:["娃的一句话让我破防","辅导作业名场面","幼儿园亲子活动实录","育儿焦虑我也有","全职妈妈的一天","二胎家庭的平衡术","孩子挑食怎么办（亲测有效）","带娃旅行的行李清单","绘本共读时光","隔代带娃的观念碰撞","娃的第一次...","双减后的周末怎么过"]},
+    {id:"ent", em:"🎬", name:"影视娱乐", desc:"追剧、看电影、追星八卦，把感受分享出来",
+      pool:["最近这部剧封神了","年度烂片吐槽","二刷才懂的隐藏细节","电影结局的N种解读","追剧上头实录","明星翻车事件复盘","经典老片重看","综艺名场面","配角比主角出彩","影视里的职场真相","追星女孩的快乐","导演的另一部神作"]},
+    {id:"history", em:"📜", name:"历史", desc:"历史故事、怀旧老物件，目前好做的是怀旧",
+      pool:["奶奶的陪嫁老物件","80后的童年零食","消失的老行当","老照片里的故事","爷爷的搪瓷缸","怀旧：小时候的动画片","老家的旧祠堂","粮票布票那些年","老式收音机还能响","复古搪瓷盆的逆袭","消失的街头手艺","老课本里的插图"]},
+    {id:"work", em:"💼", name:"职场", desc:"你做什么职业就分享什么，心得见闻记录下来",
+      pool:["新人入职避坑指南","被领导PUA怎么办","职场摸鱼的正确姿势","开会的无效沟通","我的副业到账了","工资外快怎么搞","跨行转岗实录","职场穿搭不费钱","同事关系的边界","下班后的自我充电","面试被问崩的题","年终总结怎么写不挨骂"]},
+    {id:"ganhuo", em:"📚", name:"干货类", desc:"时间管理、理财、成长、书单、兼职副业",
+      pool:["一年读完50本书的方法","记账三个月攒下第一笔","早起打卡21天变化","副业从0到月入过千","时间块管理法","极简生活清单","免费学Python资源","存钱挑战365天","普通人理财第一步","书单分享：这5本值得读","摆脱精神内耗","下班后两小时怎么用"]}
+  ];
+
+  function todayStr(){ const d=new Date(); const p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
+  function shuffleArr(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  function genOfflineTopics(track, n){ return shuffleArr(track.pool).slice(0, n).map(t=>({t, a:""})); }
+  async function genTrackTopics(track, n){
+    if(AI.ok()){
+      try{
+        const sys="你是公众号选题助手。给「"+track.name+"」赛道生成 "+n+" 个今日可写的具体选题，贴近新手、可落地、不标题党、不涉时政/擦边/不健康。返回JSON数组，每项 {\"t\":\"选题标题\",\"a\":\"一句话写作角度\"}。只返回JSON。";
+        const out=await AI.chat(sys, track.desc, taskModel("hot"));
+        const m=out?out.match(/\[[\s\S]*\]/):null; const arr=m?JSON.parse(m[0]):null;
+        if(Array.isArray(arr)&&arr.length) return arr.slice(0,n).map(x=>({t:String(x.t||""),a:String(x.a||"")})).filter(x=>x.t);
+      }catch(e){ /* 落回离线 */ }
+    }
+    return genOfflineTopics(track, n);
+  }
+  function saveTrackTopics(id, topics){ const s=store.get("tracks",{}); s[id]={day:todayStr(), topics}; store.set("tracks", s); }
+
+  function renderTracks(){
+    const box=$("#track-list"); if(!box) return;
+    const s=store.get("tracks",{});
+    box.innerHTML = TRACKS.map(t=>{
+      const e=s[t.id]; const topics=(e&&e.topics)||[];
+      const items = topics.length
+        ? topics.map((x,i)=>`<div class="tk-item"><span class="tk-t">${esc(x.t)}</span>${x.a?`<span class="tk-a">${esc(x.a)}</span>`:""}<button class="ghost sm" data-tk-add="${t.id}" data-i="${i}">＋入库</button></div>`).join("")
+        : '<div class="empty">暂无选题，点「换一批」生成</div>';
+      return `<div class="card tk-card">
+        <div class="tk-head"><span class="tk-em">${t.em}</span>
+          <div class="tk-tt"><div class="tk-name">${esc(t.name)}</div><div class="tk-desc">${esc(t.desc)}</div></div>
+          <button class="ghost sm" data-tk-refresh="${t.id}">🎲 换一批</button></div>
+        <div class="tk-sub">今日选题 · 更新于 ${e?e.day:todayStr()}</div>
+        <div class="tk-items">${items}</div>
+      </div>`;
+    }).join("");
+    box.querySelectorAll("[data-tk-refresh]").forEach(b=>b.onclick=async()=>{
+      b.disabled=true; const old=b.textContent; b.textContent="生成中…";
+      const t=TRACKS.find(x=>x.id===b.dataset.tkRefresh);
+      const topics=await genTrackTopics(t,4); saveTrackTopics(t.id, topics); renderTracks(); toast("已刷新「"+t.name+"」");
+    });
+    box.querySelectorAll("[data-tk-add]").forEach(b=>b.onclick=()=>{
+      const t=TRACKS.find(x=>x.id===b.dataset.tkAdd); const e=store.get("tracks",{})[t.id]; const x=e&&e.topics[+b.dataset.i];
+      if(x){ addTopic(x.t, (t.name+"赛道｜"+(x.a||"")), "w", {source:"赛道库·"+t.name}); toast("已存入选题库"); }
+    });
+  }
+
+  async function refreshAllTracks(){
+    const st=$("#track-status"); if(st) st.textContent="生成中…";
+    for(const t of TRACKS){ const topics=await genTrackTopics(t,4); saveTrackTopics(t.id, topics); }
+    renderTracks(); if(st) st.textContent="已生成「"+TRACKS.length+" 个赛道」今日选题"; toast("全部赛道已刷新");
+  }
+  const _trAll=$("#track-refresh-all"); if(_trAll) _trAll.onclick=refreshAllTracks;
+
+  function ensureDailyTracks(){
+    const today=todayStr(); const s=store.get("tracks",{}); let changed=false;
+    TRACKS.forEach(t=>{ if(!s[t.id] || s[t.id].day!==today){ s[t.id]={day:today, topics:genOfflineTopics(t,4)}; changed=true; } });
+    if(changed) store.set("tracks", s);
+    if(AI.ok()){
+      TRACKS.forEach(t=>{ genTrackTopics(t,4).then(topics=>{ const cur=store.get("tracks",{}); if(cur[t.id]&&cur[t.id].day===today){ cur[t.id].topics=topics; store.set("tracks",cur); renderTracks(); } }); });
+    }
+  }
+  ensureDailyTracks();
 
   /* ===== 模块3 写稿 ===== */
   function renderDrafts(){
