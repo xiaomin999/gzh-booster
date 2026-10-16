@@ -400,7 +400,7 @@
   .ct-filter-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:4px 0}
   .ct-filter-row .lbl{font-size:13px;color:var(--muted)}
   .ct-chips{display:flex;flex-wrap:wrap;gap:5px}
-  .ct-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:2px 10px;font-size:12px;cursor:pointer}
+  .ct-chip{border:1px solid var(--line);background:#fff;color:#444;border-radius:999px;padding:2px 10px;font-size:12px;cursor:pointer}
   .ct-chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
   .ct-analysis{margin-top:12px}
   .ct-an-h{font-weight:600;margin:6px 0}
@@ -3114,8 +3114,15 @@
   const ctFilter={ topics:new Set(), account:"", kw:"" };
   function ctTopicOptions(entries){
     const base=["未分类","读书感悟","个人故事","观点吐槽","戏剧","好物","职场","情绪","副业","陪娃","游戏","刷剧"];
+    const custom=store.get("compete_topics",[]);
     const dyn=Array.from(new Set(entries.map(function(e){ return e.topicType||"未分类"; })));
-    return Array.from(new Set(base.concat(dyn))).sort();
+    return Array.from(new Set(base.concat(custom,dyn))).sort();
+  }
+  function ctAddCustomTopic(name){
+    name=(name||"").trim(); if(!name) return false;
+    const list=store.get("compete_topics",[]);
+    if(list.indexOf(name)<0){ list.push(name); store.set("compete_topics",list); ctQueueSync(); }
+    return true;
   }
   function ctApplyFilter(list){
     const kw=ctFilter.kw.trim().toLowerCase();
@@ -3176,7 +3183,7 @@
             +'<td class="ct-cbx"><input type="checkbox" class="ct-row-cbx" data-id="'+e.id+'"></td>'
             +'<td class="ct-td-title">'+esc(e.title||'（无标题）')+'</td>'
             +'<td>'+esc(e.account||'—')+'</td>'
-            +'<td><select class="ct-topic-edit" data-id="'+e.id+'">'+opts.map(function(t){ return '<option'+(t===(e.topicType||"未分类")?' selected':'')+'>'+esc(t)+'</option>'; }).join('')+'</select></td>'
+            +'<td><select class="ct-topic-edit" data-id="'+e.id+'">'+opts.map(function(t){ return '<option'+(t===(e.topicType||"未分类")?' selected':'')+'>'+esc(t)+'</option>'; }).join('')+'<option value="__new__">＋ 自定义…</option></select></td>'
             +'<td class="ct-nowrap">'+esc(e.rawTime||'—')+'</td>'
             +'<td class="ct-nowrap">'+esc(e.publishTime||'?')+(e.source?(' <span class="tk-badge on">'+esc(e.source)+'</span>'):'')+'</td>'
             +'<td>'+esc(e.angle||'—')+'</td>'
@@ -3207,6 +3214,11 @@
         $$("#compete-list .ct-topic-edit").forEach(sel=>sel.onchange=function(){
           const id=sel.dataset.id; const cur=store.get("compete_entries",[]);
           const it=cur.find(function(x){ return x.id===id; });
+          if(sel.value==="__new__"){
+            const name=window.prompt("输入新题材名称（会保存到题材列表，之后所有下拉都能用）：","");
+            if(name&&name.trim()&&it){ ctAddCustomTopic(name); it.topicType=name.trim(); store.set("compete_entries",cur); ctQueueSync(); toast("已新增题材「"+name.trim()+"」"); }
+            renderCompete(); return; /* 取消/空输入则还原原题材 */
+          }
           if(it){ it.topicType=sel.value.trim(); store.set("compete_entries",cur); ctQueueSync(); }
           renderCompete(); toast("题材已更新为「"+sel.value.trim()+"」");
         });
