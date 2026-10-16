@@ -3056,20 +3056,36 @@
             +'<td class="ct-nowrap"><button class="soft sm ct-del" data-id="'+e.id+'" type="button">删除</button></td>'
             +'</tr>';
         }).join('');
-        listEl.innerHTML='<div class="ct-table-wrap"><div class="btn-row"><button class="soft ct-csvall" type="button">⬇️ 导出全部 CSV（'+entries.length+' 条）</button></div>'
+        listEl.innerHTML='<div class="ct-table-wrap"><div class="btn-row"><button class="soft ct-csvall" type="button">⬇️ 导出全部 CSV（'+entries.length+' 条）</button><button class="soft ct-saveviews" type="button">💾 保存修改</button></div>'
           +'<table class="ct-table"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>';
+        /* 阅读量统一落库：输入防抖自动存 + 失焦存 + 手动保存按钮 + 导出前强制存，彻底杜绝导出读到旧快照 */
+        const vInps=$$("#compete-list .ct-views-edit");
+        let vtTimer=0;
+        function flushCtViews(loud){
+          const cur=store.get("compete_entries",[]); let n=0;
+          vInps.forEach(function(inp){
+            const it=cur.find(function(x){ return x.id===inp.dataset.id; });
+            if(it&&(it.views||"")!==inp.value.trim()){ it.views=inp.value.trim(); n++; }
+          });
+          if(n){ store.set("compete_entries",cur); ctQueueSync(); }
+          if(loud) toast(n?("已保存 "+n+" 条阅读量"):"没有需要保存的修改");
+          return n;
+        }
+        vInps.forEach(inp=>{
+          inp.addEventListener("input",function(){ clearTimeout(vtTimer); vtTimer=setTimeout(function(){ flushCtViews(false); },800); });
+          inp.onchange=function(){ clearTimeout(vtTimer); flushCtViews(true); };
+        });
         const csvAll=$("#compete-list .ct-csvall");
         if(csvAll) csvAll.onclick=()=>{
+          flushCtViews(false); /* 导出前先把输入框里的阅读量落库，再从存储现读，不用渲染时的旧快照 */
+          const cur=store.get("compete_entries",[]);
           const header=["题材","标题","公众号","截图原文时间","推算发布时间","来源","内容角度","阅读量","备注"];
           const lines=[header.join(",")];
-          entries.forEach(function(e){ lines.push([e.topicType,e.title,e.account,e.rawTime,e.publishTime,e.source,e.angle,e.views||"",e.note].map(csvEsc).join(",")); });
+          cur.forEach(function(e){ lines.push([e.topicType,e.title,e.account,e.rawTime,e.publishTime,e.source,e.angle,e.views||"",e.note].map(csvEsc).join(",")); });
           download("竞品样本-全部.csv", lines.join("\n"));
         };
-        $$("#compete-list .ct-views-edit").forEach(inp=>inp.onchange=function(){
-          const id=inp.dataset.id; const cur=store.get("compete_entries",[]);
-          const it=cur.find(function(x){ return x.id===id; });
-          if(it){ it.views=inp.value.trim(); store.set("compete_entries",cur); toast("阅读量已保存"); ctQueueSync(); }
-        });
+        const svBtn=$("#compete-list .ct-saveviews");
+        if(svBtn) svBtn.onclick=function(){ flushCtViews(true); };
         $$("#compete-list .ct-del").forEach(b=>b.onclick=function(){
           const id=b.dataset.id; const cur=store.get("compete_entries",[]);
           store.set("compete_entries", cur.filter(function(x){ return x.id!==id; }));
