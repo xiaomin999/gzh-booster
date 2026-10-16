@@ -2904,11 +2904,14 @@
     $$("#data-history .dh-del").forEach(b=>b.onclick=function(){
       const id=b.dataset.id;
       store.set("data_history", store.get("data_history",[]).filter(function(x){ return x.id!==id; }));
+      markDeleted("data_history", id);
       renderDataHistory(); toast("已删除 1 条记录");
     });
     const clr=$("#dh-clear");
     if(clr) clr.onclick=function(){
       if(!window.confirm("确定清空全部 "+store.get("data_history",[]).length+" 条分析记录？删除后不可恢复。")) return;
+      const h=store.get("data_history",[]);
+      markDeleted("data_history", h.map(function(r){ return r.id; }));
       store.set("data_history",[]); renderDataHistory(); toast("已清空分析记录");
     };
   }
@@ -3303,6 +3306,7 @@
         $$("#compete-list .ct-del").forEach(b=>b.onclick=function(){
           const id=b.dataset.id; const cur=store.get("compete_entries",[]);
           store.set("compete_entries", cur.filter(function(x){ return x.id!==id; }));
+          markDeleted("compete_entries", id); /* 记删除墓碑，防止云同步把这条"复活" */
           renderCompete(); toast("已删除 1 条");
         });
       }
@@ -3461,26 +3465,46 @@
     const ks=Object.keys(x).sort();
     return "{"+ks.map(k=>JSON.stringify(k)+":"+canon(x[k])).join(",")+"}";
   }
-  function mergeArr(l,r,lt,rt){
+  function mergeArr(l,r,lt,rt,tomb){
+    let res;
     const lId=l.length>0&&l.every(x=>x&&typeof x==="object"&&x.id);
     const rId=r.length>0&&r.every(x=>x&&typeof x==="object"&&x.id);
-    if(lId&&rId){ const map={}; const order=(rt>=lt)?[...l,...r]:[...r,...l]; order.forEach(x=>{ if(x&&x.id) map[x.id]=x; }); return Object.values(map); }
-    const seen=new Set(), res=[];
-    [...l,...r].forEach(x=>{ const key=(x&&typeof x==="object")?canon(x):String(x); if(!seen.has(key)){ seen.add(key); res.push(x); } });
+    if(lId&&rId){ const map={}; const order=(rt>=lt)?[...l,...r]:[...r,...l]; order.forEach(x=>{ if(x&&x.id) map[x.id]=x; }); res=Object.values(map); }
+    else { const seen=new Set(); res=[]; [...l,...r].forEach(x=>{ const key=(x&&typeof x==="object")?canon(x):String(x); if(!seen.has(key)){ seen.add(key); res.push(x); } }); }
+    if(tomb&&Object.keys(tomb).length) res=res.filter(function(x){ return !(x&&x.id&&tomb[x.id]); }); /* 删过的条目不允许被另一端复活 */
     return res;
   }
   function mergeSync(L,Lm,R,Rm){
     const out={}; const keys=new Set([...Object.keys(L||{}),...Object.keys(R||{})]);
+    /* 删除日志（墓碑）：两边求并，同 id 取较新删除时间；数组合并时据此剔除，保证删除能传导到云端和另一端 */
+    const dl={}; const Ldl=(L&&L["gzh_del_log"])||{}, Rdl=(R&&R["gzh_del_log"])||{};
+    new Set([...Object.keys(Ldl),...Object.keys(Rdl)]).forEach(function(sk){
+      const m=Object.assign({},Ldl[sk]||{});
+      Object.keys(Rdl[sk]||{}).forEach(function(id){ m[id]=Math.max(m[id]||0, Rdl[sk][id]); });
+      dl[sk]=m;
+    });
+    if(Object.keys(dl).length) out["gzh_del_log"]=dl;
+    const tomb=function(sk){ return dl[sk]||{}; };
     keys.forEach(k=>{
       if(!isDataKey(k)) return;
-      const l=L[k], r=R[k];
+      if(k==="gzh_del_log") return;
+      const l=L?L[k]:undefined, r=R?R[k]:undefined;
       if(l===undefined&&r===undefined) return;
-      if(Array.isArray(l)&&Array.isArray(r)) out[k]=mergeArr(l,r,(Lm&&Lm[k])||0,(Rm&&Rm[k])||0);
-      else if(Array.isArray(l)&&r===undefined) out[k]=l.slice();
-      else if(Array.isArray(r)&&l===undefined) out[k]=r.slice();
+      if(Array.isArray(l)&&Array.isArray(r)) out[k]=mergeArr(l,r,(Lm&&Lm[k])||0,(Rm&&Rm[k])||0,tomb(k));
+      else if(Array.isArray(l)&&r===undefined) out[k]=l.filter(function(x){ return !(x&&x.id&&tomb(k)[x.id]); });
+      else if(Array.isArray(r)&&l===undefined) out[k]=r.filter(function(x){ return !(x&&x.id&&tomb(k)[x.id]); });
       else { const lt=(Lm&&Lm[k])||0, rt=(Rm&&Rm[k])||0; out[k]=(rt>=lt)?r:l; }
     });
     return out;
+  }
+  function markDeleted(storeKey, ids){
+    try{
+      const log=store.get("del_log",{});
+      const m=log[storeKey]||(log[storeKey]={});
+      const t=Date.now();
+      (Array.isArray(ids)?ids:[ids]).forEach(function(id){ if(id) m[id]=t; });
+      store.set("del_log",log);
+    }catch(e){}
   }
   function persistMerged(merged,mMeta){
     Object.keys(merged).forEach(k=>{ if(isDataKey(k)) localStorage.setItem(k, JSON.stringify(merged[k])); });
