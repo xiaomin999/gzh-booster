@@ -3020,7 +3020,8 @@
       if(r._saved){ toast("这条已保存过；要改题材/阅读量请到下方「已收集样本」表格编辑"); return; }
       syncViews();
       const note=(window.prompt("给这条样本加个备注（选填，可写观察点/为什么收藏）：","")||"");
-      saveCompeteEntry({id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:($("#compete-topic").value.trim())||"未分类", title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, views:r.views||"", image:r.thumb, note:note, createdAt:Date.now()});
+      const entry={id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:($("#compete-topic").value.trim())||"未分类", title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, views:r.views||"", image:"", note:note, createdAt:Date.now()};
+      if(!saveCompeteEntry(entry)) return; /* 写入失败：按钮保持可点，可重试 */
       r._saved=true; b.textContent="已保存 ✓"; b.disabled=true;
       ctUpdateSaveAllBtn();
     });
@@ -3032,13 +3033,20 @@
       syncViews();
       const topic=($("#compete-topic").value.trim())||"未分类";
       const list=store.get("compete_entries",[]);
-      unsaved.forEach(function(r){
-        list.unshift({id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:topic, title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, views:r.views||"", image:r.thumb, note:"", createdAt:Date.now()});
-        r._saved=true;
+      const built=unsaved.map(function(r){
+        return {id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:topic, title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, views:r.views||"", image:"", note:"", createdAt:Date.now()};
       });
-      store.set("compete_entries",list);
+      try{
+        store.set("compete_entries", built.concat(list));
+      }catch(e){
+        const full=/quota|exceed|QuotaExceededError/i.test(String(e&&(e.message||e.name)));
+        toast(full?"批量保存失败：本地存储空间已满。请删掉一些老样本，或到「📚 数据分析」页面清空历史分析记录":"批量保存失败："+(e&&e.message||"写入异常"));
+        return; /* 不标记 _saved，方便重试 */
+      }
+      unsaved.forEach(function(r){ r._saved=true; });
       renderCompete();
-      toast("已批量保存 "+unsaved.length+" 条");
+      toast("已批量保存 "+built.length+" 条");
+      ctWarnHidden(topic);
       $$("#compete-result .ct-save").forEach(b=>{ const r=lastCompeteResults[+b.dataset.i]; if(r&&r._saved){ b.textContent="已保存 ✓"; b.disabled=true; } });
       ctUpdateSaveAllBtn();
     };
@@ -3104,9 +3112,21 @@
   function saveCompeteEntry(entry){
     const list=store.get("compete_entries",[]);
     list.unshift(entry);
-    store.set("compete_entries",list);
+    try{
+      store.set("compete_entries",list);
+    }catch(e){
+      const full=/quota|exceed|QuotaExceededError/i.test(String(e&&(e.message||e.name)));
+      toast(full?"保存失败：本地存储空间已满。请删掉一些老样本，或到「📚 数据分析」页面清空历史分析记录":"保存失败："+(e&&e.message||"写入异常"));
+      return false;
+    }
     renderCompete();
     toast("已保存 1 条竞品样本（"+entry.topicType+"）");
+    ctWarnHidden(entry.topicType);
+    return true;
+  }
+  /* 保存成功但被当前筛选隐藏时给出提示，避免以为没保存上 */
+  function ctWarnHidden(topicType){
+    try{ if(!ctApplyFilter([{topicType:topicType}]).length) toast("已保存，但被当前筛选条件隐藏了 —— 点「清除筛选」即可看到"); }catch(_){}
   }
   /* --- 竞品样本自动云同步（复用设置里的 Supabase 合并同步，静默执行） --- */
   let ctSyncBusy=false, ctSkipPull=false, ctSyncTimer=0;
@@ -3644,6 +3664,15 @@
     return out.innerHTML;
   }
 
+  /* 一次性清理：样本里的原图缩略图不再使用且极占空间，删掉释放 localStorage 配额 */
+  try{
+    const _ce=store.get("compete_entries",[]);
+    if(_ce.some(function(e){ return !!e.image; })){
+      _ce.forEach(function(e){ delete e.image; });
+      store.set("compete_entries",_ce);
+      console.log("[compete] 已清理样本缩略图 "+_ce.length+" 条，释放存储空间");
+    }
+  }catch(_){}
   /* 启动：默认工作台渲染（默认 tab 为 workbench） */
   renderWorkbench();
   { const _fn=TAB_ENTER[startTab]; if(_fn) _fn(); } /* 带 #compete / #track 等 hash 直接打开时也立即渲染对应列表 */
