@@ -1033,6 +1033,8 @@
           <button class="ghost sm vm-q" data-vm="qwen-vl-plus" type="button">qwen-vl-plus</button>
           <button class="ghost sm vm-q" data-vm="qwen-vl-max" type="button">qwen-vl-max</button>
           <button class="ghost sm vm-q" data-vm="qwen3-vl-plus" type="button">qwen3-vl-plus</button>
+          <button class="ghost sm vm-q" data-vm="gpt-4o" type="button">gpt-4o</button>
+          <span class="small">也可手动填任意模型名，不在名单里会先确认再用</span>
         </div>
 
         <div class="btn-row"><button id="compete-gen" type="button">识别截图</button><span class="small">需要支持图片的模型</span></div>
@@ -1306,7 +1308,10 @@
     async chatVision(system, images, extra){
       const c=this.cfg();
       const model=(extra&&extra.model)||c.model;
-      if(!/vl|vision|gpt-4o|claude-3|gemini|kimi|pixtral|llava|qwen2-vl|qwen-vl|internvl/i.test(model||"")) throw new Error("当前模型 "+model+" 不支持图片分析，请在「视觉模型」处填写如 qwen-vl-plus、qwen-vl-max、gpt-4o 等视觉模型");
+      if(!/vl|vision|gpt-4o|claude-3|gemini|kimi|pixtral|llava|qwen2-vl|qwen-vl|internvl/i.test(model||"")){
+        const go=window.confirm("模型「"+(model||"（空）")+"」不在常见视觉模型名单里（可能不支持看图，会识别失败）。\n\n· 点「确定」= 仍用这个模型试试\n· 点「取消」= 回去把视觉模型改成 qwen-vl-plus / qwen-vl-max / gpt-4o 等");
+        if(!go) throw new Error("已取消。请把「视觉模型」改成支持图片的模型（如 qwen-vl-plus、gpt-4o）再识别。");
+      }
       const arr=Array.isArray(images)?images:[images];
       const userContent=arr.map(u=>({type:"image_url", image_url:{url:u}}));
       const t=(extra&&extra.text)?extra.text:"请综合分析这些公众号后台数据截图：先逐张复述能读到的关键数字与趋势，再交叉对比、分析可能的具体原因，最后给 3-4 条可落地的改进动作。";
