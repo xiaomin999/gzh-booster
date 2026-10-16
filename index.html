@@ -410,6 +410,11 @@
   .ct-cbx{width:24px;text-align:center}
   .inp.sm{height:30px;font-size:13px;padding:2px 8px}
   .ct-topic-edit{font-size:13px}
+  /* 竞品分析弹窗 */
+  .ct-modal-mask{position:fixed;inset:0;background:rgba(15,18,30,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+  .ct-modal{background:#fff;border-radius:14px;max-width:920px;width:100%;max-height:86vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:14px 18px 18px}
+  .ct-modal-h{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;margin:-14px -18px 10px;padding:12px 18px 10px;border-bottom:1px solid var(--line)}
+  .ct-modal-body{font-size:13px}
 </style>
 </head>
 <body data-page-node-id="uwcO4oHV1XxGg8pSWMKstM">
@@ -3283,7 +3288,7 @@
     const wdRows=wdNames.map(function(nm,i){ const s=wdStat[i]; const avg=s.n?(s.sum/s.n):0; return '<tr><td>'+nm+'</td><td>'+s.n+'</td><td>'+(s.n?avg.toFixed(0):'—')+'</td></tr>'; }).join('');
     const accRows=Object.keys(acc).sort(function(a,b){ return (acc[b].sum/acc[b].n)-(acc[a].sum/acc[a].n); }).map(function(a){ const o=acc[a]; const avg=o.sum/o.n; const topS=Object.keys(o.slots).sort(function(x,y){ return o.slots[y]-o.slots[x]; })[0]; const topT=Object.keys(o.topics).sort(function(x,y){ return o.topics[y]-o.topics[x]; })[0]; return '<tr><td>'+esc(a)+'</td><td>'+o.n+'</td><td>'+avg.toFixed(0)+'</td><td>'+(topS!=null?CT_SLOTS[+topS]:'—')+'</td><td>'+(topT||'—')+'</td></tr>'; }).join('');
     const topRows=Object.keys(top).sort(function(a,b){ return (top[b].sum/top[b].n)-(top[a].sum/top[a].n); }).map(function(t){ const o=top[t]; const avg=o.sum/o.n; return '<tr><td>'+esc(t)+'</td><td>'+o.n+'</td><td>'+avg.toFixed(0)+'</td><td>'+bar(avg/maxTopAvg*100)+'</td><td>'+o.max+'</td><td>'+bar(o.max/maxTopMax*100)+'</td></tr>'; }).join('');
-    box.innerHTML='<div class="ct-an-h">📊 数据分析（'+target.length+' 条'+(noV?('，其中 '+noV+' 条未填阅读量已排除'):'')+'）</div>'
+    const html='<div class="ct-an-h">📊 数据分析（'+target.length+' 条'+(noV?('，其中 '+noV+' 条未填阅读量已排除'):'')+'）</div>'
       +'<div class="ct-an-sub">① 发文时间 × 阅读量（按时段）</div>'
       +'<table class="ct-table"><thead><tr><th>时段</th><th>条数</th><th>平均阅读量</th><th></th></tr></thead><tbody>'+slotRows+'</tbody></table>'
       +'<div class="ct-an-sub">① 发文时间 × 阅读量（按星期）</div>'
@@ -3293,12 +3298,17 @@
       +'<div class="ct-an-sub">③ 题材 × 阅读量（按平均阅读量降序）</div>'
       +'<table class="ct-table"><thead><tr><th>题材</th><th>条数</th><th>平均阅读量</th><th></th><th>最高阅读量</th><th></th></tr></thead><tbody>'+topRows+'</tbody></table>'
       +'<div class="btn-row"><button class="soft sm ct-ai-an" type="button">🤖 AI 解读这份分析</button></div>'
-      +'<div class="ct-ai-out" id="ct-ai-an-out"></div>';
-    const aiBtn=$("#compete-analysis .ct-ai-an");
-    if(aiBtn) aiBtn.onclick=async function(){
-      const out=$("#ct-ai-an-out");
+      +'<div class="ct-ai-out"></div>';
+    const pageBox=$("#compete-analysis");
+    if(pageBox){ pageBox.innerHTML=html; bindCtAnalysisAI(pageBox); } /* 页面下方同步留一份，关掉弹窗也能看 */
+    ctOpenAnalysisModal(html); /* 弹窗直接展示，免去滚到页面底部 */
+  }
+  function bindCtAnalysisAI(root){
+    const aiBtn=root.querySelector(".ct-ai-an"); if(!aiBtn) return;
+    aiBtn.onclick=async function(){
+      const out=root.querySelector(".ct-ai-out");
       if(!AI.ok()){ toast("先配置 AI 才能解读"); switchTab("settings"); return; }
-      const statsText=box.innerText.replace(/🤖 AI 解读这份分析/g,'');
+      const statsText=root.innerText.replace(/🤖 AI 解读这份分析/g,'');
       const sys='你是公众号竞品分析助手。下面是对一批竞品文章样本的统计结果（含：各时段/星期平均阅读量、各公众号发文规律与平均阅读量、各题材平均与最高阅读量）。请基于数据给出结论：1）什么时间发文阅读量更高；2）哪个公众号/题材表现更好、为什么；3）2-3 条可落地的选题与发布时机建议。口语化、给可落地结论，不要空话。';
       const orig=aiBtn.textContent; aiBtn.textContent="解读中…"; aiBtn.disabled=true;
       out.style.display="block"; out.innerHTML='<div class="result">AI 正在解读分析…</div>';
@@ -3306,6 +3316,18 @@
       catch(e2){ out.innerHTML='<div class="result" style="color:var(--red)">解读失败：'+e2.message+'</div>'; }
       finally{ aiBtn.textContent=orig; aiBtn.disabled=false; }
     };
+  }
+  function ctCloseAnalysisModal(){ const old=document.querySelector(".ct-modal-mask"); if(old) old.remove(); document.removeEventListener("keydown", ctEscClose); }
+  function ctEscClose(e){ if(e.key==="Escape") ctCloseAnalysisModal(); }
+  function ctOpenAnalysisModal(html){
+    ctCloseAnalysisModal();
+    const mask=document.createElement("div"); mask.className="ct-modal-mask";
+    mask.innerHTML='<div class="ct-modal"><div class="ct-modal-h"><b>📊 竞品数据分析</b><button class="soft sm ct-modal-close" type="button">✕ 关闭</button></div><div class="ct-modal-body">'+html+'</div></div>';
+    document.body.appendChild(mask);
+    const cb=mask.querySelector(".ct-modal-close"); if(cb) cb.onclick=ctCloseAnalysisModal;
+    mask.addEventListener("click",function(e){ if(e.target===mask) ctCloseAnalysisModal(); });
+    document.addEventListener("keydown", ctEscClose);
+    bindCtAnalysisAI(mask.querySelector(".ct-modal-body"));
   }
   async function renderCompetePatterns(entries){
     const box=$("#compete-patterns"); if(!box) return;
