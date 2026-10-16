@@ -2898,7 +2898,7 @@
   }
   function competeTableHtml(rows, multiImg){
     if(!rows||!rows.length){ return '<div class="empty">没识别到文章。可换一张更清晰的截图，或在「视觉模型」处填 qwen-vl-plus 后重试。</div>'; }
-    const head='<tr><th class="ct-td-title">标题</th><th>公众号</th><th>截图原文时间</th><th>推算发布时间</th><th>内容角度</th><th class="ct-nowrap">操作</th></tr>';
+    const head='<tr><th class="ct-td-title">标题</th><th>公众号</th><th>截图原文时间</th><th>推算发布时间</th><th>内容角度</th><th>阅读量</th><th class="ct-nowrap">操作</th></tr>';
     const body=rows.map(function(r,i){
       return '<tr>'
         +'<td class="ct-td-title">'+esc(r.title||'（无标题）')+'</td>'
@@ -2906,6 +2906,7 @@
         +'<td class="ct-nowrap">'+esc(r.rawTime||'—')+'</td>'
         +'<td class="ct-nowrap">'+esc(r.publishTime||'?')+' <span class="tk-badge on">'+esc(r.source||'')+'</span></td>'
         +'<td>'+esc(r.angle||'—')+'</td>'
+        +'<td><input class="ct-views" data-i="'+i+'" inputmode="numeric" placeholder="手动填" style="width:84px"></td>'
         +'<td class="ct-nowrap"><button class="soft sm ct-save" data-i="'+i+'" type="button">💾 保存</button></td>'
         +'</tr>';
     }).join('');
@@ -2913,19 +2914,26 @@
       +'<table class="ct-table"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>';
   }
   function bindCompeteResultEvents(){
+    const syncViews=function(){
+      $$("#compete-result .ct-views").forEach(function(inp){
+        const r=lastCompeteResults[+inp.dataset.i]; if(r) r.views=inp.value.trim();
+      });
+    };
     $$("#compete-result .ct-save").forEach(b=>b.onclick=()=>{
       const r=lastCompeteResults[+b.dataset.i];
+      syncViews();
       const note=(window.prompt("给这条样本加个备注（选填，可写观察点/为什么收藏）：","")||"");
-      saveCompeteEntry({id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:($("#compete-topic").value.trim())||"未分类", title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, image:r.thumb, note:note, createdAt:Date.now()});
+      saveCompeteEntry({id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:($("#compete-topic").value.trim())||"未分类", title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, views:r.views||"", image:r.thumb, note:note, createdAt:Date.now()});
       b.textContent="已保存 ✓"; b.disabled=true;
     });
     const allBtn=$("#compete-result .ct-saveall");
     if(allBtn) allBtn.onclick=()=>{
       if(!lastCompeteResults.length){ toast("没有可保存的识别结果"); return; }
+      syncViews();
       const topic=($("#compete-topic").value.trim())||"未分类";
       const list=store.get("compete_entries",[]);
       lastCompeteResults.forEach(function(r){
-        list.unshift({id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:topic, title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, image:r.thumb, note:"", createdAt:Date.now()});
+        list.unshift({id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:topic, title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, views:r.views||"", image:r.thumb, note:"", createdAt:Date.now()});
       });
       store.set("compete_entries",list);
       renderCompete();
@@ -2936,9 +2944,10 @@
     const csvBtn=$("#compete-result .ct-csv");
     if(csvBtn) csvBtn.onclick=()=>{
       if(!lastCompeteResults.length){ toast("没有可导出的结果"); return; }
-      const header=["标题","公众号","截图原文时间","推算发布时间","来源","内容角度"];
+      syncViews();
+      const header=["标题","公众号","截图原文时间","推算发布时间","来源","内容角度","阅读量"];
       const lines=[header.join(",")];
-      lastCompeteResults.forEach(function(r){ lines.push([r.title,r.account,r.rawTime,r.publishTime,r.source,r.angle].map(csvEsc).join(",")); });
+      lastCompeteResults.forEach(function(r){ lines.push([r.title,r.account,r.rawTime,r.publishTime,r.source,r.angle,r.views||""].map(csvEsc).join(",")); });
       download("竞品识别-本次.csv", lines.join("\n"));
     };
   }
@@ -3011,7 +3020,7 @@
     if(listEl){
       if(!entries.length){ listEl.innerHTML='<div class="empty">还没有样本。识别并保存一张竞品截图，这里会按表格归档。</div>'; }
       else{
-        const head='<tr><th class="ct-td-title">标题</th><th>公众号</th><th>题材</th><th>原文时间</th><th>推算发布时间</th><th>内容角度</th><th>备注</th><th class="ct-nowrap">操作</th></tr>';
+        const head='<tr><th class="ct-td-title">标题</th><th>公众号</th><th>题材</th><th>原文时间</th><th>推算发布时间</th><th>内容角度</th><th>阅读量</th><th>备注</th><th class="ct-nowrap">操作</th></tr>';
         const body=entries.map(function(e){
           return '<tr>'
             +'<td class="ct-td-title">'+esc(e.title||'（无标题）')+'</td>'
@@ -3020,6 +3029,7 @@
             +'<td class="ct-nowrap">'+esc(e.rawTime||'—')+'</td>'
             +'<td class="ct-nowrap">'+esc(e.publishTime||'?')+(e.source?(' <span class="tk-badge on">'+esc(e.source)+'</span>'):'')+'</td>'
             +'<td>'+esc(e.angle||'—')+'</td>'
+            +'<td><input class="ct-views-edit" data-id="'+e.id+'" inputmode="numeric" value="'+esc(e.views||'')+'" placeholder="点开文章后填" style="width:100px"></td>'
             +'<td>'+esc(e.note||'')+'</td>'
             +'<td class="ct-nowrap"><button class="soft sm ct-del" data-id="'+e.id+'" type="button">删除</button></td>'
             +'</tr>';
@@ -3028,11 +3038,16 @@
           +'<table class="ct-table"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>';
         const csvAll=$("#compete-list .ct-csvall");
         if(csvAll) csvAll.onclick=()=>{
-          const header=["题材","标题","公众号","截图原文时间","推算发布时间","来源","内容角度","备注"];
+          const header=["题材","标题","公众号","截图原文时间","推算发布时间","来源","内容角度","阅读量","备注"];
           const lines=[header.join(",")];
-          entries.forEach(function(e){ lines.push([e.topicType,e.title,e.account,e.rawTime,e.publishTime,e.source,e.angle,e.note].map(csvEsc).join(",")); });
+          entries.forEach(function(e){ lines.push([e.topicType,e.title,e.account,e.rawTime,e.publishTime,e.source,e.angle,e.views||"",e.note].map(csvEsc).join(",")); });
           download("竞品样本-全部.csv", lines.join("\n"));
         };
+        $$("#compete-list .ct-views-edit").forEach(inp=>inp.onchange=function(){
+          const id=inp.dataset.id; const cur=store.get("compete_entries",[]);
+          const it=cur.find(function(x){ return x.id===id; });
+          if(it){ it.views=inp.value.trim(); store.set("compete_entries",cur); toast("阅读量已保存"); }
+        });
         $$("#compete-list .ct-del").forEach(b=>b.onclick=function(){
           const id=b.dataset.id; const cur=store.get("compete_entries",[]);
           store.set("compete_entries", cur.filter(function(x){ return x.id!==id; }));
@@ -3076,7 +3091,7 @@
       const out=pattern.querySelector('.ct-ai-out');
       if(!AI.ok()){ toast("先配置 AI 才能总结"); switchTab("settings"); return; }
       const items=store.get("compete_entries",[]).filter(function(e){ return e.topicType===type; });
-      const sample=items.map(function(e){ return {标题:e.title,公众号:e.account,发布时间:e.publishTime,角度:e.angle,备注:e.note}; }).slice(0,40);
+      const sample=items.map(function(e){ return {标题:e.title,公众号:e.account,发布时间:e.publishTime,角度:e.angle,阅读量:e.views||"未填",备注:e.note}; }).slice(0,40);
       const sys='你是公众号竞品分析助手。下面是收集的「'+type+'」题材竞品文章样本（标题/公众号/发布时间/角度/备注）。请总结这个题材的【发布规律与可借鉴打法】，包含：1）高频发布时段与星期；2）标题与选题套路；3）常见内容角度；4）可借鉴的 2-3 条行动建议。口语化、给可落地结论，不要空话。';
       const orig=b.textContent; b.textContent="总结中…"; b.disabled=true;
       out.style.display="block"; out.innerHTML='<div class="result">AI 正在总结「'+esc(type)+'」规律…</div>';
