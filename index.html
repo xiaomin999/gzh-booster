@@ -395,6 +395,21 @@
   .dh-item summary{cursor:pointer;font-size:13px;font-weight:600;line-height:1.6}
   .dh-body{margin-top:8px;font-size:13px;line-height:1.7;border-top:1px dashed var(--line);padding-top:8px}
   .dh-thumb{max-width:180px;border-radius:8px;border:1px solid var(--line);margin:4px 0 8px;display:block}
+  /* 竞品样本：筛选栏 + 分析面板 */
+  .ct-filter{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:10px;background:#fafbff}
+  .ct-filter-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:4px 0}
+  .ct-filter-row .lbl{font-size:13px;color:var(--muted)}
+  .ct-chips{display:flex;flex-wrap:wrap;gap:5px}
+  .ct-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:2px 10px;font-size:12px;cursor:pointer}
+  .ct-chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .ct-analysis{margin-top:12px}
+  .ct-an-h{font-weight:600;margin:6px 0}
+  .ct-an-sub{font-size:13px;font-weight:600;margin:12px 0 4px;color:var(--muted)}
+  .ct-bar{height:10px;background:#eef;border-radius:6px;overflow:hidden;min-width:60px;margin-top:2px}
+  .ct-bar span{display:block;height:100%;background:var(--accent);border-radius:6px}
+  .ct-cbx{width:24px;text-align:center}
+  .inp.sm{height:30px;font-size:13px;padding:2px 8px}
+  .ct-topic-edit{font-size:13px}
 </style>
 </head>
 <body data-page-node-id="uwcO4oHV1XxGg8pSWMKstM">
@@ -1054,8 +1069,13 @@
 
       <div class="card">
         <h3>📚 已收集样本 &amp; 规律</h3>
+        <div id="compete-filter" class="ct-filter">
+          <div class="ct-filter-row"><span class="lbl">题材：</span><span id="ct-topic-chips" class="ct-chips"></span><button class="ghost sm" id="ct-filter-clear" type="button">清除筛选</button></div>
+          <div class="ct-filter-row"><span class="lbl">公众号：</span><select id="ct-filter-account"><option value="">全部</option></select><span class="lbl">标题含：</span><input id="ct-filter-kw" class="inp sm" placeholder="关键词"></div>
+        </div>
         <div id="compete-list"></div>
         <div id="compete-patterns"></div>
+        <div id="compete-analysis" class="ct-analysis"></div>
       </div>
     </section>
 
@@ -3090,6 +3110,29 @@
     }catch(e){ console.log("[compete-sync] 静默失败：", e&&e.message); }
     finally{ ctSyncBusy=false; }
   }
+  /* --- 竞品样本筛选 / 分析辅助 --- */
+  const ctFilter={ topics:new Set(), account:"", kw:"" };
+  function ctTopicOptions(entries){
+    const base=["未分类","读书感悟","个人故事","观点吐槽","戏剧","好物","职场","情绪","副业","陪娃","游戏","刷剧"];
+    const dyn=Array.from(new Set(entries.map(function(e){ return e.topicType||"未分类"; })));
+    return Array.from(new Set(base.concat(dyn))).sort();
+  }
+  function ctApplyFilter(list){
+    const kw=ctFilter.kw.trim().toLowerCase();
+    return list.filter(function(e){
+      if(ctFilter.topics.size && !ctFilter.topics.has(e.topicType||"未分类")) return false;
+      if(ctFilter.account && (e.account||"")!==ctFilter.account) return false;
+      if(kw && !(e.title||"").toLowerCase().includes(kw)) return false;
+      return true;
+    });
+  }
+  const CT_SLOTS=["清晨(5-8)","上午(8-11)","午间(11-13)","下午(13-17)","晚间(17-21)","深夜(21-5)"];
+  function ctSlotOf(pub){
+    const m=String(pub||"").match(/(\d{1,2}):(\d{2})/); if(!m) return -1;
+    const h=+m[1];
+    if(h>=5&&h<8) return 0; if(h>=8&&h<11) return 1; if(h>=11&&h<13) return 2; if(h>=13&&h<17) return 3; if(h>=17&&h<21) return 4; return 5;
+  }
+  function ctNum(e){ const v=parseInt(e.views,10); return (isNaN(v)||v<=0)?null:v; }
   function renderCompete(){
     if(!ctSkipPull) ctQueueSync();
     const todayEl=$("#compete-today");
@@ -3102,14 +3145,38 @@
     const listEl=$("#compete-list");
     const entries=store.get("compete_entries",[]);
     if(listEl){
+      /* 筛选栏：题材多选 chips + 公众号下拉 + 标题关键词，渲染时同步 UI 与筛选状态 */
+      const chipsEl=$("#ct-topic-chips");
+      if(chipsEl){
+        const opts=ctTopicOptions(entries);
+        chipsEl.innerHTML=opts.map(function(t){ return '<button class="ct-chip'+(ctFilter.topics.has(t)?" on":"")+'" data-t="'+esc(t)+'" type="button">'+esc(t)+'</button>'; }).join('');
+        chipsEl.querySelectorAll(".ct-chip").forEach(function(c){ c.onclick=function(){ const t=c.dataset.t; if(ctFilter.topics.has(t)) ctFilter.topics.delete(t); else ctFilter.topics.add(t); renderCompete(); }; });
+      }
+      const accSel=$("#ct-filter-account");
+      if(accSel){
+        const prev=accSel.value;
+        const accs=Array.from(new Set(entries.map(function(e){ return e.account||""; }).filter(Boolean))).sort();
+        accSel.innerHTML='<option value="">全部</option>'+accs.map(function(a){ return '<option>'+esc(a)+'</option>'; }).join('');
+        if(accs.indexOf(prev)>=0) accSel.value=prev;
+        accSel.onchange=function(){ ctFilter.account=accSel.value; renderCompete(); };
+      }
+      const kwInp=$("#ct-filter-kw");
+      if(kwInp){ kwInp.value=ctFilter.kw; clearTimeout(kwInp._t); kwInp.oninput=function(){ clearTimeout(kwInp._t); kwInp._t=setTimeout(function(){ ctFilter.kw=kwInp.value; renderCompete(); },400); }; }
+      const clrBtn=$("#ct-filter-clear");
+      if(clrBtn) clrBtn.onclick=function(){ ctFilter.topics.clear(); ctFilter.account=""; ctFilter.kw=""; renderCompete(); };
+
+      const filtered=ctApplyFilter(entries);
       if(!entries.length){ listEl.innerHTML='<div class="empty">还没有样本。识别并保存一张竞品截图，这里会按表格归档。</div>'; }
+      else if(!filtered.length){ listEl.innerHTML='<div class="empty">当前筛选条件下没有样本。<a href="javascript:;" id="ct-clear2" style="color:var(--accent)"> 清除筛选</a></div>'; const c2=$("#ct-clear2"); if(c2) c2.onclick=function(){ ctFilter.topics.clear(); ctFilter.account=""; ctFilter.kw=""; renderCompete(); }; }
       else{
-        const head='<tr><th class="ct-td-title">标题</th><th>公众号</th><th>题材</th><th>原文时间</th><th>推算发布时间</th><th>内容角度</th><th>阅读量</th><th>备注</th><th class="ct-nowrap">操作</th></tr>';
-        const body=entries.map(function(e){
+        const head='<tr><th class="ct-cbx"></th><th class="ct-td-title">标题</th><th>公众号</th><th>题材</th><th>原文时间</th><th>推算发布时间</th><th>内容角度</th><th>阅读量</th><th>备注</th><th class="ct-nowrap">操作</th></tr>';
+        const opts=ctTopicOptions(entries);
+        const body=filtered.map(function(e){
           return '<tr>'
+            +'<td class="ct-cbx"><input type="checkbox" class="ct-row-cbx" data-id="'+e.id+'"></td>'
             +'<td class="ct-td-title">'+esc(e.title||'（无标题）')+'</td>'
             +'<td>'+esc(e.account||'—')+'</td>'
-            +'<td>'+esc(e.topicType||'未分类')+'</td>'
+            +'<td><select class="ct-topic-edit" data-id="'+e.id+'">'+opts.map(function(t){ return '<option'+(t===(e.topicType||"未分类")?' selected':'')+'>'+esc(t)+'</option>'; }).join('')+'</select></td>'
             +'<td class="ct-nowrap">'+esc(e.rawTime||'—')+'</td>'
             +'<td class="ct-nowrap">'+esc(e.publishTime||'?')+(e.source?(' <span class="tk-badge on">'+esc(e.source)+'</span>'):'')+'</td>'
             +'<td>'+esc(e.angle||'—')+'</td>'
@@ -3118,36 +3185,58 @@
             +'<td class="ct-nowrap"><button class="soft sm ct-del" data-id="'+e.id+'" type="button">删除</button></td>'
             +'</tr>';
         }).join('');
-        listEl.innerHTML='<div class="ct-table-wrap"><div class="btn-row"><button class="soft ct-csvall" type="button">⬇️ 导出全部 CSV（'+entries.length+' 条）</button><button class="soft ct-saveviews" type="button">💾 保存修改</button></div>'
+        listEl.innerHTML='<div class="ct-table-wrap"><div class="btn-row">'
+          +'<button class="soft ct-csvall" type="button">⬇️ 导出全部 CSV（'+entries.length+' 条）</button>'
+          +'<button class="soft ct-csvfilt" type="button">⬇️ 导出筛选结果 CSV（'+filtered.length+' 条）</button>'
+          +'<button class="soft ct-saveviews" type="button">💾 保存修改</button>'
+          +'<button class="soft ct-analyze" type="button">📊 分析（'+filtered.length+' 条）</button>'
+          +'</div>'
           +'<table class="ct-table"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>';
-        /* 阅读量统一落库：输入防抖自动存 + 失焦存 + 手动保存按钮 + 导出前强制存，彻底杜绝导出读到旧快照 */
-        const vInps=$$("#compete-list .ct-views-edit");
-        let vtTimer=0;
         function flushCtViews(loud){
+          const inps=$$("#compete-list .ct-views-edit");
           const cur=store.get("compete_entries",[]); let n=0;
-          vInps.forEach(function(inp){
-            const it=cur.find(function(x){ return x.id===inp.dataset.id; });
-            if(it&&(it.views||"")!==inp.value.trim()){ it.views=inp.value.trim(); n++; }
-          });
+          inps.forEach(function(inp){ const it=cur.find(function(x){ return x.id===inp.dataset.id; }); if(it&&(it.views||"")!==inp.value.trim()){ it.views=inp.value.trim(); n++; } });
           if(n){ store.set("compete_entries",cur); ctQueueSync(); }
           if(loud) toast(n?("已保存 "+n+" 条阅读量"):"没有需要保存的修改");
           return n;
         }
-        vInps.forEach(inp=>{
-          inp.addEventListener("input",function(){ clearTimeout(vtTimer); vtTimer=setTimeout(function(){ flushCtViews(false); },800); });
-          inp.onchange=function(){ clearTimeout(vtTimer); flushCtViews(true); };
+        $$("#compete-list .ct-views-edit").forEach(inp=>{
+          inp.addEventListener("input",function(){ clearTimeout(inp._vt); inp._vt=setTimeout(function(){ flushCtViews(false); },800); });
+          inp.onchange=function(){ clearTimeout(inp._vt); flushCtViews(true); };
+        });
+        $$("#compete-list .ct-topic-edit").forEach(sel=>sel.onchange=function(){
+          const id=sel.dataset.id; const cur=store.get("compete_entries",[]);
+          const it=cur.find(function(x){ return x.id===id; });
+          if(it){ it.topicType=sel.value.trim(); store.set("compete_entries",cur); ctQueueSync(); }
+          renderCompete(); toast("题材已更新为「"+sel.value.trim()+"」");
         });
         const csvAll=$("#compete-list .ct-csvall");
         if(csvAll) csvAll.onclick=()=>{
-          flushCtViews(false); /* 导出前先把输入框里的阅读量落库，再从存储现读，不用渲染时的旧快照 */
+          flushCtViews(false);
           const cur=store.get("compete_entries",[]);
           const header=["题材","标题","公众号","截图原文时间","推算发布时间","来源","内容角度","阅读量","备注"];
           const lines=[header.join(",")];
           cur.forEach(function(e){ lines.push([e.topicType,e.title,e.account,e.rawTime,e.publishTime,e.source,e.angle,e.views||"",e.note].map(csvEsc).join(",")); });
           download("竞品样本-全部.csv", lines.join("\n"));
         };
+        const csvF=$("#compete-list .ct-csvfilt");
+        if(csvF) csvF.onclick=()=>{
+          flushCtViews(false);
+          const f=ctApplyFilter(store.get("compete_entries",[]));
+          const header=["题材","标题","公众号","截图原文时间","推算发布时间","来源","内容角度","阅读量","备注"];
+          const lines=[header.join(",")];
+          f.forEach(function(e){ lines.push([e.topicType,e.title,e.account,e.rawTime,e.publishTime,e.source,e.angle,e.views||"",e.note].map(csvEsc).join(",")); });
+          download("竞品样本-筛选结果.csv", lines.join("\n"));
+        };
         const svBtn=$("#compete-list .ct-saveviews");
         if(svBtn) svBtn.onclick=function(){ flushCtViews(true); };
+        const anBtn=$("#compete-list .ct-analyze");
+        if(anBtn) anBtn.onclick=function(){
+          const ids=new Set($$("#compete-list .ct-row-cbx:checked").map(function(c){ return c.dataset.id; }));
+          const target=ids.size? entries.filter(function(e){ return ids.has(e.id); }) : filtered;
+          ctRunAnalysis(target);
+          toast(ids.size?("分析已勾选的 "+target.length+" 条"):("分析当前筛选的 "+target.length+" 条"));
+        };
         $$("#compete-list .ct-del").forEach(b=>b.onclick=function(){
           const id=b.dataset.id; const cur=store.get("compete_entries",[]);
           store.set("compete_entries", cur.filter(function(x){ return x.id!==id; }));
@@ -3156,6 +3245,55 @@
       }
     }
     renderCompetePatterns(entries);
+  }
+  function ctRunAnalysis(target){
+    const box=$("#compete-analysis"); if(!box) return;
+    if(!target||!target.length){ box.innerHTML='<div class="empty">没有可分析的数据。先勾选行，或在筛选条件下点「分析」。</div>'; return; }
+    const wdNames=['周日','周一','周二','周三','周四','周五','周六'];
+    const withV=target.filter(function(e){ return ctNum(e)!==null; });
+    const noV=target.length-withV.length;
+    const slotStat=CT_SLOTS.map(function(){ return {n:0,sum:0}; });
+    const wdStat=wdNames.map(function(){ return {n:0,sum:0}; });
+    withV.forEach(function(e){
+      const v=ctNum(e), s=ctSlotOf(e.publishTime);
+      if(s>=0){ slotStat[s].n++; slotStat[s].sum+=v; }
+      const d=new Date(String(e.publishTime).replace(/-/g,'/')); if(!isNaN(d.getTime())){ const w=d.getDay(); wdStat[w].n++; wdStat[w].sum+=v; }
+    });
+    const maxSlotAvg=Math.max(1, Math.max.apply(null, slotStat.map(function(s){ return s.n?s.sum/s.n:0; })));
+    const acc={};
+    withV.forEach(function(e){ const a=e.account||"（未填）"; (acc[a]=acc[a]||{n:0,sum:0,slots:{},topics:{}}); acc[a].n++; acc[a].sum+=ctNum(e); const s=ctSlotOf(e.publishTime); if(s>=0) acc[a].slots[s]=(acc[a].slots[s]||0)+1; acc[a].topics[e.topicType||"未分类"]=(acc[a].topics[e.topicType||"未分类"]||0)+1; });
+    const top={};
+    withV.forEach(function(e){ const t=e.topicType||"未分类"; (top[t]=top[t]||{n:0,sum:0,max:0}); top[t].n++; top[t].sum+=ctNum(e); top[t].max=Math.max(top[t].max,ctNum(e)); });
+    const maxTopAvg=Math.max(1, Math.max.apply(null, Object.keys(top).map(function(t){ return top[t].n?top[t].sum/top[t].n:0; })));
+    const maxTopMax=Math.max(1, Math.max.apply(null, Object.keys(top).map(function(t){ return top[t].max; })));
+    function bar(pct){ return '<div class="ct-bar"><span style="width:'+Math.max(2,Math.min(100,pct)).toFixed(0)+'%"></span></div>'; }
+    const slotRows=CT_SLOTS.map(function(nm,i){ const s=slotStat[i]; const avg=s.n?(s.sum/s.n):0; return '<tr><td>'+nm+'</td><td>'+s.n+'</td><td>'+(s.n?avg.toFixed(0):'—')+'</td><td>'+bar(avg/maxSlotAvg*100)+'</td></tr>'; }).join('');
+    const wdRows=wdNames.map(function(nm,i){ const s=wdStat[i]; const avg=s.n?(s.sum/s.n):0; return '<tr><td>'+nm+'</td><td>'+s.n+'</td><td>'+(s.n?avg.toFixed(0):'—')+'</td></tr>'; }).join('');
+    const accRows=Object.keys(acc).sort(function(a,b){ return (acc[b].sum/acc[b].n)-(acc[a].sum/acc[a].n); }).map(function(a){ const o=acc[a]; const avg=o.sum/o.n; const topS=Object.keys(o.slots).sort(function(x,y){ return o.slots[y]-o.slots[x]; })[0]; const topT=Object.keys(o.topics).sort(function(x,y){ return o.topics[y]-o.topics[x]; })[0]; return '<tr><td>'+esc(a)+'</td><td>'+o.n+'</td><td>'+avg.toFixed(0)+'</td><td>'+(topS!=null?CT_SLOTS[+topS]:'—')+'</td><td>'+(topT||'—')+'</td></tr>'; }).join('');
+    const topRows=Object.keys(top).sort(function(a,b){ return (top[b].sum/top[b].n)-(top[a].sum/top[a].n); }).map(function(t){ const o=top[t]; const avg=o.sum/o.n; return '<tr><td>'+esc(t)+'</td><td>'+o.n+'</td><td>'+avg.toFixed(0)+'</td><td>'+bar(avg/maxTopAvg*100)+'</td><td>'+o.max+'</td><td>'+bar(o.max/maxTopMax*100)+'</td></tr>'; }).join('');
+    box.innerHTML='<div class="ct-an-h">📊 数据分析（'+target.length+' 条'+(noV?('，其中 '+noV+' 条未填阅读量已排除'):'')+'）</div>'
+      +'<div class="ct-an-sub">① 发文时间 × 阅读量（按时段）</div>'
+      +'<table class="ct-table"><thead><tr><th>时段</th><th>条数</th><th>平均阅读量</th><th></th></tr></thead><tbody>'+slotRows+'</tbody></table>'
+      +'<div class="ct-an-sub">① 发文时间 × 阅读量（按星期）</div>'
+      +'<table class="ct-table"><thead><tr><th>星期</th><th>条数</th><th>平均阅读量</th></tr></thead><tbody>'+wdRows+'</tbody></table>'
+      +'<div class="ct-an-sub">② 公众号发文规律</div>'
+      +'<table class="ct-table"><thead><tr><th>公众号</th><th>条数</th><th>平均阅读量</th><th>常发时段</th><th>主打题材</th></tr></thead><tbody>'+accRows+'</tbody></table>'
+      +'<div class="ct-an-sub">③ 题材 × 阅读量（按平均阅读量降序）</div>'
+      +'<table class="ct-table"><thead><tr><th>题材</th><th>条数</th><th>平均阅读量</th><th></th><th>最高阅读量</th><th></th></tr></thead><tbody>'+topRows+'</tbody></table>'
+      +'<div class="btn-row"><button class="soft sm ct-ai-an" type="button">🤖 AI 解读这份分析</button></div>'
+      +'<div class="ct-ai-out" id="ct-ai-an-out"></div>';
+    const aiBtn=$("#compete-analysis .ct-ai-an");
+    if(aiBtn) aiBtn.onclick=async function(){
+      const out=$("#ct-ai-an-out");
+      if(!AI.ok()){ toast("先配置 AI 才能解读"); switchTab("settings"); return; }
+      const statsText=box.innerText.replace(/🤖 AI 解读这份分析/g,'');
+      const sys='你是公众号竞品分析助手。下面是对一批竞品文章样本的统计结果（含：各时段/星期平均阅读量、各公众号发文规律与平均阅读量、各题材平均与最高阅读量）。请基于数据给出结论：1）什么时间发文阅读量更高；2）哪个公众号/题材表现更好、为什么；3）2-3 条可落地的选题与发布时机建议。口语化、给可落地结论，不要空话。';
+      const orig=aiBtn.textContent; aiBtn.textContent="解读中…"; aiBtn.disabled=true;
+      out.style.display="block"; out.innerHTML='<div class="result">AI 正在解读分析…</div>';
+      try{ const r=await AI.chat(sys, statsText, taskModel('strategy')); out.innerHTML=md2html(r); }
+      catch(e2){ out.innerHTML='<div class="result" style="color:var(--red)">解读失败：'+e2.message+'</div>'; }
+      finally{ aiBtn.textContent=orig; aiBtn.disabled=false; }
+    };
   }
   async function renderCompetePatterns(entries){
     const box=$("#compete-patterns"); if(!box) return;
