@@ -3238,6 +3238,7 @@
           +'<button class="soft ct-csvall" type="button">⬇️ 导出全部 CSV（'+entries.length+' 条）</button>'
           +'<button class="soft ct-csvfilt" type="button">⬇️ 导出筛选结果 CSV（'+filtered.length+' 条）</button>'
           +'<button class="soft ct-saveviews" type="button">💾 保存修改</button>'
+          +'<button class="soft ct-del-sel" type="button">🗑 删除所选</button>'
           +'<button class="soft ct-analyze" type="button">📊 分析（'+filtered.length+' 条）</button>'
           +'</div>'
           +'<table class="ct-table"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>';
@@ -3309,6 +3310,17 @@
           markDeleted("compete_entries", id); /* 记删除墓碑，防止云同步把这条"复活" */
           renderCompete(); toast("已删除 1 条");
         });
+        const delSel=$("#compete-list .ct-del-sel");
+        if(delSel) delSel.onclick=function(){
+          const ids=$$("#compete-list .ct-row-cbx:checked").map(function(c){ return c.dataset.id; });
+          if(!ids.length){ toast("先勾选要删除的行（表头第一个复选框可全选）"); return; }
+          if(!window.confirm("确定删除勾选的 "+ids.length+" 条样本？会同步从云端移除，不可恢复。")) return;
+          const idSet=new Set(ids);
+          store.set("compete_entries", store.get("compete_entries",[]).filter(function(x){ return !idSet.has(x.id); }));
+          markDeleted("compete_entries", ids);
+          renderCompete();
+          toast("已删除 "+ids.length+" 条，正在同步清理云端…");
+        };
       }
     }
     renderCompetePatterns(entries);
@@ -3484,7 +3496,10 @@
       dl[sk]=m;
     });
     if(Object.keys(dl).length) out["gzh_del_log"]=dl;
-    const tomb=function(sk){ return dl[sk]||{}; };
+    const tomb=function(sk){
+      const s=String(sk||"");
+      return (dl[s] || dl[s.replace(/^gzh_/,"")] || {}); /* 墓碑按短 key 存，这里全 key/短 key 都能命中，避免对不上 */
+    };
     keys.forEach(k=>{
       if(!isDataKey(k)) return;
       if(k==="gzh_del_log") return;
