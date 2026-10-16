@@ -390,6 +390,11 @@
   .ct-td-title{min-width:180px;word-break:break-word}
   .ct-nowrap{white-space:nowrap}
   .ct-shot{width:100%;max-width:520px;border-radius:8px;border:1px solid var(--line);margin:6px 0;display:block}
+  /* 数据分析历史记录 */
+  .dh-item{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:8px 0;background:#fbfcff}
+  .dh-item summary{cursor:pointer;font-size:13px;font-weight:600;line-height:1.6}
+  .dh-body{margin-top:8px;font-size:13px;line-height:1.7;border-top:1px dashed var(--line);padding-top:8px}
+  .dh-thumb{max-width:180px;border-radius:8px;border:1px solid var(--line);margin:4px 0 8px;display:block}
 </style>
 </head>
 <body data-page-node-id="uwcO4oHV1XxGg8pSWMKstM">
@@ -977,6 +982,12 @@
         <div class="btn-row" data-page-node-id="QCwZaQD8lTgFcXBGJkcfk1"><button id="data-gen" type="button" data-page-node-id="wixAEQzXQHXXlGTnj8wk2L">分析数据</button><span class="small" data-page-node-id="cFKiBcmczVCIDqTE9NmPZl">需要支持图片的模型</span></div>
         <div id="data-result" style="display:none" data-page-node-id="LaWQviLTqdDJHi3CMnHf8T"></div>
       </div>
+
+      <div class="card">
+        <h3>🗂️ 历史分析记录</h3>
+        <p class="small">每次「分析数据」成功后自动存一份（含补充说明、图数、完整报告），可随时回看或删除；数据同样会云同步。</p>
+        <div id="data-history"></div>
+      </div>
     </section>
 
     <!-- 模块9.5 竞品公众号题材分析 -->
@@ -1227,14 +1238,16 @@
   function openMorePanel(){ $("#more-panel").classList.add("open"); $("#more-backdrop").classList.add("open"); }
   function toggleMorePanel(){ const p=$("#more-panel"); if(p.classList.contains("open")) closeMorePanel(); else openMorePanel(); }
 
+  /* 各 tab 进入时的渲染钩子（导航有多条路径：nav 按钮直调 showTab，wb-jump 走 switchTab，启动走 showTab，都要挂钩） */
+  const TAB_ENTER={ compete:renderCompete, track:renderDataHistory };
   $$(".sidebar .nav-btn").forEach(b=>{
     if(b.classList.contains("more")) return;
-    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); if(b.dataset.tab==="compete") renderCompete(); });
+    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); const fn=TAB_ENTER[b.dataset.tab]; if(fn) fn(); });
   });
   const moreBtn=$(".nav-btn.more");
   if(moreBtn) moreBtn.addEventListener("click", toggleMorePanel);
   $$("#more-panel .nav-btn").forEach(b=>{
-    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); if(b.dataset.tab==="compete") renderCompete(); });
+    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); const fn=TAB_ENTER[b.dataset.tab]; if(fn) fn(); });
   });
   $("#more-backdrop").addEventListener("click", closeMorePanel);
 
@@ -1248,7 +1261,7 @@
     closeMorePanel();
     updateNavActive(tab);
     showTab(tab);
-    if(tab==="compete") renderCompete(); /* 每次进入竞品页都重新渲染已收集样本，避免空白 */
+    const fn=TAB_ENTER[tab]; if(fn) fn(); /* 进入特定页时重新渲染（如竞品样本表），避免空白 */
   }
   // 工作台卡片跳转按钮（script 在 IIFE 中，不能用 inline onclick）
   $$(".wb-jump").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.jump)));
@@ -2784,6 +2797,7 @@
       box.innerHTML='<div class="review-report"><div class="data-figs">'+figs+'</div>'+combHtml+'<div class="data-actions"><button class="soft sm" id="data-deposit-low">📉 沉淀为低阅读教训</button><button class="soft sm" id="data-deposit-hit">🔥 萃取爆款因子</button><span class="small">沉淀后自动反哺「🔥 爆款选题」与「✍️ 写稿」</span></div></div>';
       $("#data-deposit-low").onclick=()=>depositDataLesson('low');
       $("#data-deposit-hit").onclick=()=>depositDataLesson('hit');
+      saveDataHistory(note, model, per).catch(function(e2){ console.log("[data-history] 保存失败:", e2&&e2.message); }); /* 每次分析成功自动存历史 */
     }catch(e){
       box.innerHTML='<div class="result" style="color:var(--red)">分析失败：'+e.message+'<br><br>修复方法：点上方「一键填入」选一个视觉模型（或手动填 qwen-vl-plus），再点「分析数据」。若提示 404 模型不存在，就是模型名拼写问题——注意是 vl 不是 v1。</div>';
     }finally{ btn.textContent=orig; btn.disabled=false; }
@@ -2824,6 +2838,53 @@
       saveDataLesson(raw.slice(0,900), type, "（AI 提炼失败，存原始分析）");
       toast("已保存原始分析");
     }finally{ if(btn){ btn.textContent=orig; btn.disabled=false; } }
+  }
+
+  /* 历史分析记录：每次分析成功自动存一份（gzh_data_history，走 gzh_ 前缀自动云同步） */
+  async function saveDataHistory(note, model, per){
+    let thumb="";
+    try{ if(per&&per[0]&&per[0].img) thumb=await compressImage(per[0].img,320,0.55); }catch(_){}
+    const h=store.get("data_history",[]);
+    h.unshift({
+      id:"d"+Date.now()+Math.random().toString(36).slice(2,5),
+      savedAt:Date.now(), note:note||"", model:model||"", n:(per?per.length:1),
+      thumb:thumb, text:(lastDataResult||"").slice(0,20000)
+    });
+    if(h.length>30) h.length=30; /* 上限 30 条，防 localStorage 爆仓 */
+    try{ store.set("data_history",h); }
+    catch(e){ /* 配额不足降级：先去缩略图，再不行砍到 15 条 */
+      h.forEach(function(r){ delete r.thumb; });
+      try{ store.set("data_history",h); }
+      catch(e2){ h.length=Math.min(h.length,15); store.set("data_history",h); }
+    }
+    renderDataHistory();
+    toast("已存入历史分析记录");
+  }
+  function renderDataHistory(){
+    const box=$("#data-history"); if(!box) return;
+    const h=store.get("data_history",[]);
+    if(!h.length){ box.innerHTML='<div class="empty">还没有分析记录。每次点「分析数据」成功后，报告会自动存一份在这里，可随时回看。</div>'; return; }
+    box.innerHTML=h.map(function(r){
+      const ds=fmtDateTime(new Date(r.savedAt));
+      const cap=(r.note?(" ｜ "+esc(r.note.slice(0,30))+(r.note.length>30?"…":"")):"")+" ｜ "+(r.n||1)+" 张图";
+      return '<details class="dh-item"><summary>📄 '+esc(ds)+cap+'</summary>'
+        +'<div class="dh-body">'
+        +'<div class="btn-row"><button class="soft sm dh-del" data-id="'+r.id+'" type="button">🗑 删除这条</button>'+(r.model?'<span class="small">模型：'+esc(r.model)+'</span>':'')+'</div>'
+        +(r.thumb?'<img class="dh-thumb" src="'+r.thumb+'" alt="原图缩略">':'')
+        +'<div class="dh-text">'+md2html(r.text||"")+'</div>'
+        +'</div></details>';
+    }).join('')
+    +'<div class="btn-row"><button class="soft sm" id="dh-clear" type="button">🧹 清空全部记录（'+h.length+' 条）</button></div>';
+    $$("#data-history .dh-del").forEach(b=>b.onclick=function(){
+      const id=b.dataset.id;
+      store.set("data_history", store.get("data_history",[]).filter(function(x){ return x.id!==id; }));
+      renderDataHistory(); toast("已删除 1 条记录");
+    });
+    const clr=$("#dh-clear");
+    if(clr) clr.onclick=function(){
+      if(!window.confirm("确定清空全部 "+store.get("data_history",[]).length+" 条分析记录？删除后不可恢复。")) return;
+      store.set("data_history",[]); renderDataHistory(); toast("已清空分析记录");
+    };
   }
 
   /* ===== 竞品公众号题材分析 ===== */
@@ -3387,7 +3448,7 @@
 
   /* 启动：默认工作台渲染（默认 tab 为 workbench） */
   renderWorkbench();
-  if(startTab==="compete") renderCompete(); /* 直接带 #compete 打开页面时也立即渲染已收集样本 */
+  { const _fn=TAB_ENTER[startTab]; if(_fn) _fn(); } /* 带 #compete / #track 等 hash 直接打开时也立即渲染对应列表 */
 })();
 </script>
 </body>
