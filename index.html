@@ -95,6 +95,7 @@
   button.ghost{background:#fff;color:var(--accent);border:1px solid var(--accent)}
   button.soft{background:var(--accent-soft);color:#7a5aa8}
   button.sm{padding:5px 10px;font-size:12px}
+  button:disabled{opacity:.5;cursor:not-allowed}
   .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
   .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;border:1px solid var(--line)}
   .pill.b{background:#fdeef0;color:#c0566a;border-color:#f3d6db}
@@ -3006,27 +3007,40 @@
         const r=lastCompeteResults[+inp.dataset.i]; if(r) r.views=inp.value.trim();
       });
     };
+    function ctUpdateSaveAllBtn(){
+      const allBtn=$("#compete-result .ct-saveall"); if(!allBtn) return;
+      const total=lastCompeteResults.length;
+      const unsaved=lastCompeteResults.filter(function(r){ return !r._saved; }).length;
+      if(!total||!unsaved){ allBtn.textContent="已保存 ✓"; allBtn.disabled=true; return; }
+      allBtn.disabled=false;
+      allBtn.textContent=(unsaved===total)?("💾 保存全部（"+total+" 条）"):("💾 保存剩余（"+unsaved+" 条）");
+    }
     $$("#compete-result .ct-save").forEach(b=>b.onclick=()=>{
-      const r=lastCompeteResults[+b.dataset.i];
+      const r=lastCompeteResults[+b.dataset.i]; if(!r) return;
+      if(r._saved){ toast("这条已保存过；要改题材/阅读量请到下方「已收集样本」表格编辑"); return; }
       syncViews();
       const note=(window.prompt("给这条样本加个备注（选填，可写观察点/为什么收藏）：","")||"");
       saveCompeteEntry({id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:($("#compete-topic").value.trim())||"未分类", title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, views:r.views||"", image:r.thumb, note:note, createdAt:Date.now()});
-      b.textContent="已保存 ✓"; b.disabled=true;
+      r._saved=true; b.textContent="已保存 ✓"; b.disabled=true;
+      ctUpdateSaveAllBtn();
     });
     const allBtn=$("#compete-result .ct-saveall");
     if(allBtn) allBtn.onclick=()=>{
       if(!lastCompeteResults.length){ toast("没有可保存的识别结果"); return; }
+      const unsaved=lastCompeteResults.filter(function(r){ return !r._saved; });
+      if(!unsaved.length){ toast("这一批已经全部保存过了"); ctUpdateSaveAllBtn(); return; }
       syncViews();
       const topic=($("#compete-topic").value.trim())||"未分类";
       const list=store.get("compete_entries",[]);
-      lastCompeteResults.forEach(function(r){
+      unsaved.forEach(function(r){
         list.unshift({id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:topic, title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, views:r.views||"", image:r.thumb, note:"", createdAt:Date.now()});
+        r._saved=true;
       });
       store.set("compete_entries",list);
       renderCompete();
-      toast("已批量保存 "+lastCompeteResults.length+" 条");
-      $$("#compete-result .ct-save").forEach(b=>{ b.textContent="已保存 ✓"; b.disabled=true; });
-      allBtn.textContent="已保存 ✓"; allBtn.disabled=true;
+      toast("已批量保存 "+unsaved.length+" 条");
+      $$("#compete-result .ct-save").forEach(b=>{ const r=lastCompeteResults[+b.dataset.i]; if(r&&r._saved){ b.textContent="已保存 ✓"; b.disabled=true; } });
+      ctUpdateSaveAllBtn();
     };
     const csvBtn=$("#compete-result .ct-csv");
     if(csvBtn) csvBtn.onclick=()=>{
