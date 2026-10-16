@@ -1229,12 +1229,12 @@
 
   $$(".sidebar .nav-btn").forEach(b=>{
     if(b.classList.contains("more")) return;
-    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); });
+    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); if(b.dataset.tab==="compete") renderCompete(); });
   });
   const moreBtn=$(".nav-btn.more");
   if(moreBtn) moreBtn.addEventListener("click", toggleMorePanel);
   $$("#more-panel .nav-btn").forEach(b=>{
-    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); });
+    b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); if(b.dataset.tab==="compete") renderCompete(); });
   });
   $("#more-backdrop").addEventListener("click", closeMorePanel);
 
@@ -1248,6 +1248,7 @@
     closeMorePanel();
     updateNavActive(tab);
     showTab(tab);
+    if(tab==="compete") renderCompete(); /* 每次进入竞品页都重新渲染已收集样本，避免空白 */
   }
   // 工作台卡片跳转按钮（script 在 IIFE 中，不能用 inline onclick）
   $$(".wb-jump").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.jump)));
@@ -3386,6 +3387,7 @@
 
   /* 启动：默认工作台渲染（默认 tab 为 workbench） */
   renderWorkbench();
+  if(startTab==="compete") renderCompete(); /* 直接带 #compete 打开页面时也立即渲染已收集样本 */
 })();
 </script>
 </body>
