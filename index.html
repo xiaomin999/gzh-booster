@@ -361,6 +361,28 @@
   .tk-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:8px;background:#eef1f6;color:var(--muted)}
   .tk-badge.on{background:var(--accent);color:#fff}
   .vm-quick{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
+  .ct-topic-row{display:flex;gap:8px;align-items:center;margin:4px 0 6px;flex-wrap:wrap}
+  .ct-anchor-row{display:flex;gap:8px;align-items:center;margin:4px 0;flex-wrap:wrap}
+  input[type=datetime-local]{font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  .ct-fields{display:flex;flex-direction:column;gap:2px;margin:6px 0}
+  .ct-field{display:flex;gap:8px;border-bottom:1px dashed var(--line);padding:5px 0}
+  .ct-k{flex:0 0 92px;color:var(--muted);font-size:13px}
+  .ct-v{flex:1;font-size:14px;word-break:break-word}
+  .ct-group{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+  .ct-group-h{font-weight:600;margin-bottom:8px}
+  .ct-item{display:flex;gap:10px;padding:8px 0;border-top:1px solid #f0f2f6}
+  .ct-item:first-child{border-top:none}
+  .ct-thumb{width:64px;height:64px;object-fit:cover;border-radius:8px;flex:0 0 64px}
+  .ct-item-body{flex:1;min-width:0}
+  .ct-item-title{font-weight:600;font-size:14px}
+  .ct-item-meta{font-size:12px;color:var(--muted);margin-top:2px}
+  .ct-item-note{font-size:12px;margin-top:2px;background:#f7f8fa;border-radius:6px;padding:3px 6px}
+  .ct-item-actions{margin-top:4px}
+  .ct-pattern{margin-top:14px;border:1px solid var(--accent);border-radius:12px;padding:10px 12px;background:#fbfcff}
+  .ct-pattern-h{font-weight:600;margin-bottom:6px}
+  .mt-sum{font-size:13px;line-height:1.6}
+  .ct-ai-out{margin-top:8px;font-size:13px}
+  .ct-ai-out h3,.ct-ai-out h4{margin:8px 0 4px}
 </style>
 </head>
 <body data-page-node-id="uwcO4oHV1XxGg8pSWMKstM">
@@ -387,6 +409,7 @@
       <button class="nav-btn" data-tab="strategy"><span class="em">🧭</span>运营策略</button>
       <button class="nav-btn" data-tab="track"><span class="em">🛤️</span>赛道库</button>
       <button class="nav-btn" data-tab="layout"><span class="em">✨</span>排版复制</button>
+      <button class="nav-btn" data-tab="compete"><span class="em">🔍</span>竞品题材</button>
       <button class="nav-btn set" data-tab="settings"><span class="em">⚙️</span>AI 设置</button>
     </div>
   </div>
@@ -945,6 +968,73 @@
         <div class="vm-quick" id="vm-quick"><span class="small">一键填入：</span><button class="ghost sm vm-q" data-vm="qwen-vl-plus" type="button">qwen-vl-plus</button><button class="ghost sm vm-q" data-vm="qwen-vl-max" type="button">qwen-vl-max</button><button class="ghost sm vm-q" data-vm="qwen3-vl-plus" type="button">qwen3-vl-plus</button></div>
         <div class="btn-row" data-page-node-id="QCwZaQD8lTgFcXBGJkcfk1"><button id="data-gen" type="button" data-page-node-id="wixAEQzXQHXXlGTnj8wk2L">分析数据</button><span class="small" data-page-node-id="cFKiBcmczVCIDqTE9NmPZl">需要支持图片的模型</span></div>
         <div id="data-result" style="display:none" data-page-node-id="LaWQviLTqdDJHi3CMnHf8T"></div>
+      </div>
+    </section>
+
+    <!-- 模块9.5 竞品公众号题材分析 -->
+    <section id="compete" class="tab" style="display:none">
+      <h2>🔍 竞品公众号题材分析</h2>
+      <p class="sub">每天研究一个题材类型，截图竞品文章，AI 识别「标题 / 公众号名称 / 发布时间」，发布时间按你提供的截图时间锚点倒推成绝对时间，长期沉淀后自动汇总规律。</p>
+
+      <div class="card">
+        <h3>📅 今日研究</h3>
+        <div id="compete-today" class="mt-summary"></div>
+        <label>今日研究题材类型</label>
+        <div class="ct-topic-row">
+          <input id="compete-topic" class="inp" placeholder="如：减脂餐 / 副业 / 陪娃 / 游戏…" list="compete-topic-list">
+          <datalist id="compete-topic-list">
+            <option value="减脂餐"></option><option value="副业"></option><option value="陪娃"></option>
+            <option value="游戏"></option><option value="刷剧"></option><option value="职场"></option>
+            <option value="好物"></option><option value="情绪"></option>
+          </datalist>
+        </div>
+        <div class="vm-quick" id="compete-topic-quick">
+          <span class="small">快捷：</span>
+          <button class="ghost sm ct-tq" type="button" data-t="减脂餐">减脂餐</button>
+          <button class="ghost sm ct-tq" type="button" data-t="副业">副业</button>
+          <button class="ghost sm ct-tq" type="button" data-t="陪娃">陪娃</button>
+          <button class="ghost sm ct-tq" type="button" data-t="游戏">游戏</button>
+          <button class="ghost sm ct-tq" type="button" data-t="刷剧">刷剧</button>
+          <button class="ghost sm ct-tq" type="button" data-t="职场">职场</button>
+          <button class="ghost sm ct-tq" type="button" data-t="好物">好物</button>
+          <button class="ghost sm ct-tq" type="button" data-t="情绪">情绪</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📸 识别一张竞品截图</h3>
+        <label>上传 / 粘贴竞品文章截图（可多张，每张单独识别最显眼的一条）</label>
+        <div id="compete-drop" class="data-drop">
+          <input type="file" id="compete-file" accept="image/*" multiple hidden>
+          <button class="ghost" id="compete-pick" type="button">选择图片</button>
+          <span class="small">支持多选 / 拖拽 / Ctrl+V 粘贴</span>
+        </div>
+        <div id="compete-thumbs" class="data-thumbs"></div>
+
+        <label>截图时间（锚点）— 这张图是何时拍 / 发的</label>
+        <div class="ct-anchor-row">
+          <input type="datetime-local" id="compete-anchor">
+          <button class="ghost sm" id="compete-now" type="button">填现在</button>
+        </div>
+        <span class="small">例：锚点 2026-10-16 09:01 + 截图显示「40分钟前」→ 推算发布时间 08:21</span>
+
+        <label>视觉模型（选填，需支持图片）</label>
+        <input id="compete-vmodel" placeholder="留空则用 AI 设置里的模型（建议 qwen-vl-plus / gpt-4o）">
+        <div class="vm-quick" id="compete-vm-quick">
+          <span class="small">一键填入：</span>
+          <button class="ghost sm vm-q" data-vm="qwen-vl-plus" type="button">qwen-vl-plus</button>
+          <button class="ghost sm vm-q" data-vm="qwen-vl-max" type="button">qwen-vl-max</button>
+          <button class="ghost sm vm-q" data-vm="qwen3-vl-plus" type="button">qwen3-vl-plus</button>
+        </div>
+
+        <div class="btn-row"><button id="compete-gen" type="button">识别截图</button><span class="small">需要支持图片的模型</span></div>
+        <div id="compete-result" style="display:none"></div>
+      </div>
+
+      <div class="card">
+        <h3>📚 已收集样本 &amp; 规律</h3>
+        <div id="compete-list"></div>
+        <div id="compete-patterns"></div>
       </div>
     </section>
 
@@ -2720,6 +2810,210 @@
       saveDataLesson(raw.slice(0,900), type, "（AI 提炼失败，存原始分析）");
       toast("已保存原始分析");
     }finally{ if(btn){ btn.textContent=orig; btn.disabled=false; } }
+  }
+
+  /* ===== 竞品公众号题材分析 ===== */
+  let competeImages=[];
+  let lastCompeteResults=[];
+  function renderCompeteThumbs(){
+    const box=$("#compete-thumbs"); if(!box) return; box.innerHTML="";
+    competeImages.forEach((u,i)=>{
+      const d=document.createElement("div"); d.className="data-thumb";
+      d.innerHTML='<img src="'+u+'"><button class="thumb-x" data-i="'+i+'" type="button" title="移除">×</button>';
+      d.querySelector(".thumb-x").onclick=()=>{ competeImages.splice(i,1); renderCompeteThumbs(); };
+      box.appendChild(d);
+    });
+  }
+  function addCompeteImage(dataUrl){ competeImages.push(dataUrl); renderCompeteThumbs(); }
+  $("#compete-pick").onclick=()=>$("#compete-file").click();
+  $("#compete-file").onchange=e=>{ const fs=e.target.files; if(!fs||!fs.length) return; [].forEach.call(fs,f=>{ const rd=new FileReader(); rd.onload=()=>addCompeteImage(rd.result); rd.readAsDataURL(f); }); $("#compete-file").value=""; };
+  const competeDrop=$("#compete-drop");
+  competeDrop.addEventListener("dragover",e=>{e.preventDefault();competeDrop.classList.add("drag");});
+  competeDrop.addEventListener("dragleave",e=>competeDrop.classList.remove("drag"));
+  competeDrop.addEventListener("drop",e=>{e.preventDefault();competeDrop.classList.remove("drag"); const fs=e.dataTransfer.files; if(fs&&fs.length){ [].forEach.call(fs,f=>{ if(f&&f.type.startsWith("image/")){ const rd=new FileReader(); rd.onload=()=>addCompeteImage(rd.result); rd.readAsDataURL(f); } }); }});
+  document.addEventListener("paste",e=>{
+    if($("#compete").style.display==="none") return;
+    const items=e.clipboardData&&e.clipboardData.items; if(!items) return;
+    for(const it of items){ if(it.type&&it.type.startsWith("image/")){ const f=it.getAsFile(); if(!f) continue; const rd=new FileReader(); rd.onload=()=>addCompeteImage(rd.result); rd.readAsDataURL(f); e.preventDefault(); return; } }
+  });
+  $("#compete-now").onclick=()=>{ $("#compete-anchor").value=nowLocalInput(); };
+  $$("#compete-topic-quick .ct-tq").forEach(b=>b.onclick=()=>{ $("#compete-topic").value=b.dataset.t; });
+  $$("#compete-vm-quick .vm-q").forEach(b=>b.onclick=()=>{ $("#compete-vmodel").value=b.dataset.vm; toast("已填入视觉模型 "+b.dataset.vm); });
+  (function(){ const a=$("#compete-anchor"); if(a&&!a.value) a.value=nowLocalInput(); })();
+
+  function nowLocalInput(){
+    const d=new Date(); const p=n=>String(n).padStart(2,'0');
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes());
+  }
+  function fmtDateTime(d){
+    if(!(d instanceof Date)||isNaN(d.getTime())) return "";
+    const p=n=>String(n).padStart(2,'0');
+    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
+  }
+  function parseRelativeTime(raw, anchorDate){
+    if(!raw) return null;
+    const s=String(raw).trim(); const a=new Date(anchorDate.getTime());
+    let m;
+    if(/刚刚|刚才/.test(s)) return a;
+    if((m=s.match(/(\d+)\s*分钟前/))) { a.setMinutes(a.getMinutes()-parseInt(m[1],10)); return a; }
+    if((m=s.match(/(\d+)\s*小时前/))) { a.setHours(a.getHours()-parseInt(m[1],10)); return a; }
+    if((m=s.match(/(\d+)\s*天前/))) { a.setDate(a.getDate()-parseInt(m[1],10)); return a; }
+    if(/前天/.test(s)) { a.setDate(a.getDate()-2); const t=s.match(/(\d{1,2}):(\d{2})/); if(t)a.setHours(+t[1],+t[2],0,0); else a.setHours(0,0,0,0); return a; }
+    if(/昨天/.test(s)) { a.setDate(a.getDate()-1); const t=s.match(/(\d{1,2}):(\d{2})/); if(t)a.setHours(+t[1],+t[2],0,0); else a.setHours(0,0,0,0); return a; }
+    if((m=s.match(/(\d{1,2})月(\d{1,2})日\s*(?:(\d{1,2}):(\d{2}))?/))) {
+      const d=new Date(a.getFullYear(), (+m[1])-1, +m[2]);
+      if(m[3]!==undefined) d.setHours(+m[3],+m[4],0,0); else d.setHours(0,0,0,0);
+      return d;
+    }
+    if((m=s.match(/(\d{4})[-/年](\d{1,2})[-/月](\d{1,2})[日]?\s*(?:(\d{1,2}):(\d{2}))?/))) {
+      const d=new Date(+m[1], (+m[2])-1, +m[3]);
+      if(m[4]!==undefined) d.setHours(+m[4],+m[5],0,0); else d.setHours(0,0,0,0);
+      return d;
+    }
+    return null;
+  }
+  function extractJson(text){
+    if(!text) return null;
+    let t=text.trim();
+    const fence=t.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if(fence) t=fence[1].trim();
+    const s=t.indexOf('{'), e=t.lastIndexOf('}');
+    if(s>=0&&e>s) t=t.slice(s,e+1);
+    try{ return JSON.parse(t); }catch(_){ return null; }
+  }
+
+  $("#compete-gen").onclick=async()=>{
+    if(!competeImages.length){ toast("先上传或粘贴至少一张竞品截图"); return; }
+    if(!AI.ok()){ toast("先配置 AI 才能识别"); switchTab("settings"); return; }
+    if(competeImages.length>8){ toast("一次最多传 8 张，请先移除几张"); return; }
+    const box=$("#compete-result"); box.style.display="block";
+    const btn=$("#compete-gen"); const orig=btn.textContent; btn.textContent="识别中…"; btn.disabled=true;
+    const topic=($("#compete-topic").value.trim())||"（未分类）";
+    const anchorStr=$("#compete-anchor").value||nowLocalInput();
+    const anchorDate=new Date(anchorStr.replace('T',' ').replace(/-/g,'/'));
+    const vmodel=$("#compete-vmodel").value.trim();
+    const model=vmodel||taskModel('data');
+    const sys='你是一个公众号竞品分析助手。用户会给你一张公众号文章列表或文章页截图。请从中识别【一条最显眼、最完整的文章】的关键信息，并只返回一个 JSON 对象（不要输出任何额外文字、不要加 markdown 代码块），字段如下：{"title": 文章标题(字符串), "account": 公众号名称(字符串), "rawTime": 截图中显示的发布时间原文(字符串，如 "40分钟前"、"昨天 21:30"、"10月12日"、"2026-10-12 18:30")，无法判断则填空, "publishTime": 根据下方「截图时间锚点」把 rawTime 里的相对时间推算成的绝对发布时间(字符串，格式 "YYYY-MM-DD HH:mm")，若 rawTime 已是绝对时间则原样填，无法判断则填空, "angle": 内容角度/形式(从 [干货清单,个人故事,观点吐槽,资源分享,测评对比,情感共鸣,热点跟进,其他] 中选一个，或简短自填)}。某项无法识别就填空字符串。';
+    try{
+      box.innerHTML='<div class="result">正在压缩 '+competeImages.length+' 张图片…</div>';
+      const compressed=await Promise.all(competeImages.map(u=>compressImage(u,1280,0.8)));
+      const results=[];
+      for(let i=0;i<compressed.length;i++){
+        box.innerHTML='<div class="result">AI 正在识别第 '+(i+1)+'/'+compressed.length+' 张截图…</div>';
+        const userText='【截图时间锚点】这张截图是在 '+anchorStr+' 拍摄/发送的（即“现在”）。请据此把 rawTime 中的相对时间（如 X分钟前 / X小时前 / 昨天 / X天前）推算成绝对发布时间填入 publishTime。\n请只返回 JSON。';
+        const out=await AI.chatVision(sys, [compressed[i]], {text:userText, model});
+        const j=extractJson(out)||{};
+        let pub="", src="";
+        const local=parseRelativeTime(j.rawTime, anchorDate);
+        if(local){ pub=fmtDateTime(local); src="本地倒推"; }
+        else if(j.publishTime){ pub=String(j.publishTime).trim(); src="模型识别"; }
+        const thumb=await compressImage(compressed[i],480,0.6);
+        results.push({img:compressed[i], thumb:thumb, title:(j.title||"").trim(), account:(j.account||"").trim(), rawTime:(j.rawTime||"").trim(), publishTime:pub, source:src, angle:(j.angle||"").trim()});
+      }
+      lastCompeteResults=results;
+      box.innerHTML='<div class="review-report">'+results.map((r,i)=>{
+        const cap=(compressed.length>1?("图"+(i+1)):"原图");
+        const fields=[['标题',r.title],['公众号',r.account],['截图原文时间',r.rawTime],['推算发布时间',r.publishTime+' <span class="tk-badge on">'+r.source+'</span>'],['内容角度',r.angle]]
+          .map(function(pair){ return '<div class="ct-field"><span class="ct-k">'+pair[0]+'</span><span class="ct-v">'+(pair[1]?pair[1]:'<span style="color:var(--muted)">—</span>')+'</span></div>'; }).join('');
+        return '<div class="data-fig"><div class="df-cap">'+cap+'</div><img src="'+r.img+'" alt="'+cap+'"><div class="df-body"><div class="ct-fields">'+fields+'</div><div class="btn-row"><button class="soft sm ct-save" data-i="'+i+'" type="button">💾 保存这条样本</button></div></div></div>';
+      }).join('')+'</div>';
+      $$("#compete-result .ct-save").forEach(b=>b.onclick=()=>{
+        const r=lastCompeteResults[+b.dataset.i];
+        const note=(window.prompt("给这条样本加个备注（选填，可写观察点/为什么收藏）：","")||"");
+        saveCompeteEntry({id:"c"+Date.now()+Math.random().toString(36).slice(2,5), topicType:($("#compete-topic").value.trim())||"未分类", title:r.title, account:r.account, rawTime:r.rawTime, publishTime:r.publishTime, source:r.source, angle:r.angle, image:r.thumb, note:note, createdAt:Date.now()});
+        b.textContent="已保存 ✓"; b.disabled=true;
+      });
+    }catch(e){
+      box.innerHTML='<div class="result" style="color:var(--red)">识别失败：'+e.message+'<br><br>修复方法：在「视觉模型」处填一个支持图片的模型（如 qwen-vl-plus），或手动填 qwen-vl-plus 后重试。若提示 404 模型不存在，是模型名拼写问题（注意 vl 不是 v1）。</div>';
+    }finally{ btn.textContent=orig; btn.disabled=false; }
+  };
+
+  function saveCompeteEntry(entry){
+    const list=store.get("compete_entries",[]);
+    list.unshift(entry);
+    store.set("compete_entries",list);
+    renderCompete();
+    toast("已保存 1 条竞品样本（"+entry.topicType+"）");
+  }
+  function renderCompete(){
+    const todayEl=$("#compete-today");
+    if(todayEl){
+      const now=new Date(); const y=now.getFullYear(),mo=now.getMonth(),d=now.getDate();
+      const list=store.get("compete_entries",[]);
+      const todayTypes=Array.from(new Set(list.filter(function(e){ const c=new Date(e.createdAt); return c.getFullYear()===y&&c.getMonth()===mo&&c.getDate()===d; }).map(function(e){ return e.topicType; })));
+      todayEl.innerHTML='📅 今天：'+fmtDateTime(now).slice(0,10)+' ｜ 今日已研究题材：'+(todayTypes.length?todayTypes.join('、'):'（还没保存，先识别一张吧）');
+    }
+    const listEl=$("#compete-list");
+    const entries=store.get("compete_entries",[]);
+    if(listEl){
+      if(!entries.length){ listEl.innerHTML='<div class="empty">还没有样本。识别并保存一张竞品截图，这里会按题材类型归档。</div>'; }
+      else{
+        const groups={};
+        entries.forEach(function(e){ (groups[e.topicType]=groups[e.topicType]||[]).push(e); });
+        listEl.innerHTML=Object.keys(groups).sort().map(function(type){
+          const items=groups[type];
+          const rows=items.map(function(e){
+            const img=e.image?'<img class="ct-thumb" src="'+e.image+'" alt="thumb">':'';
+            return '<div class="ct-item">'+img+'<div class="ct-item-body"><div class="ct-item-title">'+esc(e.title||'（无标题）')+'</div>'
+              +'<div class="ct-item-meta">'+esc(e.account||'（无公众号）')+' ｜ 发布 '+esc(e.publishTime||'?')+(e.rawTime?('（原文：'+esc(e.rawTime)+'）'):'')+' ｜ '+esc(e.angle||'')+'</div>'
+              +(e.note?'<div class="ct-item-note">📝 '+esc(e.note)+'</div>':'')
+              +'<div class="ct-item-actions"><button class="soft sm ct-del" data-id="'+e.id+'" type="button">删除</button></div></div></div>';
+          }).join('');
+          return '<div class="ct-group"><div class="ct-group-h">🏷️ '+esc(type)+' <span class="tk-badge">'+items.length+' 条</span></div>'+rows+'</div>';
+        }).join('');
+        $$("#compete-list .ct-del").forEach(b=>b.onclick=function(){
+          const id=b.dataset.id; const cur=store.get("compete_entries",[]);
+          store.set("compete_entries", cur.filter(function(x){ return x.id!==id; }));
+          renderCompete(); toast("已删除 1 条");
+        });
+      }
+    }
+    renderCompetePatterns(entries);
+  }
+  async function renderCompetePatterns(entries){
+    const box=$("#compete-patterns"); if(!box) return;
+    if(!entries||!entries.length){ box.innerHTML=''; return; }
+    const groups={};
+    entries.forEach(function(e){ if(!e.publishTime) return; (groups[e.topicType]=groups[e.topicType]||[]).push(e); });
+    const keys=Object.keys(groups).filter(function(k){ return groups[k].length>0; });
+    if(!keys.length){ box.innerHTML='<div class="empty">样本还没识别到发布时间，暂无法汇总时段规律。等攒几条带时间的样本再说～</div>'; return; }
+    const wdNames=['周日','周一','周二','周三','周四','周五','周六'];
+    box.innerHTML=keys.sort().map(function(type){
+      const items=groups[type];
+      const hours=items.map(function(e){ const m=e.publishTime.match(/(\d{1,2}):(\d{2})/); return m?+m[1]:null; }).filter(function(h){ return h!==null; });
+      const hourCount={}; hours.forEach(function(h){ hourCount[h]=(hourCount[h]||0)+1; });
+      const topHours=Object.keys(hourCount).map(function(h){ return +h; }).sort(function(a,b){ return hourCount[b]-hourCount[a]; }).slice(0,3);
+      const wdCount={}; items.forEach(function(e){ const d=new Date(e.publishTime.replace(/-/g,'/')); if(!isNaN(d.getTime())){ const w=d.getDay(); wdCount[w]=(wdCount[w]||0)+1; } });
+      const topWd=Object.keys(wdCount).map(function(w){ return +w; }).sort(function(a,b){ return wdCount[b]-wdCount[a]; }).slice(0,3).map(function(w){ return wdNames[w]; });
+      const acc={}; items.forEach(function(e){ if(e.account) acc[e.account]=(acc[e.account]||0)+1; });
+      const topAcc=Object.keys(acc).sort(function(a,b){ return acc[b]-acc[a]; }).slice(0,3);
+      const ang={}; items.forEach(function(e){ if(e.angle) ang[e.angle]=(ang[e.angle]||0)+1; });
+      const topAng=Object.keys(ang).sort(function(a,b){ return ang[b]-ang[a]; }).slice(0,3);
+      const stat='样本 '+items.length+' 条 ｜ 最常发布时段：'+(topHours.length?topHours.map(function(h){ return h+':00'; }).join('、'):'—')
+        +' ｜ 常发星期：'+(topWd.length?topWd.join('、'):'—')
+        +' ｜ 高频公众号：'+(topAcc.length?topAcc.join('、'):'—')
+        +' ｜ 常见角度：'+(topAng.length?topAng.join('、'):'—');
+      return '<div class="ct-pattern"><div class="ct-pattern-h">📊 '+esc(type)+' 的发布规律（本地统计）</div>'
+        +'<div class="mt-sum">'+stat+'</div>'
+        +'<div class="btn-row"><button class="soft sm ct-ai" data-type="'+esc(type)+'" type="button">🤖 AI 总结该题材规律</button></div>'
+        +'<div class="ct-ai-out"></div></div>';
+    }).join('');
+    $$("#compete-patterns .ct-ai").forEach(b=>b.onclick=async function(){
+      const type=b.dataset.type;
+      const pattern=b.closest('.ct-pattern');
+      const out=pattern.querySelector('.ct-ai-out');
+      if(!AI.ok()){ toast("先配置 AI 才能总结"); switchTab("settings"); return; }
+      const items=store.get("compete_entries",[]).filter(function(e){ return e.topicType===type; });
+      const sample=items.map(function(e){ return {标题:e.title,公众号:e.account,发布时间:e.publishTime,角度:e.angle,备注:e.note}; }).slice(0,40);
+      const sys='你是公众号竞品分析助手。下面是收集的「'+type+'」题材竞品文章样本（标题/公众号/发布时间/角度/备注）。请总结这个题材的【发布规律与可借鉴打法】，包含：1）高频发布时段与星期；2）标题与选题套路；3）常见内容角度；4）可借鉴的 2-3 条行动建议。口语化、给可落地结论，不要空话。';
+      const orig=b.textContent; b.textContent="总结中…"; b.disabled=true;
+      out.style.display="block"; out.innerHTML='<div class="result">AI 正在总结「'+esc(type)+'」规律…</div>';
+      try{
+        const r=await AI.chat(sys, JSON.stringify(sample,null,2), taskModel('strategy'));
+        out.innerHTML=md2html(r);
+      }catch(e2){ out.innerHTML='<div class="result" style="color:var(--red)">总结失败：'+e2.message+'</div>'; }
+      finally{ b.textContent=orig; b.disabled=false; }
+    });
   }
 
   /* ===== 设置 ===== */
