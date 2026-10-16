@@ -3007,7 +3007,29 @@
     renderCompete();
     toast("已保存 1 条竞品样本（"+entry.topicType+"）");
   }
+  /* --- 竞品样本自动云同步（复用设置里的 Supabase 合并同步，静默执行） --- */
+  let ctSyncBusy=false, ctSkipPull=false, ctSyncTimer=0;
+  function ctQueueSync(){ clearTimeout(ctSyncTimer); ctSyncTimer=setTimeout(ctSyncPullAndPush, 1500); }
+  async function ctSyncPullAndPush(){
+    const key=syncKey();
+    if(!key||ctSyncBusy) return;
+    ctSyncBusy=true;
+    try{
+      const remote=await readRemote();
+      const L=collectAll(), Lm=getMeta();
+      const merged=mergeSync(L,Lm,remote.data,remote.meta);
+      const mMeta=Object.assign({},Lm);
+      Object.keys(remote.meta||{}).forEach(function(k){ if(isDataKey(k)) mMeta[k]=Math.max(mMeta[k]||0, remote.meta[k]||0); });
+      const changed=canon(merged)!==canon(L);
+      if(changed) persistMerged(merged,mMeta);
+      await pushMerged(merged,mMeta);
+      store.set("sync_last",Date.now());
+      if(changed){ ctSkipPull=true; renderCompete(); ctSkipPull=false; console.log("[compete-sync] 已从云端合并数据并回写"); }
+    }catch(e){ console.log("[compete-sync] 静默失败：", e&&e.message); }
+    finally{ ctSyncBusy=false; }
+  }
   function renderCompete(){
+    if(!ctSkipPull) ctQueueSync();
     const todayEl=$("#compete-today");
     if(todayEl){
       const now=new Date(); const y=now.getFullYear(),mo=now.getMonth(),d=now.getDate();
@@ -3046,7 +3068,7 @@
         $$("#compete-list .ct-views-edit").forEach(inp=>inp.onchange=function(){
           const id=inp.dataset.id; const cur=store.get("compete_entries",[]);
           const it=cur.find(function(x){ return x.id===id; });
-          if(it){ it.views=inp.value.trim(); store.set("compete_entries",cur); toast("阅读量已保存"); }
+          if(it){ it.views=inp.value.trim(); store.set("compete_entries",cur); toast("阅读量已保存"); ctQueueSync(); }
         });
         $$("#compete-list .ct-del").forEach(b=>b.onclick=function(){
           const id=b.dataset.id; const cur=store.get("compete_entries",[]);
