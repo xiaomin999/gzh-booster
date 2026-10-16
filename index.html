@@ -3181,7 +3181,7 @@
       if(!entries.length){ listEl.innerHTML='<div class="empty">还没有样本。识别并保存一张竞品截图，这里会按表格归档。</div>'; }
       else if(!filtered.length){ listEl.innerHTML='<div class="empty">当前筛选条件下没有样本。<a href="javascript:;" id="ct-clear2" style="color:var(--accent)"> 清除筛选</a></div>'; const c2=$("#ct-clear2"); if(c2) c2.onclick=function(){ ctFilter.topics.clear(); ctFilter.account=""; ctFilter.kw=""; renderCompete(); }; }
       else{
-        const head='<tr><th class="ct-cbx"></th><th class="ct-td-title">标题</th><th>公众号</th><th>题材</th><th>原文时间</th><th>推算发布时间</th><th>内容角度</th><th>阅读量</th><th>备注</th><th class="ct-nowrap">操作</th></tr>';
+        const head='<tr><th class="ct-cbx"><input type="checkbox" class="ct-cbx-all" title="全选 / 全不选（当前筛选结果）"></th><th class="ct-td-title">标题</th><th>公众号</th><th>题材</th><th>原文时间</th><th>推算发布时间</th><th>内容角度</th><th>阅读量</th><th>备注</th><th class="ct-nowrap">操作</th></tr>';
         const opts=ctTopicOptions(entries);
         const body=filtered.map(function(e){
           return '<tr>'
@@ -3254,6 +3254,18 @@
           ctRunAnalysis(target);
           toast(ids.size?("分析已勾选的 "+target.length+" 条"):("分析当前筛选的 "+target.length+" 条"));
         };
+        function updateAnBtn(){
+          const anBtn=$("#compete-list .ct-analyze"); if(!anBtn) return;
+          const n=$$("#compete-list .ct-row-cbx:checked").length;
+          anBtn.textContent="📊 分析（"+(n||filtered.length)+" 条）";
+        }
+        const cbxAll=$("#compete-list .ct-cbx-all");
+        if(cbxAll) cbxAll.onchange=function(){
+          const on=cbxAll.checked;
+          $$("#compete-list .ct-row-cbx").forEach(function(c){ c.checked=on; });
+          updateAnBtn();
+        };
+        $$("#compete-list .ct-row-cbx").forEach(function(c){ c.onchange=updateAnBtn; });
         $$("#compete-list .ct-del").forEach(b=>b.onclick=function(){
           const id=b.dataset.id; const cur=store.get("compete_entries",[]);
           store.set("compete_entries", cur.filter(function(x){ return x.id!==id; }));
@@ -3300,7 +3312,7 @@
       +'<div class="btn-row"><button class="soft sm ct-ai-an" type="button">🤖 AI 解读这份分析</button></div>'
       +'<div class="ct-ai-out"></div>';
     const pageBox=$("#compete-analysis");
-    if(pageBox){ pageBox.innerHTML=html; bindCtAnalysisAI(pageBox); } /* 页面下方同步留一份，关掉弹窗也能看 */
+    if(pageBox) pageBox.innerHTML=''; /* 分析结果不在页面下方保留，避免重复和混淆，只看弹窗 */
     ctOpenAnalysisModal(html); /* 弹窗直接展示，免去滚到页面底部 */
   }
   function bindCtAnalysisAI(root){
