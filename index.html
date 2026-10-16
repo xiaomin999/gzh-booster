@@ -2890,8 +2890,10 @@
     let t=text.trim();
     const fence=t.match(/```(?:json)?\s*([\s\S]*?)```/i);
     if(fence) t=fence[1].trim();
-    const s=t.indexOf('{'), e=t.lastIndexOf('}');
-    if(s>=0&&e>s) t=t.slice(s,e+1);
+    const sa=t.indexOf('['), ea=t.lastIndexOf(']');
+    const so=t.indexOf('{'), eo=t.lastIndexOf('}');
+    if(sa>=0&&ea>sa&&(so<0||sa<so)) t=t.slice(sa,ea+1);
+    else if(so>=0&&eo>so) t=t.slice(so,eo+1);
     try{ return JSON.parse(t); }catch(_){ return null; }
   }
   function competeTableHtml(rows, multiImg){
@@ -2957,10 +2959,12 @@
       box.innerHTML='<div class="result">正在压缩 '+competeImages.length+' 张图片…</div>';
       const compressed=await Promise.all(competeImages.map(u=>compressImage(u,1280,0.8)));
       const results=[];
+      let firstRawOut="";
       for(let i=0;i<compressed.length;i++){
         box.innerHTML='<div class="result">AI 正在识别第 '+(i+1)+'/'+compressed.length+' 张截图（请识别其中每一篇文章）…</div>';
         const userText='【截图时间锚点】这张截图是在 '+anchorStr+' 拍摄/发送的（即此刻的现在）。请据此把 rawTime 中的相对时间（如 X分钟前 / X小时前 / 昨天 / X天前）推算成绝对发布时间填入 publishTime。\n请返回一个 JSON 数组，里面是这张截图里的【每篇文章】，不要只返回第一篇。';
         const out=await AI.chatVision(sys, [compressed[i]], {text:userText, model});
+        if(!firstRawOut) firstRawOut=String(out||"").slice(0,300);
         const parsed=extractJson(out);
         let arr=[];
         if(Array.isArray(parsed)) arr=parsed;
@@ -2979,7 +2983,8 @@
         });
       }
       lastCompeteResults=results;
-      box.innerHTML=competeTableHtml(results, compressed.length>1);
+      box.innerHTML=competeTableHtml(results, compressed.length>1)
+        +(results.length?'':'<div class="result" style="margin-top:8px;color:var(--muted)">调试信息：模型原始返回（前 300 字）——<br><span style="white-space:pre-wrap">'+esc(String(firstRawOut||'（模型返回为空）'))+'</span></div>');
       bindCompeteResultEvents();
     }catch(e){
       box.innerHTML='<div class="result" style="color:var(--red)">识别失败：'+e.message+'<br><br>修复方法：在「视觉模型」处填一个支持图片的模型（如 qwen-vl-plus），或手动填 qwen-vl-plus 后重试。若提示 404 模型不存在，是模型名拼写问题（注意 vl 不是 v1）。</div>';
