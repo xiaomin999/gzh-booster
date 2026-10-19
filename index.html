@@ -986,6 +986,26 @@
     <section id="data" class="tab" style="display:none" data-page-node-id="1Oz9LHIN0ts8RALZ5RAcwM">
       <h2 data-page-node-id="Fg3gTuAexy27itPSoiD9sM">📊 公众号数据分析</h2>
       <p class="sub" data-page-node-id="Z6gHiwewx4Tae2RryOHJmS">粘贴或上传后台数据截图（阅读 / 涨粉 / 分享 / 转化等），AI 会按「每张原图 + 对应分析」分组展示，多张图再附综合对比与改进建议。</p>
+      <div class="card">
+        <h3>📚 用知识库文章做 AI 分析</h3>
+        <p class="small">读取「📚 知识库」里你写过的全部文章，按下面的维度让 AI 分析出可执行结论（正文每条取前 400 字、单次最多 30 篇，控制成本）。</p>
+        <div id="kb-stats" class="mt-summary"></div>
+        <label>分析范围</label>
+        <select id="kb-scope" style="max-width:320px">
+          <option value="compare">🔥小爆款 vs 📉低阅读 对比（默认）</option>
+          <option value="all">全部文章</option>
+          <option value="hit">仅🔥小爆款</option>
+          <option value="low">仅📉低阅读</option>
+          <option value="recent">最近 20 篇</option>
+        </select>
+        <div class="btn-row">
+          <button class="soft sm kb-an" data-kind="cmp" type="button">① 爆款 vs 低阅读对比</button>
+          <button class="soft sm kb-an" data-kind="portrait" type="button">② 我的写作画像</button>
+          <button class="soft sm kb-an" data-kind="next" type="button">③ 下一步选题建议</button>
+          <button class="soft sm kb-an" data-kind="title" type="button">④ 低阅读标题改写</button>
+        </div>
+        <div id="kb-an-out"></div>
+      </div>
       <div class="card" data-page-node-id="LwdTUytvB1HvKZSI0rZ9zn">
         <label data-page-node-id="MEOhHrMraeLZdY2FUo1I8a">上传 / 粘贴后台数据截图（可多张，综合分析）</label>
         <div id="data-drop" class="data-drop" data-page-node-id="VsDSpPuPLzFFoBwZ6DZwGi">
@@ -1265,7 +1285,8 @@
   function toggleMorePanel(){ const p=$("#more-panel"); if(p.classList.contains("open")) closeMorePanel(); else openMorePanel(); }
 
   /* 各 tab 进入时的渲染钩子（导航有多条路径：nav 按钮直调 showTab，wb-jump 走 switchTab，启动走 showTab，都要挂钩） */
-  const TAB_ENTER={ compete:renderCompete, track:renderDataHistory };
+  /* 注意：数据分析页的 section id 是 data（track 是另一个「数据追踪」页），别挂错 */
+  const TAB_ENTER={ compete:renderCompete, data:function(){ renderDataHistory(); renderKbStats(); } };
   $$(".sidebar .nav-btn").forEach(b=>{
     if(b.classList.contains("more")) return;
     b.addEventListener("click",()=>{ closeMorePanel(); updateNavActive(b.dataset.tab); showTab(b.dataset.tab); const fn=TAB_ENTER[b.dataset.tab]; if(fn) fn(); });
@@ -2866,6 +2887,74 @@
     }finally{ if(btn){ btn.textContent=orig; btn.disabled=false; } }
   }
 
+  /* ===== 知识库文章 AI 分析（数据分析页） ===== */
+  const KB_PERF={hit:"🔥小爆款",low:"📉低阅读",normal:"普通"};
+  function renderKbStats(){
+    const box=$("#kb-stats"); if(!box) return;
+    const kb=store.get("kb",[]);
+    const c={hit:0,low:0,normal:0};
+    kb.forEach(function(a){ const p=a.perf||"normal"; c[p]=(c[p]||0)+1; });
+    box.innerHTML='📚 知识库共 '+kb.length+' 篇 ｜ 🔥小爆款 '+c.hit+' ｜ 📉低阅读 '+c.low+' ｜ 普通 '+c.normal
+      +(kb.length?'':'（还没有文章，先去「📚 知识库」添加几篇）');
+  }
+  function kbSample(scope){
+    const kb=store.get("kb",[]);
+    let arr;
+    if(scope==="hit") arr=kb.filter(function(a){ return a.perf==="hit"; });
+    else if(scope==="low") arr=kb.filter(function(a){ return a.perf==="low"; });
+    else if(scope==="recent") arr=kb.slice(0,20);
+    else if(scope==="compare"){
+      arr=kb.filter(function(a){ return a.perf==="hit"; }).slice(0,15)
+        .concat(kb.filter(function(a){ return a.perf==="low"; }).slice(0,15));
+    } else arr=kb.slice();
+    arr=arr.slice(0,30); /* 单次上限 30 篇，控制 token 成本 */
+    return arr.map(function(a){
+      return {标题:(a.title||"（无标题）").slice(0,120), 正文摘要:String(a.body||"").slice(0,400), 表现:KB_PERF[a.perf||"normal"]};
+    });
+  }
+  const KB_SYS={
+    cmp:'你是一个公众号内容诊断专家。下面是我自己写过的文章（含标题、正文摘要、表现标签：🔥小爆款 / 📉低阅读）。请对比分析：1）小爆款在选题方向、标题写法、开头钩子、结构节奏上有什么共同点；2）低阅读的文章具体踩了哪些坑（选题/标题/开头/结构/受众）；3）给出 3-4 条我下次写作可直接执行的改进动作，每条说明"改什么 + 预期效果"。口语化、不要空话、结论必须具体到可执行。',
+    portrait:'你是公众号内容分析师。下面是我自己写过的文章（标题 / 正文摘要 / 表现）。请总结我的写作画像：1）主要选题方向及大致占比；2）标题套路与常用句式；3）开头方式与文章结构习惯；4）语气、人称与读者关系；5）我的独特优势与明显短板。给具体观察，不要泛泛而谈。',
+    next:'你是公众号选题策划。下面是我写过的文章（标题 / 正文摘要 / 表现）。请基于我已写内容的分布与表现，给出 3-5 个下一步选题方向，每个写清：①选题方向 ②为什么适合我（结合我已有内容）③一个可直接用的示例标题 ④内容要点 3 条。务实、可落地、不空谈。',
+    title:'你是公众号标题优化专家。下面是我写过但表现不佳的文章（📉低阅读，含标题与正文摘要）。请对每一篇：①指出原标题的问题（太泛 / 没钩子 / 受众不清 / 没利益点等）；②给出 2 个改写标题（风格不同）；③一句话说明为什么更好。逐篇列出，不要合并成泛泛建议。'
+  };
+  const KB_LABEL={cmp:"爆款vs低阅读对比",portrait:"写作画像",next:"下一步选题",title:"低阅读标题改写"};
+  let lastKbResult="";
+  async function runKbAnalysis(kind){
+    const out=$("#kb-an-out"); if(!out) return;
+    if(!AI.ok()){ toast("先配置 AI 才能分析"); switchTab("settings"); return; }
+    const scopeEl=$("#kb-scope"); const scope=scopeEl?scopeEl.value:"compare";
+    let data=kbSample(kind==="title"?"low":scope);
+    if(kind==="title"&&!data.length) data=kbSample(scope); /* 没标低阅读就退回所选范围 */
+    if(!data.length){ out.innerHTML='<div class="empty">该范围内没有文章。先去「📚 知识库」添加文章，或换个范围试试。</div>'; return; }
+    const origMsg='AI 正在分析 '+data.length+' 篇文章（正文取前 400 字）…';
+    out.innerHTML='<div class="result">'+origMsg+'</div>';
+    lastKbResult="";
+    try{
+      const r=await AI.chat(KB_SYS[kind]||KB_SYS.cmp, JSON.stringify(data,null,2), taskModel('strategy'));
+      lastKbResult=String(r||"");
+      out.innerHTML='<div class="review-report">'+md2html(lastKbResult)+'</div>'
+        +'<div class="btn-row"><button class="soft sm kb-save" type="button">💾 存入分析记录</button>'
+        +'<button class="soft sm kb-hit" type="button">🔥 萃取爆款因子</button>'
+        +'<button class="soft sm kb-low" type="button">📉 沉淀低阅读教训</button></div>'
+        +'<div id="kb-act-out"></div>';
+      const actOut=$("#kb-act-out");
+      const sv=$("#kb-an-out .kb-save"); if(sv) sv.onclick=function(){
+        if(!lastKbResult.trim()){ toast("没有可保存的内容"); return; }
+        lastDataResult=lastKbResult;
+        saveDataHistory("知识库分析·"+KB_LABEL[kind], taskModel('strategy')||"", null);
+      };
+      const bh=$("#kb-an-out .kb-hit"); if(bh) bh.onclick=function(){ lastDataResult=lastKbResult; depositDataLesson('hit'); };
+      const bl=$("#kb-an-out .kb-low"); if(bl) bl.onclick=function(){ lastDataResult=lastKbResult; depositDataLesson('low'); };
+    }catch(e){ out.innerHTML='<div class="result" style="color:var(--red)">分析失败：'+e.message+'</div>'; }
+  }
+  $$(".kb-an").forEach(function(b){
+    b.addEventListener("click",function(){
+      const kind=b.dataset.kind;
+      const orig=b.textContent; b.textContent="分析中…"; b.disabled=true;
+      runKbAnalysis(kind).finally(function(){ b.textContent=orig; b.disabled=false; });
+    });
+  });
   /* 历史分析记录：每次分析成功自动存一份（gzh_data_history，走 gzh_ 前缀自动云同步） */
   async function saveDataHistory(note, model, per){
     let thumb="";
