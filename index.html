@@ -561,6 +561,7 @@
         <div class="btn-row" data-page-node-id="CtdDnxqlyXUOSLpGDUOLHg">
           <button id="frag-to-topic" data-page-node-id="KOWpJxq4mQRx13xWSEvFnW">转成备选选题并入库</button>
           <button class="soft" id="topic-from-kb" data-page-node-id="KYe3VhyLKF6GJOEkKEjX4X">📚 从知识库生成选题</button>
+          <button class="ghost" id="topic-gate" type="button">🎯 去「数据分析」过三关</button>
         </div>
         <div class="btn-row" data-page-node-id="AdNJK7Q0YyXv9vWugAU9so"><span class="small" id="frag-tip" data-page-node-id="Cr1IJqlMvoHDvxnCjimdu9">未配置 AI 时，直接把碎片存为「待打磨」选题；配置 AI 后可一键提炼标题+角度。「从知识库生成选题」会用你沉淀的爆款因子 + 低阅读教训出题。</span></div>
       </div>
@@ -1005,6 +1006,17 @@
           <button class="soft sm kb-an" data-kind="title" type="button">④ 低阅读标题改写</button>
         </div>
         <div id="kb-an-out"></div>
+      </div>
+      <div class="card">
+        <h3>🎯 选题三关筛查</h3>
+        <p class="small">写完标题别急着发，先过三关：<b>①</b> 标题里第一个落到读者眼里的名词，是不是读者自己的身体 / 钱包 / 家人？<b>②</b> 读完能带走一个具体动作吗？<b>③</b> 这事我是亲自<span style="text-decoration:underline">做到了</span>，还是只是<span style="text-decoration:underline">想通了</span>？三关全过才写，否则攒着。</p>
+        <label>待筛选题（每行一个，最多 20 条）</label>
+        <textarea id="gate-input" style="min-height:110px" placeholder="我用扣子编程搭了一个市场洞察分析网站&#10;胰岛素抵抗之后，我把外卖 App 删到只剩 3 家&#10;我们都在假装被爱"></textarea>
+        <div class="btn-row">
+          <button class="soft" id="gate-run" type="button">🎯 批量过筛</button>
+          <button class="ghost" id="gate-pool" type="button">📥 载入我的选题池</button>
+        </div>
+        <div id="gate-out"></div>
       </div>
       <div class="card" data-page-node-id="LwdTUytvB1HvKZSI0rZ9zn">
         <label data-page-node-id="MEOhHrMraeLZdY2FUo1I8a">上传 / 粘贴后台数据截图（可多张，综合分析）</label>
@@ -2955,6 +2967,118 @@
       runKbAnalysis(kind).finally(function(){ b.textContent=orig; b.disabled=false; });
     });
   });
+  /* ===== 选题三关筛查（数据分析页）=====
+     依据：该号历史数据里「身体实操」爆款率 80%、「家人照护」75%；
+     「抽象感悟」「关于写公众号本身」「单纯介绍自做的 AI 工具」均为 0%。
+     三关的共同本质：主菜是读者的处境，还是作者的玩具。 */
+  const GATE_RULES=[
+    ['主角是不是读者','标题里第一个落到读者眼里的名词，是不是读者自己的身体 / 钱包 / 家人？（「我的工具」「我的想法」都不算）'],
+    ['带不走动作就别写','读者读完能说出一个具体动作吗，比如「打开XX→点这里」「这一样以后别点了」。只有共鸣没有动作，不过关。'],
+    ['是做到了还是想通了','这件事我亲自做过 / 踩过 → 过关；只是在脑子里想明白了 → 不过关。']
+  ];
+  const GATE_SYS='你是公众号选题筛选助手。这位作者运营的是一个真人随笔号，她的读者只关心三样东西：自己的身体、自己的钱、自己的家人。\n'
+    +'她的历史数据规律（必须据此判断）：写成「身体实操 / 踩坑」的爆款率 80%，「家人照护 / 代际」75%；而「抽象感悟与方法论」「关于写公众号本身的心得」「单纯介绍自己做的 AI 工具」爆款率都是 0%。\n'
+    +'差别只有一个：这篇的主菜是读者的处境，还是作者自己的玩具。\n'
+    +'现在请对下面每一个待筛选题逐关判断：\n'
+    +'第一关：'+GATE_RULES[0][1]+'\n'
+    +'第二关：'+GATE_RULES[1][1]+'\n'
+    +'第三关：'+GATE_RULES[2][1]+'\n'
+    +'三关全过 → verdict 为「写」；过 1~2 关 → verdict 为「改」，并给出 newTitle（必须保留原选题里真实的人或物，把主语换成读者的处境，尽量带一个可验证的结果或数量）；一关都没过 → verdict 为「砍」。\n'
+    +'只返回 JSON 数组，不要任何其他文字。每项格式：{"t":"原选题","g1":true或false,"g2":true或false,"g3":true或false,"r1":"第一关一句判断","r2":"第二关一句判断","r3":"第三关一句判断","verdict":"写或改或砍","newTitle":"改造后的标题","angle":"一句话写作角度"}';
+  const GATE_VERDICT={'写':['b','写'],'改':['g','改完再写'],'砍':['w','砍掉']};
+  function gatePill(v){ const c=GATE_VERDICT[v]||['w',v||'待定']; return '<span class="pill '+c[0]+'">'+c[1]+'</span>'; }
+  function gateLines(){
+    const t=$("#gate-input"); if(!t) return [];
+    return t.value.split(/\n+/).map(function(s){ return s.replace(/^[\s\-*\d.、]+/,'').trim(); }).filter(Boolean).slice(0,20);
+  }
+  function gateManual(list){
+    const out=$("#gate-out"); if(!out) return;
+    out.innerHTML='<div class="small" style="margin-bottom:10px">没配 AI，就自己勾：三条都勾＝写，勾一两条＝改，一条没勾＝砍。</div>'
+      + list.map(function(t,i){
+        return '<div style="padding:10px 0;border-top:1px solid rgba(0,0,0,.08)">'
+          +'<div style="font-weight:500;margin-bottom:6px">'+esc(t)+'</div>'
+          + GATE_RULES.map(function(r,j){
+              return '<label style="display:block;margin:3px 0"><input type="checkbox" class="gm" data-i="'+i+'"> '+esc(r[0])+' <span class="small">'+esc(r[1])+'</span></label>';
+            }).join('')
+          +'<div class="small" id="gv'+i+'" style="margin-top:4px"></div></div>';
+      }).join('')
+      +'<div class="btn-row"><button class="soft sm" id="gm-save" type="button">💾 把「写 / 改」的存入选题库</button></div>';
+    function tally(){
+      const ks={};
+      $$("#gate-out .gm").forEach(function(c){ ks[c.dataset.i]=(ks[c.dataset.i]||0)+(c.checked?1:0); });
+      list.forEach(function(t,i){
+        const el=$("#gv"+i); if(!el) return;
+        const n=ks[i]||0; const v=n>=3?'写':(n>0?'改':'砍');
+        el.innerHTML=gatePill(v)+' <span style="margin-left:6px">'+n+'/3 关</span>';
+      });
+    }
+    $$("#gate-out .gm").forEach(function(c){ c.onchange=tally; });
+    tally();
+    const sv=$("#gm-save"); if(sv) sv.onclick=function(){
+      const ks={};
+      $$("#gate-out .gm").forEach(function(c){ ks[c.dataset.i]=(ks[c.dataset.i]||0)+(c.checked?1:0); });
+      let n=0;
+      list.forEach(function(t,i){ const c=ks[i]||0; if(c>0){ addTopic(t,'三关自评 '+c+'/3','w'); n++; } });
+      toast(n?('已存入 '+n+' 条选题'):'一条关都没过');
+    };
+  }
+  async function gateRun(){
+    const out=$("#gate-out"); if(!out) return;
+    const list=gateLines();
+    if(!list.length){ toast('先粘一行待筛的标题'); return; }
+    if(!AI.ok()){ gateManual(list); return; }
+    out.innerHTML='<div class="result">AI 正在逐个过筛（'+list.length+' 条）…</div>';
+    try{
+      const r=await AI.chat(GATE_SYS, list.map(function(t,i){ return (i+1)+'. '+t; }).join('\n'), taskModel('strategy'));
+      let arr=extractJson(r);
+      if(!Array.isArray(arr)){ out.innerHTML='<div class="result">没解析出结构化结果，原始输出如下：<hr>'+md2html(String(r||''))+'</div>'; return; }
+      arr=arr.slice(0,20);
+      const cnt=function(v){ return arr.filter(function(x){ return x&&x.verdict===v; }).length; };
+      out.innerHTML='<div class="small" style="margin-bottom:8px">'+cnt('写')+' 条直接写 · '+cnt('改')+' 条改完再写 · '+cnt('砍')+' 条建议砍</div>'
+        + arr.map(function(x,i){
+          if(!x) return '';
+          const mk=function(b){ return b?'<span style="color:#0F6E56">通过</span>':'<span style="color:#A32D2D">没过</span>'; };
+          return '<div style="padding:12px 0;border-top:1px solid rgba(0,0,0,.08)">'
+            +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+gatePill(x.verdict)
+            +'<span style="font-weight:500">'+esc(x.t||'')+'</span></div>'
+            +'<div class="small" style="margin-top:6px">① '+esc(GATE_RULES[0][0])+'：'+mk(x.g1)+' · '+esc(x.r1||'')+'</div>'
+            +'<div class="small">② '+esc(GATE_RULES[1][0])+'：'+mk(x.g2)+' · '+esc(x.r2||'')+'</div>'
+            +'<div class="small">③ '+esc(GATE_RULES[2][0])+'：'+mk(x.g3)+' · '+esc(x.r3||'')+'</div>'
+            +((x.newTitle&&x.verdict!=='写')?'<div class="small" style="margin-top:6px"><b>改成 →</b> '+esc(x.newTitle)+'</div>':'')
+            +(x.angle?'<div class="small">角度：'+esc(x.angle)+'</div>':'')
+            +'<div class="btn-row" style="margin-top:8px">'
+            +'<button class="soft sm g-add" data-i="'+i+'" type="button">💾 存入选题库</button>'
+            +'<button class="ghost sm g-copy" data-i="'+i+'" type="button">📋 复制标题</button></div></div>';
+        }).join('');
+      $$("#gate-out .g-add").forEach(function(b){
+        b.onclick=function(){
+          const x=arr[+b.dataset.i]; if(!x) return;
+          addTopic(x.verdict==='写'?(x.t||''):(x.newTitle||x.t||''), (x.angle||'')+'（三关判定：'+x.verdict+'）','g');
+          toast('已存入选题库');
+        };
+      });
+      $$("#gate-out .g-copy").forEach(function(b){
+        b.onclick=function(){
+          const x=arr[+b.dataset.i]; if(!x) return;
+          const txt=x.verdict==='写'?(x.t||''):(x.newTitle||x.t||'');
+          navigator.clipboard.writeText(txt).then(function(){ toast('已复制'); }).catch(function(){ toast('复制失败'); });
+        };
+      });
+    }catch(e){ out.innerHTML='<div class="result" style="color:var(--red)">筛查失败：'+e.message+'</div>'; }
+  }
+  (function(){
+    const run=$("#gate-run"), pool=$("#gate-pool"), jump=$("#topic-gate");
+    if(run) run.onclick=gateRun;
+    if(pool) pool.onclick=function(){
+      const d=store.get("topics",[]);
+      if(!d.length){ toast('选题库还是空的'); return; }
+      const box=$("#gate-input"); if(!box) return;
+      box.value=d.map(function(t){ return t.title; }).join('\n');
+      toast('已载入 '+d.length+' 条，点「批量过筛」开始');
+    };
+    if(jump) jump.onclick=function(){ switchTab('data'); setTimeout(function(){ const el=$("#gate-input"); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); },80); };
+  })();
+
   /* 历史分析记录：每次分析成功自动存一份（gzh_data_history，走 gzh_ 前缀自动云同步） */
   async function saveDataHistory(note, model, per){
     let thumb="";
